@@ -38,8 +38,16 @@ Token efficiency is opt-in, not automatic. Other skills call `enforce` explicitl
 
 **prodmasterai routing table addition** (add to Step 1 routing table in `skills/prodmasterai/SKILL.md`):
 ```
-| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits", "too many tokens", "optimize tokens" | `token-efficiency` (audit mode default) |
+| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits", "too many tokens", "optimize tokens", "token-efficiency" | `token-efficiency` |
 ```
+
+The routing entry covers all token-efficiency invocations. The skill itself parses the mode from the full command:
+- `/prodmasterai token-efficiency` or natural language triggers -> audit mode (default)
+- `/prodmasterai token-efficiency audit` -> audit mode
+- `/prodmasterai token-efficiency enforce <action>` -> enforce mode
+- `/prodmasterai token-efficiency rewrite <skill-path>` -> rewrite mode
+
+No separate routing rows are needed for enforce and rewrite -- they are sub-modes parsed inside the skill, not separate routing destinations.
 
 **skill-pattern-manifest.md addition** (append after `### resume` block):
 ```markdown
@@ -93,10 +101,13 @@ top_issue: "skills/orchestrate/SKILL.md full file read"
 
 ### Called by other skills
 
-Any skill can include this line before an expensive operation:
+**Invocation mechanism:** Enforce is a behavioral instruction in the SKILL.md body -- Claude reads and follows it as part of executing the skill. No programmatic function call or subprocess is involved. The instruction pattern is:
+
 ```
-Before reading <file>: call token-efficiency enforce -- check if full read is necessary
+Before reading <file>: invoke token-efficiency enforce with action="read <file>" -- follow the returned recommendation before proceeding.
 ```
+
+This is the same mechanism all skill cross-references use in this plugin (pure markdown instructions that Claude executes). An implementer adds this line verbatim to the relevant step in any skill body.
 
 ### Five enforcement rules
 

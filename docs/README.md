@@ -57,6 +57,8 @@ The plugin reads your current state and decides what to do. No need to remember 
 | `decide` | At a decision fork | ROI-ranked recommendation |
 | `learn` | After cycle or on feedback | Patterns, mistakes, gaps — parallel write ‖ gap detection |
 | `evolve-self` | Every N tasks or `/evolve` | Convergence loop: improve skills + generate new ones until clean |
+| `dev-loop` | "loop until passing" / "keep iterating" / "dev loop" | Iterate a task in a loop until tests pass, quality thresholds are met, or max iterations reached. Escalates to research-resolve when stuck. |
+| `research-resolve` | "research and resolve" / "loop is stuck" / "can't make progress" | Autonomous fix loop in an isolated git worktree. Researches failures, applies hypotheses, merges back only on success. |
 
 ## Hooks
 

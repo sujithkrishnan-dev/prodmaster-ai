@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Use after each Superpowers cycle to capture patterns, mistakes, and skill gaps. Also use when user provides explicit feedback ("that was wrong", "that worked well", "remember this").
-version: 1.0.0
+version: 1.1.0
 triggers:
   - measure hands off a cycle outcome object
   - User gives explicit feedback about a workflow or decision
@@ -45,8 +45,13 @@ unhandled_patterns: [keywords]
 - `qa_pass_rate < 0.6` OR `review_iterations > 4` → write to `mistakes.md`
 - Neither condition → no write to patterns or mistakes
 
-### Write Pattern (if success)
+### Parallel Write Block
 
+Run the pattern/mistake write AND the skill-gap detection in **parallel** — they read/write different files:
+
+**Thread A — Pattern or Mistake write (parallel):**
+
+Write Pattern (if success):
 ```yaml
 ---
 date: YYYY-MM-DD
@@ -57,9 +62,7 @@ review_iterations: <value>
 ---
 ```
 
-### Write Mistake (if failure)
-
-Analyse root cause:
+Write Mistake (if failure) — analyse root cause first:
 - High `review_iterations` → usually unclear spec or over-built solution
 - Low `qa_pass_rate` → usually insufficient upfront test coverage or wrong integration assumptions
 
@@ -74,7 +77,7 @@ review_iterations: <value>
 ---
 ```
 
-### Detect Skill Gaps
+**Thread B — Detect Skill Gaps (parallel):**
 
 Read `memory/connectors/skill-pattern-manifest.md`. Compare `unhandled_patterns` against all keyword lists using substring matching.
 

@@ -1,7 +1,7 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal — "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.0.0
+version: 1.1.0
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities
@@ -28,13 +28,12 @@ You are the **feature-level orchestration layer** above Superpowers. Superpowers
 
 ### 1. Read Current State
 
-Read `memory/project-context.md`:
-- Active features and their statuses
-- Open blockers and their ages
-- Recent decisions
+Read these in **parallel** (do not wait for one before starting the next):
+- `memory/project-context.md` — active features, blockers, decisions
+- `memory/connectors/github.md` — if active, queue GitHub Issue fetch
+- `memory/connectors/linear.md` — if active, queue Linear issue fetch
 
-If GitHub connector is active (`memory/connectors/github.md` has `active: true`): read open Issues to augment the feature list.
-If Linear connector is active: read open Linear issues.
+Fetch GitHub Issues and Linear issues in **parallel** while processing project-context.md output. Do not serialize these reads.
 
 ### 2. Classify the Request
 
@@ -58,6 +57,8 @@ Estimated cycles: <n>
 For each task cycle, hand off to Superpowers:
 - Planning: trigger `superpowers:writing-plans`
 - Execution: trigger `superpowers:subagent-driven-development`
+
+**Parallelism rule:** Identify which subtasks have no shared state or output dependencies. Dispatch all independent subtasks in parallel. Only serialize tasks that depend on the output of a prior task. Never artificially queue tasks that could run concurrently.
 
 Do not reimplement Superpowers. Hand off cleanly.
 
@@ -100,5 +101,6 @@ Fill `unhandled_patterns` with patterns that arose but no manifest keyword cover
 
 - Never reimplement Superpowers — invoke it, don't replace it
 - Always update project-context.md before ending the session
-- One feature at a time unless user explicitly requests parallel work
+- Within a feature: dispatch all independent subtasks in parallel; only serialize where output dependency exists
+- Across features: one active feature at a time unless user explicitly requests multi-feature parallel work
 - **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

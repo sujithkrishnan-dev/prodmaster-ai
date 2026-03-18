@@ -1,7 +1,7 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal — "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.3.0
+version: 1.4.0
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities
@@ -38,6 +38,19 @@ Read these in **parallel** (do not wait for one before starting the next):
 Fetch GitHub Issues and Linear issues in **parallel** while processing project-context.md output. Do not serialize these reads.
 
 ### 2. Classify the Request
+
+**Existing branch detection:** If the `## Active Features` section of `project-context.md` is empty AND the user is not explicitly naming a new feature, check:
+```
+git branch --show-current
+```
+If the current branch is NOT the default branch (e.g. `feature/payments`, `fix/login-bug`, `chore/refactor-api`):
+- Suggest tracking it: *"I see you're on `$current_branch` — want me to track that as your active feature? I'll log it and break it into cycles."*
+- If yes: use the branch name (stripped of prefix like `feature/`, `fix/`, `chore/`) as the feature name and proceed.
+- If no: ask what to track instead.
+
+This ensures existing in-flight work is not lost when the plugin is installed mid-project.
+
+---
 
 **Starting a new feature** → break it down and present as a plain list:
 

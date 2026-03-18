@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
 description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic — runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
-version: 1.9.0
+version: 2.0.0
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -89,8 +89,6 @@ Evaluate in order (first match wins):
 
 Read the `first_run_complete` field from the frontmatter of `memory/project-context.md`.
 
-**If `first_run_complete: false` (or the field is absent):** run the interactive onboarding flow below.
-
 **If `first_run_complete: true`:** show the quick-start card:
 
 ```
@@ -103,26 +101,50 @@ ProdMaster AI is ready.
   Self-improve:      /evolve
 ```
 
+**If `first_run_complete: false` (or absent):** run the onboarding flow below.
+
+---
+
 #### First-Run Onboarding Flow
 
-Run this sequence exactly once, in order. Never ask more than 3 questions total.
+Before asking anything, **detect the project context** by running these in parallel:
+```
+git log --oneline -1          ← does the repo have commits?
+git branch --show-current     ← what branch are we on?
+git remote show origin | grep "HEAD branch"  ← what is the default branch?
+```
 
-1. **Greet** — one sentence only, e.g.: *"Welcome to ProdMaster AI — let's get you set up in under a minute."*
+**Existing project detection:** If `git log` returns at least one commit AND the current branch differs from the default branch → this is an **existing project already in flight**. Run the **Existing Project variant** below.
 
-2. **Question 1 — Project name:**
-   Ask: *"What's the name of your project or codebase?"*
-   Store the answer in a local session variable `$project_name` (use it to personalise subsequent messages this session only — do not write it anywhere).
+Otherwise → run the **New Project variant**.
 
-3. **Question 2 — First feature:**
-   Ask: *"What are you building first in $project_name?"*
-   Take the answer and immediately invoke `orchestrate` with it as input — do not ask a third question unless orchestrate requires clarification.
+---
 
-4. **After orchestrate returns** (or accepts the input), write `first_run_complete: true` into the frontmatter of `memory/project-context.md`. If the field does not exist yet, add it. Do not change any other frontmatter field.
+##### New Project variant
 
-**Rules for the onboarding flow:**
-- Never exceed 3 questions. If clarification is needed, fold it into one of the two questions above.
-- Do not show the quick-start card during onboarding — the user is already being routed to action.
-- Do not explain what ProdMaster AI can do in detail — the greeting is one sentence; everything else is a question or an action.
+1. *"Welcome to ProdMaster AI — let's get you set up in under a minute."*
+2. Ask: *"What's the name of your project?"* — store as `$project_name` (session only, never written).
+3. Ask: *"What are you building first in $project_name?"* — invoke `orchestrate` with the answer immediately.
+4. After `orchestrate` returns: write `first_run_complete: true` to frontmatter.
+
+---
+
+##### Existing Project variant
+
+1. *"ProdMaster AI is now tracking `$current_branch` — let me catch up with where you are."*
+2. Ask ONE question only: *"What are you currently working on in this branch? (I'll start tracking it as an active feature)"*
+   - Take the answer and invoke `orchestrate` with it — this logs it as an active feature in project-context.md.
+   - If the branch name is descriptive (e.g. `feature/user-auth`, `fix/payment-bug`), pre-fill the suggestion: *"Looks like you're working on `user auth` — is that right, or would you describe it differently?"*
+3. After `orchestrate` returns: write `first_run_complete: true` to frontmatter.
+
+**Do not ask about project history, past tasks, or metrics** — let the user start logging from now. `total_tasks_completed` starts at 0 for new installs on existing repos; that is correct and expected.
+
+---
+
+**Rules for all onboarding variants:**
+- Never exceed 3 questions total across both variants
+- Do not show the quick-start card during onboarding — user is already being routed to action
+- Do not explain the plugin in detail — one sentence greeting, then act
 
 ---
 

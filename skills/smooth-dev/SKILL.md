@@ -1,7 +1,7 @@
 ---
 name: smooth-dev
 description: Use before starting any development session, after a context switch, or when the codebase state is uncertain. Pulls latest changes, checks repo health, verifies tests pass, and surfaces any blockers — ensuring the dev environment is clean before work begins.
-version: 1.1.0
+version: 1.2.0
 triggers:
   - User says "take a pull", "pull latest", "sync code", "get latest", "ensure code is up to date"
   - User says "start dev", "start development", "ready to code", "begin session"
@@ -31,21 +31,38 @@ Run these simultaneously:
 - Read `memory/project-context.md` — note active features and open blockers
 - If GitHub connector active: check for open PRs targeting current branch
 
-Determine the default branch before checking divergence:
+Determine the default and current branch before checking divergence (run in parallel):
 ```
-git remote show origin | grep "HEAD branch" | awk '{print $NF}'
+git remote show origin | grep "HEAD branch" | awk '{print $NF}'  ← $default_branch
+git branch --show-current                                          ← $current_branch
 ```
-Store as `$default_branch`. Fall back to `main` if the command fails or returns empty.
+Fall back: `$default_branch = main` if command fails or returns empty.
 
-After fetch, check divergence:
-```
-git status
-git log HEAD..origin/$default_branch --oneline
+**Branch mode decision:**
+
+- **On default branch** (`$current_branch == $default_branch`): check divergence against `origin/$default_branch` and pull if behind.
+- **On a feature/topic branch** (`$current_branch != $default_branch`): pull the feature branch's own remote tracking ref, NOT the default branch.
+
+```bash
+# Feature branch divergence check
+git log HEAD..origin/$current_branch --oneline  2>/dev/null
 ```
 
-**If remote is ahead:** run `git pull --ff-only origin $default_branch`. If fast-forward fails (diverged history), surface the conflict and stop — do not force-merge. Tell user:
+If the feature branch has no remote tracking ref yet (new local branch): note *"Branch `$current_branch` has no remote tracking ref — push with `git push -u origin $current_branch` when ready."* Continue without pulling.
 
-> Your branch has diverged from origin — a fast-forward pull isn't safe. Run `git status` to see what's different, resolve the conflict, then run `/prodmasterai` again to restart the check.
+**Pull logic:**
+
+| Situation | Action |
+|---|---|
+| On default branch, remote ahead | `git pull --ff-only origin $default_branch` |
+| On feature branch, remote tracking ref exists, remote ahead | `git pull --ff-only origin $current_branch` |
+| On feature branch, no remote tracking ref | Note it, continue |
+| Fast-forward fails (diverged) | Surface conflict, stop |
+| Already up to date | Continue |
+
+**If fast-forward fails (diverged history):**
+
+> Branch `$current_branch` has diverged from origin — a fast-forward pull isn't safe. Run `git status` to see what's different, resolve the conflict, then run `/prodmasterai` again to restart the check.
 
 **If already up to date:** continue.
 
@@ -108,14 +125,19 @@ Print a concise session card:
 ```
 Dev session ready.
 
-  Branch:        <branch name>
+  Branch:        <branch name>  [default | feature | fix | other]
   Last commit:   <hash> <message>
   Tests:         PASS (N tests) | FAIL (N failing) | SKIPPED
   Working tree:  clean | N uncommitted files | stashed
   Open blockers: N  (oldest: N days)
-  Active features: <feature names from project-context.md>
+  Active features: <feature names from project-context.md, or "(none tracked yet)">
 
 Next: /prodmasterai build [feature] | /prodmasterai cycle done — ...
+```
+
+**If on a feature branch with no tracked active feature:** append one line:
+```
+  Tip: run /prodmasterai to track this branch as an active feature.
 ```
 
 ### 6. Update Memory

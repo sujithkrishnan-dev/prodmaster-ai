@@ -92,6 +92,23 @@ Log `spec_confidence: high | medium | low`.
 
 ## Execution
 
+Before each pipeline stage (brainstorm, plan, implement, test, pr), call:
+```
+checkpoint.write(
+  skill: "auto-pilot",
+  step: "<stage_name>",
+  step_index: <stage number: 1=brainstorm, 2=plan, 3=implement, 4=test, 5=pr>,
+  total_steps: 5,
+  context: {
+    goal: <goal>,
+    remaining_tasks: <remaining stages>,
+    last_completed: <last completed stage>,
+    exit_conditions: "",
+    iterations_remaining: 0
+  }
+)
+```
+
 ### Create branch
 
 Create and checkout branch `auto/<session_id>`. This is the only branch auto-pilot ever commits to.
@@ -114,8 +131,9 @@ Repeat dev-loop cycles up to `autonomous_max_iterations`. If `dev-loop` escalate
 
 On successful pipeline completion:
 1. Reset `autonomous_mode: false`, `autonomous_session_id: ""`
-2. Append complete session block to `memory/autonomous-log.md`
-3. Print completion card:
+2. Call checkpoint.clear.
+3. Append complete session block to `memory/autonomous-log.md`
+4. Print completion card:
 
 ```
 == Auto-Pilot Complete: <session_id> ==

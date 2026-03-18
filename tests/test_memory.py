@@ -17,6 +17,7 @@ REQUIRED_FILES = [
     "blocker-research.md",
     "autonomous-log.md",
     "checkpoint.md",
+    "token-efficiency-log.md",
 ]
 
 @pytest.mark.parametrize("filename", REQUIRED_FILES)
@@ -43,7 +44,8 @@ def test_connectors_all_inactive():
 def test_skill_pattern_manifest_has_all_skills():
     content = open(os.path.join(MEMORY_DIR, "connectors", "skill-pattern-manifest.md")).read()
     for skill in ["orchestrate", "measure", "report", "decide", "learn", "evolve-self",
-                  "dev-loop", "research-resolve", "auto-pilot", "resume", "checkpoint"]:
+                  "dev-loop", "research-resolve", "auto-pilot", "resume", "checkpoint",
+                  "token-efficiency"]:
         assert f"### {skill}" in content
 
 def test_last_pr_txt_valid_timestamp():

@@ -28,6 +28,8 @@ def test_all_required_files_exist():
         "memory/autonomous-log.md",
         "skills/checkpoint/SKILL.md",
         "memory/checkpoint.md",
+        "skills/token-efficiency/SKILL.md",
+        "memory/token-efficiency-log.md",
         "reports/dashboard.html", "reports/.gitkeep",
         "docs/README.md", "EVOLUTION-LOG.md",
     ]

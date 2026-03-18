@@ -40,6 +40,7 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "resume", "continue", "pick up where", "checkpoint resume", "what happened while I was away", "show autonomous summary", "autonomous summary" | `checkpoint` if `memory/checkpoint.md` has `status: active`; otherwise `resume` skill |
 | "checkpoint discard", "discard checkpoint", "clear checkpoint" | `checkpoint` clear operation |
 | "checkpoint reset", "reset in", "limit resets in" | `checkpoint` update scheduled task with user-supplied reset time |
+| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits", "too many tokens", "optimize tokens", "token-efficiency" | `token-efficiency` |
 | "decision on X was good/bad", "that worked", "that failed", "update decision" | `decide` (outcome close path) |
 
 **If classified:** invoke the matched skill immediately with the supplied text as input. Do not re-present a menu.

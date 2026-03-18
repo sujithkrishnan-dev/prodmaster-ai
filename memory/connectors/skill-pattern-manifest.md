@@ -44,3 +44,6 @@ keywords: [resume, what happened while I was away, autonomous summary, show auto
 
 ### checkpoint
 keywords: [checkpoint, resume session, pick up where I left off, continue after limit, save progress, interrupted task, plan limit reset, auto-resume, checkpoint discard, checkpoint reset]
+
+### token-efficiency
+keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too many tokens, optimize tokens, token waste, token usage, plan limit, efficiency audit]

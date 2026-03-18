@@ -62,6 +62,7 @@ The plugin reads your current state and decides what to do. No need to remember 
 | `auto-pilot` | "auto" / "run autonomously" / "work while I sleep" | Full autonomous pipeline: brainstorm, plan, implement, test, and create PR -- no questions asked. |
 | `resume` | "resume" / "what happened while I was away" | Show autonomous session audit: every decision made, with rationale and per-decision rollback. |
 | `checkpoint` | "resume" / "continue" / "checkpoint reset Xh" | Save in-flight task state before each step. Resumes automatically after plan usage limit resets — with scheduled auto-resume. |
+| `token-efficiency` | "token efficiency" / "reduce tokens" / "I'm hitting limits" | Audit, enforce, and rewrite plugin operations to reduce token consumption and delay plan usage limit. |
 
 ## Hooks
 

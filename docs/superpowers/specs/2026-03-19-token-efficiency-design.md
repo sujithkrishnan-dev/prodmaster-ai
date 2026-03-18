@@ -34,7 +34,18 @@ Token efficiency is opt-in, not automatic. Other skills call `enforce` explicitl
 | `/prodmasterai token-efficiency audit` | Scan all skills + memory for waste, print report |
 | `/prodmasterai token-efficiency enforce <action>` | Check a proposed action against efficiency rules |
 | `/prodmasterai token-efficiency rewrite <skill-path>` | Rewrite a skill file to be leaner |
-| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits" | Routes to audit mode by default |
+| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits", "too many tokens", "optimize tokens" | Routes to `token-efficiency` audit mode by default |
+
+**prodmasterai routing table addition** (add to Step 1 routing table in `skills/prodmasterai/SKILL.md`):
+```
+| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits", "too many tokens", "optimize tokens" | `token-efficiency` (audit mode default) |
+```
+
+**skill-pattern-manifest.md addition** (append after `### resume` block):
+```markdown
+### token-efficiency
+keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too many tokens, optimize tokens, token waste, token usage, plan limit, efficiency audit]
+```
 
 ---
 
@@ -100,8 +111,8 @@ Before reading <file>: call token-efficiency enforce -- check if full read is ne
 ### Return values
 
 - `ALLOW` -- action is efficient, proceed
-- `ALLOW_WITH_WARNING <message>` -- proceed but log the warning
-- `SUGGEST_ALTERNATIVE <leaner approach>` -- do not proceed; try the suggested alternative instead
+- `ALLOW_WITH_WARNING <message>` -- proceed but log the warning. Example: `ALLOW_WITH_WARNING: subagent prompt is 2100 tokens -- trim session history before next dispatch`
+- `SUGGEST_ALTERNATIVE <leaner approach>` -- do not proceed; try the suggested alternative instead. Example for E1: `SUGGEST_ALTERNATIVE: use Read tool with limit: 30 offset: 0 instead of full file read`. Example for E3: `SUGGEST_ALTERNATIVE: task touches 1 line -- skip review subagent, use implementer self-review only`
 
 Enforce never blocks unconditionally -- it always provides an alternative. The calling skill decides whether to follow the suggestion.
 
@@ -147,10 +158,11 @@ reduction_pct: 23
 
 ### Safety rules
 
-- Never remove functional behaviour (steps, rules, routing logic, hard limits)
+- **Never remove functional behaviour.** Functional = steps, rules, routing logic, conditionals (if/else), error handlers, hard limits, tool call instructions. Non-functional = hedge phrases, verbose preambles, redundant re-statements, decorative comments.
+- **Trim frontmatter description to 2 lines**: keep the first line verbatim; if more than 2 lines exist, produce a summary second line combining the remaining content. Never drop meaning -- if content cannot be compressed without loss, keep 3 lines.
 - Never rewrite tests or memory files -- skills only
-- Never batch-rewrite multiple skills in one invocation
-- Always show diff before writing
+- Never batch-rewrite multiple skills in one invocation -- one skill per rewrite call
+- Always show diff before writing; never write without explicit user confirmation
 
 ---
 
@@ -170,6 +182,20 @@ Each entry is a YAML block appended after the header comment. Fields vary by typ
 
 ---
 
+## Test Cases
+
+Tests added to `tests/test_skills.py` and `tests/test_memory.py` (file existence + frontmatter only — no behaviour tests for markdown skills):
+
+| Test | File | What it checks |
+|---|---|---|
+| `test_skill_exists[token-efficiency]` | test_skills.py | `skills/token-efficiency/SKILL.md` exists |
+| `test_skill_frontmatter[token-efficiency]` | test_skills.py | All 8 required frontmatter fields present |
+| `test_memory_file_exists[token-efficiency-log.md]` | test_memory.py | `memory/token-efficiency-log.md` exists |
+| `test_all_required_files_exist` | test_integration.py | Skill + memory file in required list |
+| `test_skill_pattern_manifest_has_all_skills` | test_memory.py | `### token-efficiency` present in manifest |
+
+---
+
 ## New Files
 
 | File | Purpose |
@@ -183,7 +209,7 @@ Each entry is a YAML block appended after the header comment. Fields vary by typ
 |---|---|
 | `skills/prodmasterai/SKILL.md` | Add routing entry for token-efficiency triggers |
 | `memory/connectors/skill-pattern-manifest.md` | Add token-efficiency keyword entry |
-| `tests/test_skills.py` | Add "token-efficiency" to ALL_SKILLS |
-| `tests/test_memory.py` | Add "token-efficiency-log.md" to REQUIRED_FILES |
-| `tests/test_integration.py` | Add skill + memory file to required lists |
+| `tests/test_skills.py` | Add `"token-efficiency"` to `ALL_SKILLS` list |
+| `tests/test_memory.py` | Add `"token-efficiency-log.md"` to `REQUIRED_FILES` list |
+| `tests/test_integration.py` | (a) Add `"skills/token-efficiency/SKILL.md"` and `"memory/token-efficiency-log.md"` to the `required` list in `test_all_required_files_exist`. (b) No frontmatter or counter changes needed. |
 | `docs/README.md` | Add token-efficiency row to Skills table |

@@ -80,6 +80,7 @@ Fields:
 - `checkpoint_timestamp` -- UTC ISO8601 time the checkpoint was written
 - `estimated_reset_timestamp` -- `checkpoint_timestamp + 5 hours` (plan limit typical reset window)
 - `scheduled_resume_id` -- ID returned by mcp__scheduled-tasks; empty if scheduling failed
+- `session_id` -- audit logging only; not used by resume logic (resume uses step_index + context to relaunch)
 - `context` -- skill-specific state bag; each skill defines what it stores here
 
 ---
@@ -96,7 +97,7 @@ Called at the **start** of each step, before any work begins.
 4. Compute `estimated_reset_timestamp = checkpoint_timestamp + 5 hours`
 5. Call `mcp__scheduled-tasks__create_scheduled_task` to schedule `/prodmasterai resume` at `estimated_reset_timestamp`
 6. Store returned task ID in `scheduled_resume_id`
-7. If scheduling fails (MCP unavailable): continue silently, leave `scheduled_resume_id: ""`
+7. If scheduling fails (MCP unavailable): continue silently, leave `scheduled_resume_id: ""`. Log one line to checkpoint log section: `<!-- [timestamp] scheduling failed -- MCP unavailable -->`
 
 ### checkpoint.clear
 
@@ -104,7 +105,7 @@ Called only on **clean, successful** completion of a skill run.
 
 1. Set `status: cleared` in frontmatter
 2. Blank all context fields
-3. If `scheduled_resume_id` is non-empty: call `mcp__scheduled-tasks__update_scheduled_task` to cancel the scheduled resume
+3. If `scheduled_resume_id` is non-empty: call `mcp__scheduled-tasks__update_scheduled_task` to cancel the scheduled resume. If MCP unavailable: continue silently -- the scheduled task may fire but checkpoint will be cleared so resume will be a no-op
 4. Append one line to log: `<!-- [timestamp] CLEARED -- clean exit -->`
 
 Never called if an error, limit, or unexpected stop interrupts work. Silence = checkpoint preserved.
@@ -165,7 +166,16 @@ Add to the routing table in `skills/prodmasterai/SKILL.md`:
 | "checkpoint discard", "discard checkpoint", "clear checkpoint" | `checkpoint` clear operation |
 | "checkpoint reset Xh Ym", "reset in", "limit resets in" | `checkpoint` update scheduled task with user-supplied reset time |
 
-Note: "resume" was previously routed to the `resume` skill (autonomous session audit). Disambiguation rule: if `memory/checkpoint.md` has `status: active`, route to `checkpoint`. If checkpoint is cleared, route to `resume` (autonomous audit). Add this disambiguation check to the prodmasterai routing logic.
+**Disambiguation rule for "resume" keyword** (replaces the existing simple `resume` -> `resume-skill` routing row):
+
+```
+"resume", "continue", "pick up where", "checkpoint resume":
+  1. Read memory/checkpoint.md
+  2. If file does not exist OR status == "cleared" -> route to `resume` skill (autonomous session audit)
+  3. If status == "active" -> route to `checkpoint` resume mode
+```
+
+Replace the current prodmasterai routing row `| "resume", ... | resume |` with this conditional logic. The `resume` skill remains reachable -- it just requires the checkpoint to be cleared first.
 
 ---
 
@@ -240,8 +250,8 @@ checkpoint.clear
 | `skills/dev-loop/SKILL.md` | Add checkpoint.write before each iteration + checkpoint.clear on exit |
 | `skills/auto-pilot/SKILL.md` | Add checkpoint.write before each stage + checkpoint.clear on completion |
 | `skills/orchestrate/SKILL.md` | Add checkpoint.write after each task dispatch + checkpoint.clear on all done |
-| `tests/test_skills.py` | Add "checkpoint" to ALL_SKILLS |
-| `tests/test_memory.py` | Add "checkpoint.md" to REQUIRED_FILES |
-| `tests/test_integration.py` | Add skill + memory file to required lists |
+| `tests/test_skills.py` | Add `"checkpoint"` to `ALL_SKILLS` list (line 6) |
+| `tests/test_memory.py` | Add `"checkpoint.md"` to `REQUIRED_FILES` list |
+| `tests/test_integration.py` | (a) Add `"skills/checkpoint/SKILL.md"` and `"memory/checkpoint.md"` to the `required` list in `test_all_required_files_exist`. (b) No frontmatter or counter changes needed. |
 | `memory/connectors/skill-pattern-manifest.md` | Add checkpoint entry |
 | `docs/README.md` | Add checkpoint row to Skills table |

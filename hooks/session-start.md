@@ -14,3 +14,4 @@
 
 ---
 *Skills: orchestrate · measure · report · decide · learn · evolve-self*
+*Fresh install? Say "build [feature]" to start, or "cycle done" after a Superpowers cycle.*

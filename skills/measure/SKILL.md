@@ -1,7 +1,7 @@
 ---
 name: measure
 description: Use after every completed Superpowers cycle to record metrics. Captures velocity, QA pass rate, review iterations, and blockers. Always hand off to learn after recording.
-version: 1.3.1
+version: 1.4.0
 triggers:
   - A Superpowers cycle has just completed
   - User says "cycle done", "feature finished", "tasks completed"
@@ -64,6 +64,8 @@ Run steps 2 and 3 simultaneously — they write to different files with no share
 **Step 2 (parallel)** — Append the cycle entry to `skill-performance.md` (internal format, do not show the raw YAML to the user).
 
 `blocker_age_days_avg`: Read `## Blockers` in `project-context.md`. For each open blocker, compute `(today - blocker_date)` in days. Average all values. If no blockers: `0`.
+
+`blockers_encountered`: Record the integer value from the input's `blockers_encountered` field (count of `research-resolve` escalations this cycle). If absent or not provided, record `0`. This is distinct from `blockers` (open blocker count) and `blocker_age_days_avg`.
 
 **Step 3 (parallel)** — Increment counter in `project-context.md`:
 Read frontmatter (between first `---` and second `---`). Add the cycle's `tasks_completed` count (the integer from this cycle's input) to the current `total_tasks_completed:` value. Rewrite frontmatter block only — do not touch the rest of the file.

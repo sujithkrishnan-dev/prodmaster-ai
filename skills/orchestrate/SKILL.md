@@ -1,7 +1,7 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal — "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.4.0
+version: 1.4.1
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities
@@ -14,6 +14,7 @@ reads:
   - memory/connectors/superpowers.md
 writes:
   - memory/project-context.md
+  - memory/connectors/superpowers.md
 generated: false
 generated_from: ""
 ---

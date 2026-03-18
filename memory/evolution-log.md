@@ -172,3 +172,27 @@ trigger: structural-review — stale blocker age_days and JSON XSS risk
 change_summary: age_days now recomputed from date field at report generation time; XSS escaping added for </script> in embedded JSON.
 upstream_status: merged
 ---
+---
+date: 2026-03-18
+mode: improve
+skill: prodmasterai
+trigger: structural-review convergence-pass-1
+change_summary: Removed stale reads declarations (evolution-log.md, patterns.md) that were declared in frontmatter but never read in any step.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: orchestrate
+trigger: structural-review convergence-pass-1
+change_summary: Added memory/connectors/superpowers.md to writes: frontmatter — Step 3c writes installed/active flags but the declaration was missing.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: help
+trigger: structural-review convergence-pass-1
+change_summary: Updated Improve table triggers to include optimize/deep review/audit keywords added in prodmasterai v1.9.0 routing table.
+upstream_status: pending_publish
+---

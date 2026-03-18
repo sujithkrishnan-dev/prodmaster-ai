@@ -1,7 +1,7 @@
 ---
 name: help
 description: Use when the user asks what the plugin can do, asks for help, or seems lost. Lists all skills with triggers and examples.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - User says "help", "/help", "what can you do", "show commands", "what skills", "how does this work"
   - User seems confused or asks an open-ended question about the plugin
@@ -60,7 +60,7 @@ Print the card below exactly as formatted. Do not paraphrase. Do not add preambl
 
 | Skill | Trigger | Example |
 |---|---|---|
-| `evolve-self` | `/evolve` / "improve yourself" / "generate skill" | `/evolve` |
+| `evolve-self` | `/evolve` / "optimize the plugin" / "deep review" / "audit" | `/evolve` |
 | `prodmasterai update` | "update" / "publish" / "contribute upstream" | `/prodmasterai update` |
 
 ---

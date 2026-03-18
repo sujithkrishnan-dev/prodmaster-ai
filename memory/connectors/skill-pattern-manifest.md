@@ -41,3 +41,6 @@ keywords: [auto, autonomously, run autonomously, unattended, while I sleep, work
 
 ### resume
 keywords: [resume, what happened while I was away, autonomous summary, show autonomous summary, decision audit, rollback, auto-pilot review]
+
+### checkpoint
+keywords: [checkpoint, resume session, pick up where I left off, continue after limit, save progress, interrupted task, plan limit reset, auto-resume, checkpoint discard, checkpoint reset]

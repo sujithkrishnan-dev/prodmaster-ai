@@ -61,6 +61,7 @@ The plugin reads your current state and decides what to do. No need to remember 
 | `research-resolve` | "research and resolve" / "loop is stuck" / "can't make progress" | Autonomous fix loop in an isolated git worktree. Researches failures, applies hypotheses, merges back only on success. |
 | `auto-pilot` | "auto" / "run autonomously" / "work while I sleep" | Full autonomous pipeline: brainstorm, plan, implement, test, and create PR -- no questions asked. |
 | `resume` | "resume" / "what happened while I was away" | Show autonomous session audit: every decision made, with rationale and per-decision rollback. |
+| `checkpoint` | "resume" / "continue" / "checkpoint reset Xh" | Save in-flight task state before each step. Resumes automatically after plan usage limit resets — with scheduled auto-resume. |
 
 ## Hooks
 

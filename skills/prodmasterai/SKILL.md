@@ -37,7 +37,9 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved", "optimize", "optimize the plugin", "deep review", "audit the plugin", "quality pass", "run a review", "find issues", "check the plugin", "tighten up" | `evolve-self` Phase 1 (local only) |
 | "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
 | "auto", "autonomously", "run autonomously", "while I sleep", "work while I sleep", "unattended", "unattended execution" | `auto-pilot` |
-| "resume", "what happened while I was away", "show autonomous summary", "autonomous summary" | `resume` |
+| "resume", "continue", "pick up where", "checkpoint resume", "what happened while I was away", "show autonomous summary", "autonomous summary" | `checkpoint` if `memory/checkpoint.md` has `status: active`; otherwise `resume` skill |
+| "checkpoint discard", "discard checkpoint", "clear checkpoint" | `checkpoint` clear operation |
+| "checkpoint reset", "reset in", "limit resets in" | `checkpoint` update scheduled task with user-supplied reset time |
 | "decision on X was good/bad", "that worked", "that failed", "update decision" | `decide` (outcome close path) |
 
 **If classified:** invoke the matched skill immediately with the supplied text as input. Do not re-present a menu.

@@ -29,3 +29,14 @@ Pattern/mistake write (Thread A) and skill-gap detection (Thread B) run in paral
 
 ### hooks/pre-tool-bash.py (new)
 PreToolUse hook for Bash commands. Blocks: recursive rm, force push, `git branch -D`, `git reset --hard`, `git clean -f`, discard-all checkout/restore, `DROP TABLE/DATABASE/SCHEMA`. Registered in `.claude-plugin/hooks.json`.
+
+## 2026-03-18 — Structural review pass: 8 issues fixed across 7 skills
+PR: auto-evolved/2026-03-18-structural-review-improve | Type: skill_improvement | Trigger: explicit structural-review (/prodmasterai optimize the plugin)
+
+- evolve-self: Mode 0 structural review + 24h rate limit removed
+- prodmasterai: "optimize/deep review" routing keywords + threshold flag reset
+- measure: division-by-zero guard + persistent evolution_threshold_reached flag
+- smooth-dev: auto default-branch detection
+- learn: gap slug derivation algorithm
+- decide: keyword-overlap topic matching for Step 6
+- report: live blocker age_days + JSON XSS escaping

@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
-description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed.
-version: 1.0.0
+description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic — runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
+version: 1.3.0
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -56,8 +56,9 @@ Evaluate in order (first match wins):
 
 ### A. Evolution threshold reached
 `total_tasks_completed - last_evolved_at_task >= evolve_every_n_tasks`
-→ Tell user: *"Evolution threshold reached — running evolve-self now."*
-→ Invoke `evolve-self` immediately. No confirmation needed.
+→ **Do not tell the user. Do not ask. Run immediately.**
+→ Invoke `evolve-self` Phase 1 (convergence loop — runs until all changed skills are clean). Show output only after convergence.
+→ After evolve-self finishes, continue to check B/C/D and act on whatever is next.
 
 ### B. Active feature in progress
 `## Active Features` section of project-context.md contains at least one non-empty feature entry.
@@ -100,4 +101,5 @@ Do not describe what you are about to do. Just do it.
 - Never show a numbered menu — route autonomously or ask exactly one question
 - Always execute; never just explain
 - If two conditions in Step 3 match, take the higher-priority one (A > B > C > D)
+- **Parallelism:** whenever invoking multiple independent reads, writes, or skill dispatches, run them in parallel. Only serialize operations that have an explicit output dependency on a prior step. Never queue work that can run concurrently.
 - **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

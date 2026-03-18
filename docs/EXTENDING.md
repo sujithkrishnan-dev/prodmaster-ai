@@ -174,6 +174,8 @@ If the change is significant and you want it to reach all users of the plugin, o
 
 When the `learn` skill records a skill gap entry in `memory/skill-gaps.md` with `occurrences >= 3` and `status: open`, the next `/evolve` run will auto-generate a new skill file using the gap pattern as its specification.
 
+`evolve-self` runs a **convergence loop** — no fixed iteration cap. After applying Mode 1 improvements and Mode 2 generated skills, it reruns passes until a full pass over all changed files finds zero further issues. Each pass checks all files in parallel. A 5-pass per-file safeguard prevents infinite loops.
+
 To influence what gets generated:
 - Write clear, specific gap patterns — the generated skill title and description come directly from them.
 - A gap like `"user asks for sprint planning but no skill handles it"` produces a better skill than `"sprint"`.
@@ -187,13 +189,15 @@ Generated skills have `generated: true` and `generated_from: <gap-id>` in their 
 ```
 .claude-plugin/
   plugin.json           ← plugin manifest, upstream repo config
+  hooks.json            ← plugin-level hook registration (PreToolUse + SessionStart)
 
 hooks/
-  hooks.json            ← hook registration
+  hooks.json            ← local hook registration (mirrors .claude-plugin/hooks.json)
   session-start.md      ← context template ({{placeholders}})
-  run-hook.sh           ← Unix runner
-  run-hook.cmd          ← Windows launcher
-  run-hook.ps1          ← Windows PowerShell runner
+  run-hook.sh           ← Unix runner (SessionStart)
+  run-hook.cmd          ← Windows launcher (SessionStart)
+  run-hook.ps1          ← Windows PowerShell runner (SessionStart)
+  pre-tool-bash.py      ← PreToolUse safety hook (blocks destructive Bash patterns)
 
 skills/
   <name>/

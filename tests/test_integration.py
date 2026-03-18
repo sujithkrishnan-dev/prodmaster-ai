@@ -24,6 +24,8 @@ def test_all_required_files_exist():
         "memory/connectors/github.md",
         "memory/connectors/slack.md",
         "memory/connectors/linear.md",
+        "skills/auto-pilot/SKILL.md", "skills/resume/SKILL.md",
+        "memory/autonomous-log.md",
         "reports/dashboard.html", "reports/.gitkeep",
         "docs/README.md", "EVOLUTION-LOG.md",
     ]
@@ -41,7 +43,7 @@ def test_all_json_valid():
 
 def test_all_skill_frontmatter():
     skills_dir = os.path.join(PLUGIN_ROOT, "skills")
-    required = ["name:", "description:", "version:", "triggers:", "reads:", "writes:", "generated:"]
+    required = ["name:", "description:", "version:", "triggers:", "reads:", "writes:", "generated:", "generated_from:"]
     failures = []
     for name in os.listdir(skills_dir):
         p = os.path.join(skills_dir, name, "SKILL.md")
@@ -58,7 +60,11 @@ def test_all_skill_frontmatter():
 def test_project_context_counters():
     c = open(os.path.join(PLUGIN_ROOT, "memory", "project-context.md")).read()
     # Check field presence only — values change as cycles are logged
-    for f in ["total_tasks_completed:", "last_evolved_at_task:", "evolve_every_n_tasks:"]:
+    for f in [
+        "total_tasks_completed:", "last_evolved_at_task:", "evolve_every_n_tasks:",
+        "autonomous_mode:", "autonomous_session_id:",
+        "autonomous_max_iterations:", "autonomous_confidence_floor:",
+    ]:
         assert f in c, f"project-context.md missing: {f}"
 
 def test_hook_output(tmp_path):

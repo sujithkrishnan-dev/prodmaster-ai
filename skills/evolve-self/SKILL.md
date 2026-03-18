@@ -1,11 +1,12 @@
 ---
 name: evolve-self
-description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills, generates new skills from gaps, and contributes improvements upstream.
-version: 1.0.0
+description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
+version: 1.3.0
 triggers:
   - User runs /evolve
   - measure notifies that evolution threshold was reached
   - User asks the plugin to improve itself or generate new skills
+  - User says "update plugin" or "/prodmasterai update" (triggers Upstream Pipeline only)
 reads:
   - memory/patterns.md
   - memory/mistakes.md
@@ -21,49 +22,48 @@ writes:
   - memory/research-findings.md
   - memory/evolution-log.md
   - memory/pending-upstream/
-  - memory/pending-upstream/last-pr.txt
   - memory/connectors/skill-pattern-manifest.md
-  - EVOLUTION-LOG.md
+  - EVOLUTION-LOG.md (only on upstream merge)
 generated: false
 generated_from: ""
 ---
 
 # Evolve Self
 
-Improve existing skills, generate new ones, and contribute changes upstream.
-
-## Pre-flight
-
-Read `memory/project-context.md` frontmatter. Record the current value of `total_tasks_completed` — you will use it later. Do NOT update `last_evolved_at_task` yet; that happens after Mode 1 and Mode 2 complete so that a mid-run failure does not silently skip the next evolution cycle.
+Two separate phases. Phase 1 (local) runs on every `/evolve`. Phase 2 (upstream) runs ONLY on explicit publish request.
 
 ---
 
-## Mode 1 — Improve Existing Skills (runs first)
+## Phase 1 — Local Evolution (runs on /evolve or threshold)
 
-### 1. Identify Underperforming Skills
+### Pre-flight
 
-Read `memory/skill-performance.md`. A skill is underperforming if the last 5 entries (or all entries if fewer than 5 exist) show a declining `qa_pass_rate` trend — meaning each entry's `qa_pass_rate` is lower than the one before it across that window.
+Read `memory/project-context.md` frontmatter. Record `total_tasks_completed`. Do NOT update `last_evolved_at_task` yet.
 
-Map cycle metrics to skills:
+---
+
+### Mode 1 — Improve Existing Skills
+
+#### 1. Identify Underperforming Skills
+
+Read `memory/skill-performance.md`. A skill is underperforming if the last 5 entries show a declining `qa_pass_rate` trend.
+
+Map metrics to skills:
 - High blockers → check `orchestrate`
-- Low qa_pass_rate → check `learn` (capturing patterns?) and `orchestrate` (task breakdown quality?)
-- High review_iterations → check the skills involved in that workflow
+- Low qa_pass_rate → check `learn` and `orchestrate`
+- High review_iterations → check skills in that workflow
 
-### 2. Research Better Approaches
+#### 2. Research Better Approaches
 
-For each underperforming skill, dispatch a research subagent using `skills/evolve-self/research-subagent-prompt.md`. Fill in:
-- `{{skill_name}}` — skill to investigate
-- `{{current_skill_content}}` — current SKILL.md content
-- `{{performance_data}}` — last 5 skill-performance.md entries
-- `{{research_question}}` — specific question about how to improve
+For each underperforming skill, dispatch a research subagent using `skills/evolve-self/research-subagent-prompt.md`. Fill in `{{skill_name}}`, `{{current_skill_content}}`, `{{performance_data}}`, `{{research_question}}`.
 
 The research subagent writes its finding to `memory/research-findings.md`.
 
-### 3. Apply Improvements
+#### 3. Apply Improvements
 
 For research-findings entries with `confidence: high` or `medium` and `applied: false`:
 1. Read the target SKILL.md
-2. Apply the finding — update the relevant sections
+2. Apply the finding — update relevant sections
 3. Preserve frontmatter schema; increment `version:` (1.0.0 → 1.1.0)
 4. Set `applied: true` on the research-findings entry
 
@@ -75,28 +75,29 @@ mode: improve
 skill: <name>
 trigger: declining qa_pass_rate + research: <source>
 change_summary: <one sentence>
+upstream_status: pending_publish
 ---
 ```
 
 ---
 
-## Mode 2 — Generate New Skills (runs second)
+### Mode 2 — Generate New Skills
 
-### 1. Find Candidates
+#### 1. Find Candidates
 
 Read `memory/skill-gaps.md`. Collect entries where `occurrences >= 3` AND `status: open`.
 
-### 2. Check Name Collision
+#### 2. Check Name Collision
 
-Derive skill name: lowercase, hyphen-separated, 1-3 words from the gap pattern.
+Derive skill name: lowercase, hyphen-separated, 1-3 words.
 Check if `skills/<name>/SKILL.md` already exists.
 
-- **Exists:** Set gap `status: generated`, `generated_skill: <existing name>`. Log warning. Move to next candidate.
+- **Exists:** Set gap `status: generated`, `generated_skill: <existing name>`. Log warning. Move to next.
 - **Does not exist:** Proceed.
 
-### 3. Create Skill File
+#### 3. Create Skill File
 
-Create `skills/<name>/SKILL.md` using the standard frontmatter schema:
+Create `skills/<name>/SKILL.md` with the standard frontmatter schema:
 
 ```markdown
 ---
@@ -119,17 +120,17 @@ generated_from: <gap entry id>
 
 ## Process
 
-<Draft specific steps. Follow the same structure as other skills.
-Be actionable. Include what to read, what to write, what to output.>
+<Draft specific steps. Be actionable. Include what to read, what to write, what to output.>
 
 ## Rules
 
 - Always update memory files after acting
 - Document actions so they can be measured
+- Never contribute anything upstream — upstream is exclusively evolve-self's responsibility
 - <Add 2-3 more rules specific to this skill's purpose>
 ```
 
-### 4. Update Manifest
+#### 4. Update Manifest
 
 Append to `memory/connectors/skill-pattern-manifest.md`:
 ```markdown
@@ -138,9 +139,9 @@ Append to `memory/connectors/skill-pattern-manifest.md`:
 keywords: [<5-10 keywords from the gap pattern>]
 ```
 
-### 5. Update Gap Entry
+#### 5. Update Gap Entry
 
-Set `status: generating`. After file is written: `status: generated`, `generated_skill: <name>`.
+Set `status: generating`. After file written: `status: generated`, `generated_skill: <name>`.
 
 Append to `memory/evolution-log.md`:
 ```yaml
@@ -150,12 +151,13 @@ mode: generate
 skill: <new skill name>
 trigger: gap <id> reached 3+ occurrences
 change_summary: New skill generated for: <gap pattern>
+upstream_status: pending_publish
 ---
 ```
 
 ---
 
-## No-Op Case
+### No-Op Case
 
 If neither mode produced output:
 ```yaml
@@ -165,6 +167,7 @@ mode: no-op
 skill: ""
 trigger: scheduled evolution check
 change_summary: No improvements or new skills needed at this time
+upstream_status: n/a
 ---
 ```
 
@@ -172,17 +175,29 @@ Tell user: *"Evolution check ran — nothing needed at this time."*
 
 ---
 
-## Post-Mode Update
+### Post-Phase-1 Update
 
-After Mode 1 and Mode 2 have both completed (whether or not they produced output): update `last_evolved_at_task` in `memory/project-context.md` frontmatter to the value of `total_tasks_completed` recorded during Pre-flight. This prevents the threshold from triggering again until another `evolve_every_n_tasks` tasks are completed.
+After Mode 1 and Mode 2 complete: update `last_evolved_at_task` in `memory/project-context.md` frontmatter to the recorded `total_tasks_completed`.
+
+Tell user: *"Local evolution complete. [N] skills improved, [M] new skills generated. Run `/prodmasterai update` when you want to contribute these improvements upstream."*
+
+**Stop here. Do NOT proceed to Phase 2 unless the user explicitly requests it.**
 
 ---
 
-## Upstream Pipeline (runs ONLY here, ONLY during evolve-self)
+## Phase 2 — Upstream Pipeline (ONLY on explicit publish request)
 
-> **The upstream pipeline is the exclusive property of evolve-self.**
+> **This phase runs ONLY when the user explicitly says one of:**
+> - `/prodmasterai update`
+> - "update plugin"
+> - "publish improvements"
+> - "contribute upstream"
+>
+> It NEVER runs automatically after Phase 1. If the current trigger is `/evolve` or a
+> threshold notification, stop at the end of Phase 1.
+>
 > No other skill (orchestrate, measure, report, decide, learn, prodmasterai) ever
-> touches upstream. If you are not executing evolve-self, skip this section entirely.
+> runs this phase.
 
 ### What can go upstream
 
@@ -191,29 +206,29 @@ After Mode 1 and Mode 2 have both completed (whether or not they produced output
 - `skills/evolve-self/research-subagent-prompt.md`, `pr-template.md`
 - `hooks/session-start.md`
 
-**Memory / user data (eligible as supporting evidence):**
-- `memory/patterns.md`, `memory/mistakes.md`, `memory/skill-gaps.md` — anonymised aggregates only
-- `memory/feedback.md` — user-gated (see Step 5 gate rule)
-- `memory/skill-performance.md` — metrics trends, not raw project names
+**Memory / user data (eligible as supporting evidence, anonymised):**
+- `memory/patterns.md`, `memory/mistakes.md`, `memory/skill-gaps.md` — aggregates only
+- `memory/feedback.md` — user-gated separately (see Step 4 gate)
+- `memory/skill-performance.md` — metric trends, not raw project names
 - `memory/research-findings.md` — research conclusions only
 
-**Anonymisation rule:** Before including any memory data in an upstream proposal or PR body,
-strip or generalise identifiable project names, feature names, and personal details.
-Aggregate patterns are fine ("qa_pass_rate declined 3 cycles in a row").
-Raw entries with project names are not ("feature: user authentication login flow failed").
+**Anonymisation rule:** Strip all project names, feature names, and personal identifiers before
+including memory data. Use aggregated signals only:
+- OK: *"qa_pass_rate declined 3 cycles in a row"*
+- Not OK: *"feature: user authentication login flow failed"*
 
-### 1. Identify Upstream-Eligible Changes
+### 1. Find Pending Changes
 
-Before anything else: build a list of files actually changed/created in Mode 1 and Mode 2.
-If the list is empty: **skip the entire upstream pipeline** — log "no changes, upstream skipped."
+Collect all `memory/evolution-log.md` entries with `upstream_status: pending_publish`.
+If none: tell user *"Nothing pending to publish upstream."* Stop.
 
 ### 2. Rate Limit Check
 
-Read `memory/pending-upstream/last-pr.txt`. Parse as ISO 8601 UTC. If fewer than 24 hours have elapsed: skip PR creation, queue proposal, tell user: *"Upstream proposal queued — rate limit active until [timestamp + 24h]."* Queue means the proposal file sits in pending-upstream/ with `status: pending`.
+Read `memory/pending-upstream/last-pr.txt`. If fewer than 24 hours since last PR: queue and tell user *"Rate limit active until [timestamp + 24h] — queued for next available window."*
 
-### 3. Package Proposal
+### 3. Package Proposals
 
-For each changed/generated item create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
+For each pending change create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
 
 ```yaml
 ---
@@ -227,66 +242,56 @@ status: pending
 pr_url: ""
 ---
 ## What Changed
-<description of plugin file changes>
+<description of skill file changes>
 
 ## Why
-<trigger and evidence — cite anonymised patterns/performance trends>
+<trigger and evidence — anonymised patterns/performance trends>
 
 ## Supporting Data (anonymised)
-<aggregated memory signals that drove this change, stripped of project/user identifiers>
-<e.g. "qa_pass_rate declined 3 cycles in a row" not "feature: login page declined">
+<aggregated memory signals, stripped of project/user identifiers>
 ```
 
 ### 4. Validate (no duplicates)
 
-Check for duplicates in:
-- All files in `memory/pending-upstream/` (any status)
-- All existing `skills/` files
-- `applied: true` entries in `memory/research-findings.md`
+Check existing files in `memory/pending-upstream/` (any status), existing `skills/`, and `applied: true` entries in `memory/research-findings.md`. If duplicate: delete proposal, log, skip.
 
-If duplicate: delete proposal, log, skip.
+### 5. Create PRs
 
-### 5. Create PR or Gate
+**Feedback-sourced proposals:** Always ask first:
+*"Improvement from your feedback on [topic]: [change_summary]. Include anonymised supporting patterns and contribute back for all users?"*
+- Yes → create PR
+- No → `status: rejected`, keep local only
 
-**Feedback gate:** Any proposal with `source: feedback` MUST ask the user before creating a PR:
-*"I've prepared an improvement based on your feedback about [topic]: [change_summary]. Include your supporting patterns as anonymised evidence and contribute back?"*
-- Yes → proceed with PR (anonymise memory data in body)
-- No → `status: rejected`, keep local changes only
-
-**Source = outcome or research:** Create GitHub PR automatically:
+**Outcome/research-sourced proposals:** Create GitHub PR:
 - Branch: `auto-evolved/YYYY-MM-DD-<skill-name>-<mode>` (suffix `-v2` if branch exists)
-- Body: render `skills/evolve-self/pr-template.md` — include only skill diffs, no user data
+- Body: render `skills/evolve-self/pr-template.md`
 - Label: `auto-evolved`
 - Auth order: GitHub MCP → `gh` CLI → local-only fallback (log + notify)
 
-Update `status: pr_created`, `pr_url: <url>`.
-Write current UTC timestamp to `memory/pending-upstream/last-pr.txt`.
-
-*(feedback already handled above — skip for feedback source)*
+After each PR: set `upstream_status: pr_created` on the evolution-log entry, update proposal `status: pr_created`, write UTC timestamp to `memory/pending-upstream/last-pr.txt`.
 
 ### 6. Check Pending PRs
 
-On every run, check all `status: pr_created` proposals:
-- Query GitHub API once per proposal
-- Merged → `status: pr_merged`, append to root `EVOLUTION-LOG.md`:
+For all `status: pr_created` proposals:
+- Merged → `status: pr_merged`, set `upstream_status: merged`, append to root `EVOLUTION-LOG.md`:
   ```markdown
   ## YYYY-MM-DD — <change_summary>
   PR: <url> | Type: <type> | Trigger: <trigger>
   ```
-- Closed without merge → `status: rejected`
-- API unavailable → leave as `pr_created`, retry next run
+- Closed without merge → `status: rejected`, `upstream_status: rejected`
+- API unavailable → leave as-is, retry next run
 - Older than 30 days → `status: rejected`, log "30-day timeout"
 
 ---
 
 ## Rules
 
-- Mode 1 always before Mode 2
-- **Upstream contributions happen ONLY here, ONLY during evolve-self.** No other skill ever touches upstream — not measure, not learn, not report, not decide, not orchestrate.
-- Memory data MAY go upstream as supporting evidence — but MUST be anonymised first (no raw project names, feature names, or personal identifiers)
-- Feedback-sourced contributions are always user-gated before PR creation
+- Phase 1 (local) runs on `/evolve` and threshold — STOP before Phase 2
+- Phase 2 (upstream) runs ONLY on explicit publish request — never automatic
+- **No other skill ever runs Phase 2** — upstream is exclusively evolve-self's responsibility
+- Memory data MAY go upstream as supporting evidence — MUST be anonymised first
 - Never delete existing skills upstream — additive only
-- feedback.md is READ-ONLY for this skill — only read, never write
+- feedback.md is READ-ONLY for this skill — only the learn skill writes to it
 - Max 1 upstream PR per 24 hours
 - PRs never self-merge
 - Generated skills must use the full standard frontmatter schema

@@ -34,7 +34,8 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "should we A or B", "what to prioritise", "pick between" | `decide` |
 | "report", "summary", "dashboard", "weekly" | `report` |
 | "remember this", "log this", "that was wrong/right" | `learn` (feedback path) |
-| "evolve", "improve yourself", "generate skill" | `evolve-self` |
+| "evolve", "improve yourself", "generate skill" | `evolve-self` Phase 1 (local only) |
+| "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
 
 **If classified:** invoke the matched skill immediately with the supplied text as input. Do not re-present a menu.
 

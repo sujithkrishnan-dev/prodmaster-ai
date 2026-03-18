@@ -14,6 +14,7 @@ REQUIRED_FILES = [
     "connectors/github.md",
     "connectors/slack.md",
     "connectors/linear.md",
+    "blocker-research.md",
 ]
 
 @pytest.mark.parametrize("filename", REQUIRED_FILES)
@@ -22,7 +23,8 @@ def test_memory_file_exists(filename):
 
 def test_project_context_has_counters():
     content = open(os.path.join(MEMORY_DIR, "project-context.md")).read()
-    for f in ["total_tasks_completed: 0", "last_evolved_at_task: 0", "evolve_every_n_tasks: 10"]:
+    # Check field presence only — values change as cycles are logged
+    for f in ["total_tasks_completed:", "last_evolved_at_task:", "evolve_every_n_tasks:"]:
         assert f in content, f"Missing: {f}"
 
 def test_skill_performance_has_example():
@@ -35,7 +37,7 @@ def test_connectors_all_inactive():
 
 def test_skill_pattern_manifest_has_all_skills():
     content = open(os.path.join(MEMORY_DIR, "connectors", "skill-pattern-manifest.md")).read()
-    for skill in ["orchestrate", "measure", "report", "decide", "learn", "evolve-self"]:
+    for skill in ["orchestrate", "measure", "report", "decide", "learn", "evolve-self", "dev-loop", "research-resolve"]:
         assert f"### {skill}" in content
 
 def test_last_pr_txt_valid_timestamp():

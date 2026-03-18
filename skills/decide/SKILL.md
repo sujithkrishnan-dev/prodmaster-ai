@@ -1,6 +1,6 @@
 ---
 name: decide
-description: Use when user is at a decision fork — "should we do A or B?", "what should we prioritise?", "which approach?". Reads project state and metrics to rank options by ROI/risk and give one clear recommendation.
+description: Use when user is at a decision fork -- "should we do A or B?", "what should we prioritise?", "which approach?". Reads project state and metrics to rank options by ROI/risk and give one clear recommendation.
 version: 1.2.0
 triggers:
   - User asks "should we", "which option", "prioritise", "help me decide", "recommend"
@@ -22,9 +22,9 @@ Give data-backed recommendations at decision forks.
 
 ### 1. Read Context (parallel)
 
-Read both files simultaneously — no shared state:
-- `memory/project-context.md` — active features, blockers, recent decisions
-- `memory/skill-performance.md` — last 5 entries (skip `example: true`)
+Read both files simultaneously -- no shared state:
+- `memory/project-context.md` -- active features, blockers, recent decisions
+- `memory/skill-performance.md` -- last 5 entries (skip `example: true`)
 
 ### 2. Get the Options
 
@@ -32,14 +32,14 @@ Ensure the user has stated all options clearly. You need: what each option achie
 
 ### 3. Score Options
 
-**ROI (1–5):** 5 = unblocks critical work or delivers clear user value. 1 = low value.
-**Risk (1–5):** 1 = reversible, isolated. 5 = irreversible, high uncertainty.
-**Priority = ROI / Risk** — higher is better.
+**ROI (1-5):** 5 = unblocks critical work or delivers clear user value. 1 = low value.
+**Risk (1-5):** 1 = reversible, isolated. 5 = irreversible, high uncertainty.
+**Priority = ROI / Risk** -- higher is better.
 
 Also factor in:
-- Declining velocity trend → prefer lower-risk options
-- Many open blockers → prefer options that unblock first
-- Declining QA pass rate → prefer simpler options
+- Declining velocity trend -> prefer lower-risk options
+- Many open blockers -> prefer options that unblock first
+- Declining QA pass rate -> prefer simpler options
 
 ### 4. Present Recommendation
 
@@ -64,9 +64,9 @@ Also factor in:
 
 ### 5. Log Decision
 
-Append the decision entry to `memory/project-context.md` `## Decisions Log` (internal format — do not show raw YAML to the user).
+Append the decision entry to `memory/project-context.md` `## Decisions Log` (internal format -- do not show raw YAML to the user).
 
-Tell the user: *"Decision logged. When you see how it plays out, say `/prodmasterai decision on [topic] was good/bad` — I'll update the outcome and the system will learn from it."*
+Tell the user: *"Decision logged. When you see how it plays out, say `/prodmasterai decision on [topic] was good/bad` -- I'll update the outcome and the system will learn from it."*
 
 Next: `/prodmasterai build [chosen option]` to start the work | `/prodmasterai` to check what else needs attention
 
@@ -83,7 +83,7 @@ If the user provides outcome feedback on a previously logged decision (e.g. "tha
 
 ## Rules
 
-- Give ONE clear recommendation — no hedging without a conclusion
+- Give ONE clear recommendation -- no hedging without a conclusion
 - Use actual performance data when available; flag when there is none
 - Log every decision, even simple ones
-- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility
+- **Never contribute anything upstream** -- upstream is exclusively evolve-self's responsibility

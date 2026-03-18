@@ -29,3 +29,9 @@ keywords: [pull latest, take a pull, sync code, get latest, start dev, smooth de
 
 ### help
 keywords: [help, what can you do, show commands, how does this work, what skills, confused, lost, guide me, tutorial, getting started]
+
+### dev-loop
+keywords: [dev loop, loop until passing, iterate until tests pass, loop mode, improvement loop, polish loop, watch mode, keep improving, run until done]
+
+### research-resolve
+keywords: [stuck, research and resolve, autonomous fix, worktree fix, can't make progress, loop stuck, investigate failure, research the problem]

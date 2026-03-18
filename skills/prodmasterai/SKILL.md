@@ -1,6 +1,6 @@
 ---
 name: prodmasterai
-description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic — runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
+description: Master entry point -- invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic -- runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
 version: 2.0.1
 triggers:
   - User says /prodmasterai
@@ -15,13 +15,13 @@ generated: false
 generated_from: ""
 ---
 
-# ProdMaster AI — Master Entry Point
+# ProdMaster AI -- Master Entry Point
 
-This is the single command the user needs to know. Read context, decide the right action, execute it — all without asking the user to remember which skill to invoke.
+This is the single command the user needs to know. Read context, decide the right action, execute it -- all without asking the user to remember which skill to invoke.
 
 ---
 
-## Step 1 — Parse Intent (if argument given)
+## Step 1 -- Parse Intent (if argument given)
 
 If the user wrote `/prodmasterai <text>`, classify the text immediately:
 
@@ -30,7 +30,7 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "help", "what can you do", "show commands", "how does this work" | `help` |
 | "pull latest", "take a pull", "sync code", "start dev", "smooth dev", "pre-flight", "ensure up to date", "ready to code", "let's get started", "beginning work", "check everything", "is everything ok", "set me up", "get me ready", "am I good to go", "before I start coding" | `smooth-dev` |
 | "build X", "implement X", "start X", "work on X", "let's build", "i want to work on", "kick off", "create", "new feature", "add", "i want to add", "we should build", "can we build", "feature request", "i need to implement", "let's create", "spin up" | `orchestrate` |
-| "cycle done", "N tasks, QA X%, Y reviews, Z hours", "just finished", "wrapped up", "completed", "logged N tasks", "done with", "that's done", "finished the cycle", "we're done", "shipping done", "sprint complete", "cycle complete", "done — N tasks" | `measure` → `learn` |
+| "cycle done", "N tasks, QA X%, Y reviews, Z hours", "just finished", "wrapped up", "completed", "logged N tasks", "done with", "that's done", "finished the cycle", "we're done", "shipping done", "sprint complete", "cycle complete", "done -- N tasks" | `measure` -> `learn` |
 | "should we A or B", "what to prioritise", "pick between", "help me choose", "not sure whether to", "what's better", "trade-off between", "which is better", "A vs B", "compare A and B", "i can't decide", "pros and cons of" | `decide` |
 | "report", "summary", "dashboard", "weekly", "show me stats", "how are we doing", "progress", "metrics", "what did we ship", "status update", "how's the project", "give me a summary", "what have we done" | `report` |
 | "remember this", "log this", "that was wrong/right", "note that", "worth remembering", "lesson learned", "that was a mistake", "take note", "important learning", "write this down", "don't forget", "i learned that", "add to memory" | `learn` (feedback path) |
@@ -44,44 +44,44 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 
 **Ambiguous input:** If the intent does not match any route with confidence, pick the most likely route and confirm with ONE question:
 
-> "That sounds like [route] — shall I [action]? (or tell me what you meant)"
+> "That sounds like [route] -- shall I [action]? (or tell me what you meant)"
 
 Never reject input silently. Always offer the best guess. Route on confirmation without further prompting.
 
 ---
 
-## Step 2 — Read Context (if no argument or classification unclear)
+## Step 2 -- Read Context (if no argument or classification unclear)
 
 Read these three files in parallel:
-1. `memory/project-context.md` — frontmatter gives `total_tasks_completed`, `last_evolved_at_task`, `evolve_every_n_tasks`; body gives Active Features list
-2. `memory/skill-performance.md` — last 3 entries
-3. `memory/skill-gaps.md` — count of `status: open` gaps
+1. `memory/project-context.md` -- frontmatter gives `total_tasks_completed`, `last_evolved_at_task`, `evolve_every_n_tasks`; body gives Active Features list
+2. `memory/skill-performance.md` -- last 3 entries
+3. `memory/skill-gaps.md` -- count of `status: open` gaps
 
 ---
 
-## Step 3 — Auto-Decide
+## Step 3 -- Auto-Decide
 
 Evaluate in order (first match wins):
 
 ### A. Evolution threshold reached
 `total_tasks_completed - last_evolved_at_task >= evolve_every_n_tasks` OR `evolution_threshold_reached: true` in project-context.md frontmatter
-→ **Do not tell the user. Do not ask. Run immediately.**
-→ After evolve-self completes, reset `evolution_threshold_reached: false` in project-context.md frontmatter.
-→ Invoke `evolve-self` Phase 1 (convergence loop — runs until all changed skills are clean). Show output only after convergence.
-→ After evolve-self finishes, continue to check B/C/D and act on whatever is next.
+-> **Do not tell the user. Do not ask. Run immediately.**
+-> After evolve-self completes, reset `evolution_threshold_reached: false` in project-context.md frontmatter.
+-> Invoke `evolve-self` Phase 1 (convergence loop -- runs until all changed skills are clean). Show output only after convergence.
+-> After evolve-self finishes, continue to check B/C/D and act on whatever is next.
 
 ### B. Active feature in progress
 `## Active Features` section of project-context.md contains at least one non-empty feature entry.
-→ Show a single-line status for each active feature (name + last known stage).
-→ Ask ONE question: *"Update on [most recently active feature]? (or say 'cycle done — N tasks, QA X%, Y reviews, Z hours' to log a cycle)"*
-→ Wait for response, then route:
-  - Metrics given → `measure` → `learn`
-  - Progress update → continue `orchestrate` from current stage
-  - "done" / "shipped" → `measure` with completion data, mark feature complete
+-> Show a single-line status for each active feature (name + last known stage).
+-> Ask ONE question: *"Update on [most recently active feature]? (or say 'cycle done -- N tasks, QA X%, Y reviews, Z hours' to log a cycle)"*
+-> Wait for response, then route:
+  - Metrics given -> `measure` -> `learn`
+  - Progress update -> continue `orchestrate` from current stage
+  - "done" / "shipped" -> `measure` with completion data, mark feature complete
 
 ### C. No active features + 3 or more open skill gaps
-→ Tell user: *"No active features. [N] skill gaps detected — run /evolve to generate new skills, or tell me what to build next."*
-→ Wait. Route response to `orchestrate` or `evolve-self`.
+-> Tell user: *"No active features. [N] skill gaps detected -- run /evolve to generate new skills, or tell me what to build next."*
+-> Wait. Route response to `orchestrate` or `evolve-self`.
 
 ### D. Fresh / empty state (no active features, no gaps, <3 performance entries)
 
@@ -93,7 +93,7 @@ Read the `first_run_complete` field from the frontmatter of `memory/project-cont
 ProdMaster AI is ready.
 
   Build something:   /prodmasterai build [feature name]
-  Log a cycle:       /prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours
+  Log a cycle:       /prodmasterai cycle done -- N tasks, QA X%, Y reviews, Z hours
   Weekly report:     /prodmasterai report
   Make a decision:   /prodmasterai should we A or B?
   Self-improve:      /evolve
@@ -107,48 +107,48 @@ ProdMaster AI is ready.
 
 Before asking anything, **detect the project context** by running these in parallel:
 ```
-git log --oneline -1          ← does the repo have commits?
-git branch --show-current     ← what branch are we on?
-git remote show origin | grep "HEAD branch"  ← what is the default branch?
+git log --oneline -1          <- does the repo have commits?
+git branch --show-current     <- what branch are we on?
+git remote show origin | grep "HEAD branch"  <- what is the default branch?
 ```
 
-**Existing project detection:** If `git log` returns at least one commit AND the current branch differs from the default branch → this is an **existing project already in flight**. Run the **Existing Project variant** below.
+**Existing project detection:** If `git log` returns at least one commit AND the current branch differs from the default branch -> this is an **existing project already in flight**. Run the **Existing Project variant** below.
 
-Otherwise → run the **New Project variant**.
+Otherwise -> run the **New Project variant**.
 
 ---
 
 ##### New Project variant
 
-1. *"Welcome to ProdMaster AI — let's get you set up in under a minute."*
-2. Ask: *"What's the name of your project?"* — store as `$project_name` (session only, never written).
-3. Ask: *"What are you building first in $project_name?"* — invoke `orchestrate` with the answer immediately.
+1. *"Welcome to ProdMaster AI -- let's get you set up in under a minute."*
+2. Ask: *"What's the name of your project?"* -- store as `$project_name` (session only, never written).
+3. Ask: *"What are you building first in $project_name?"* -- invoke `orchestrate` with the answer immediately.
 4. After `orchestrate` returns: write `first_run_complete: true` to frontmatter.
 
 ---
 
 ##### Existing Project variant
 
-1. *"ProdMaster AI is now tracking `$current_branch` — let me catch up with where you are."*
+1. *"ProdMaster AI is now tracking `$current_branch` -- let me catch up with where you are."*
 2. Ask ONE question only: *"What are you currently working on in this branch? (I'll start tracking it as an active feature)"*
-   - Take the answer and invoke `orchestrate` with it — this logs it as an active feature in project-context.md.
-   - If the branch name is descriptive (e.g. `feature/user-auth`, `fix/payment-bug`), pre-fill the suggestion: *"Looks like you're working on `user auth` — is that right, or would you describe it differently?"*
+   - Take the answer and invoke `orchestrate` with it -- this logs it as an active feature in project-context.md.
+   - If the branch name is descriptive (e.g. `feature/user-auth`, `fix/payment-bug`), pre-fill the suggestion: *"Looks like you're working on `user auth` -- is that right, or would you describe it differently?"*
 3. After `orchestrate` returns: write `first_run_complete: true` to frontmatter.
 
-**Do not ask about project history, past tasks, or metrics** — let the user start logging from now. `total_tasks_completed` starts at 0 for new installs on existing repos; that is correct and expected.
+**Do not ask about project history, past tasks, or metrics** -- let the user start logging from now. `total_tasks_completed` starts at 0 for new installs on existing repos; that is correct and expected.
 
 ---
 
 **Rules for all onboarding variants:**
 - Never exceed 3 questions total across both variants
-- Do not show the quick-start card during onboarding — user is already being routed to action
-- Do not explain the plugin in detail — one sentence greeting, then act
+- Do not show the quick-start card during onboarding -- user is already being routed to action
+- Do not explain the plugin in detail -- one sentence greeting, then act
 
 ---
 
-## Step 4 — Execute
+## Step 4 -- Execute
 
-Invoke the target skill as if the user had called it directly — pass all relevant context.
+Invoke the target skill as if the user had called it directly -- pass all relevant context.
 Do not describe what you are about to do. Just do it.
 
 ---
@@ -156,8 +156,8 @@ Do not describe what you are about to do. Just do it.
 ## Rules
 
 - Never ask the user to remember skill names
-- Never show a numbered menu — route autonomously or ask exactly one question
+- Never show a numbered menu -- route autonomously or ask exactly one question
 - Always execute; never just explain
 - If two conditions in Step 3 match, take the higher-priority one (A > B > C > D)
 - **Parallelism:** whenever invoking multiple independent reads, writes, or skill dispatches, run them in parallel. Only serialize operations that have an explicit output dependency on a prior step. Never queue work that can run concurrently.
-- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility
+- **Never contribute anything upstream** -- upstream is exclusively evolve-self's responsibility

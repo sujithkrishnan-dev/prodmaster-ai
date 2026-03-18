@@ -77,7 +77,7 @@ def test_evolve_self_has_pr_template():
 cd C:\Users\teame\Desktop\Plugin && python -m pytest tests/test_skills.py -v 2>&1 | head -40
 ```
 
-Expected: `test_skill_exists[auto-pilot]` FAIL, `test_skill_exists[resume]` FAIL. Existing tests still pass.
+Expected: `test_skill_exists[auto-pilot]` FAIL, `test_skill_exists[resume]` FAIL. All other tests pass — all 11 existing skills already contain `generated_from:`, so adding it to `REQUIRED_FIELDS` introduces no new failures for existing skills.
 
 - [ ] **Step 3: Update tests/test_memory.py**
 
@@ -173,7 +173,7 @@ for f in [
 cd C:\Users\teame\Desktop\Plugin && python -m pytest tests/ -v 2>&1 | tail -30
 ```
 
-Expected failures (and only these):
+Expected failures at this point (and only these):
 - `test_skill_exists[auto-pilot]`
 - `test_skill_exists[resume]`
 - `test_skill_frontmatter[auto-pilot]`
@@ -182,8 +182,10 @@ Expected failures (and only these):
 - `test_project_context_has_counters`
 - `test_skill_pattern_manifest_has_all_skills`
 - `test_all_required_files_exist`
-- `test_all_skill_frontmatter`
 - `test_project_context_counters`
+
+Note: `test_all_skill_frontmatter` (test_integration.py) uses `os.listdir(skills_dir)` — it will only go red AFTER Tasks 4/5 create the skill directories. It will NOT fail at this point.
+Note: `test_manifest_covers_all_skills` (test_integration.py) also uses `os.listdir(skills_dir)` — same behaviour: goes red after Tasks 4/5, green after Task 6 Step 2.
 
 All pre-existing tests must still pass.
 
@@ -657,11 +659,15 @@ After the `| \`research-resolve\` | ...` row, add:
 
 - [ ] **Step 4: Run manifest test**
 
+Note: If Tasks 4 and 5 ran before this task, `test_manifest_covers_all_skills` is already failing (skill directories exist but manifest did not yet have them). Step 2 above fixes this. Always run the manifest append (Step 2) before running the tests below.
+
 ```bash
 cd C:\Users\teame\Desktop\Plugin && python -m pytest tests/test_memory.py::test_skill_pattern_manifest_has_all_skills tests/test_integration.py::test_manifest_covers_all_skills -v
 ```
 
 Expected: both PASS
+
+Note: `docs/README.md` changes (Step 3) are intentionally not covered by any automated test — README correctness is verified by human review only.
 
 - [ ] **Step 5: Commit**
 
@@ -686,8 +692,12 @@ If any test fails, read the failure message carefully and fix the specific file 
 
 - [ ] **Step 2: Commit (if any fixes were needed)**
 
+Stage only the specific files that were changed during fixes:
+
 ```bash
-cd C:\Users\teame\Desktop\Plugin && git add -A && git commit -m "fix: resolve remaining test failures"
+cd C:\Users\teame\Desktop\Plugin && git add <list-only-fixed-files> && git commit -m "fix: resolve remaining test failures"
 ```
+
+Do NOT use `git add -A` — stage specific files only to avoid accidentally including unrelated changes.
 
 Only run this step if fixes were needed in Step 1. If all tests passed first time, skip.

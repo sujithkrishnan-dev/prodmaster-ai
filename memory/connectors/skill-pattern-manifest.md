@@ -35,3 +35,9 @@ keywords: [dev loop, loop until passing, iterate until tests pass, loop mode, im
 
 ### research-resolve
 keywords: [stuck, research and resolve, autonomous fix, worktree fix, can't make progress, loop stuck, investigate failure, research the problem]
+
+### auto-pilot
+keywords: [auto, autonomously, run autonomously, unattended, while I sleep, work while I sleep, autonomous pipeline, no questions, full pipeline auto]
+
+### resume
+keywords: [resume, what happened while I was away, autonomous summary, show autonomous summary, decision audit, rollback, auto-pilot review]

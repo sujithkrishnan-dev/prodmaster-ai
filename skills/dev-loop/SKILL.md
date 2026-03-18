@@ -77,6 +77,23 @@ research_resolve_escalations: 0
 
 Each pass begins with: `iteration = iteration + 1`
 
+Before any other work in this pass, call:
+```
+checkpoint.write(
+  skill: "dev-loop",
+  step: "iteration_<iteration>_of_<max_iterations or ongoing>",
+  step_index: iteration,
+  total_steps: max_iterations (or 999 if uncapped),
+  context: {
+    goal: <task name / feature>,
+    remaining_tasks: [],
+    last_completed: "iteration <iteration-1> -- <last test result>",
+    exit_conditions: <exit_when value>,
+    iterations_remaining: <max_iterations - iteration if capped, else -1>
+  }
+)
+```
+
 1. Run the appropriate Superpowers cycle (TDD / implement / review). Accumulate: `total_tasks_completed`, `total_time_hours`, a 0.0-1.0 float into `qa_pass_rate_samples`, `review_iterations_total`.
 2. Run tests, collect metrics (coverage %, lint error count, LLM score).
 3. Evaluate exit conditions per `exit_logic` (AND or OR):
@@ -139,6 +156,8 @@ dev-loop complete - N iterations
   Tests:           PASS (N) / FAIL (N)
   Stuck events:    N (resolved by research-resolve: Y/N)
 ```
+
+After printing the summary, call checkpoint.clear.
 
 ---
 

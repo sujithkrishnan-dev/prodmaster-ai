@@ -100,6 +100,25 @@ For each task cycle, hand off to Superpowers:
 
 Do not reimplement Superpowers. Hand off cleanly.
 
+After dispatching each task N, call:
+```
+checkpoint.write(
+  skill: "orchestrate",
+  step: "task_<N>_dispatched",
+  step_index: N,
+  total_steps: <total task count>,
+  context: {
+    goal: <feature goal>,
+    remaining_tasks: <list of not-yet-dispatched task names>,
+    last_completed: "task <N>: <task name> -- dispatched",
+    exit_conditions: "all tasks complete",
+    iterations_remaining: <total - N>
+  }
+)
+```
+
+When all tasks are dispatched and confirmed complete, call checkpoint.clear.
+
 ---
 
 #### 3c. Install Superpowers

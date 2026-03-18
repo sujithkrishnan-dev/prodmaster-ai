@@ -36,6 +36,11 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "remember this", "log this", "that was wrong/right", "note that", "worth remembering", "lesson learned", "that was a mistake", "take note", "important learning", "write this down", "don't forget", "i learned that", "add to memory" | `learn` (feedback path) |
 | "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved", "optimize", "optimize the plugin", "deep review", "audit the plugin", "quality pass", "run a review", "find issues", "check the plugin", "tighten up" | `evolve-self` Phase 1 (local only) |
 | "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
+| "auto", "autonomously", "run autonomously", "while I sleep", "work while I sleep", "unattended", "unattended execution" | `auto-pilot` |
+| "resume", "continue", "pick up where", "checkpoint resume", "what happened while I was away", "show autonomous summary", "autonomous summary" | `checkpoint` if `memory/checkpoint.md` has `status: active`; otherwise `resume` skill |
+| "checkpoint discard", "discard checkpoint", "clear checkpoint" | `checkpoint` clear operation |
+| "checkpoint reset", "reset in", "limit resets in" | `checkpoint` update scheduled task with user-supplied reset time |
+| "token efficiency", "reduce tokens", "token audit", "I'm hitting limits", "too many tokens", "optimize tokens", "token-efficiency" | `token-efficiency` |
 | "decision on X was good/bad", "that worked", "that failed", "update decision" | `decide` (outcome close path) |
 
 **If classified:** invoke the matched skill immediately with the supplied text as input. Do not re-present a menu.

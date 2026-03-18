@@ -1,10 +1,14 @@
 ---
 total_tasks_completed: 8
-last_evolved_at_task: 0
+last_evolved_at_task: 8
 evolution_threshold_reached: false
 evolve_every_n_tasks: 10
 last_evolved_date: 2026-03-18
 first_run_complete: false
+autonomous_mode: false
+autonomous_session_id: ""
+autonomous_max_iterations: 5
+autonomous_confidence_floor: medium
 ---
 
 ## Active Features

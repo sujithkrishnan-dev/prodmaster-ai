@@ -180,13 +180,31 @@ After Mode 1 and Mode 2 have both completed (whether or not they produced output
 
 ## Upstream Pipeline (runs after any Mode 1 or Mode 2 output)
 
-### 1. Rate Limit Check
+> **Scope rule:** The upstream pipeline exists ONLY to improve the shared plugin code.
+> It MUST ONLY package changes to plugin files:
+> - `skills/*/SKILL.md`
+> - `skills/evolve-self/research-subagent-prompt.md`
+> - `skills/evolve-self/pr-template.md`
+> - `hooks/session-start.md`
+>
+> **NEVER include memory files** (`memory/**`) in any upstream proposal or PR.
+> Memory files contain local user data — metrics, decisions, patterns, feedback — and are
+> always private to this installation. Sending them upstream would violate user privacy
+> and make the plugin non-standard.
+
+### 1. Identify Upstream-Eligible Changes
+
+Before anything else: build a list of files actually changed/created in Mode 1 and Mode 2.
+Keep ONLY files matching `skills/**` or `hooks/session-start.md`.
+If the list is empty: **skip the entire upstream pipeline** — log "no plugin files changed, upstream skipped."
+
+### 2. Rate Limit Check
 
 Read `memory/pending-upstream/last-pr.txt`. Parse as ISO 8601 UTC. If fewer than 24 hours have elapsed: skip PR creation, queue proposal, tell user: *"Upstream proposal queued — rate limit active until [timestamp + 24h]."* Queue means the proposal file sits in pending-upstream/ with `status: pending`.
 
-### 2. Package Proposal
+### 3. Package Proposal
 
-For each changed/generated skill create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
+For each eligible changed/generated plugin file create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
 
 ```yaml
 ---
@@ -200,16 +218,16 @@ status: pending
 pr_url: ""
 ---
 ## What Changed
-<description>
+<description of skill file changes — no user data>
 
 ## Why
-<trigger and evidence>
+<trigger and evidence — cite patterns/performance trends, NOT raw memory entries>
 
 ## Evidence
-<relevant entries from memory files>
+<aggregated stats only: e.g. "qa_pass_rate declined 3 cycles in a row" — never paste user project names or decisions>
 ```
 
-### 3. Validate (no duplicates)
+### 4. Validate (no duplicates)
 
 Check for duplicates in:
 - All files in `memory/pending-upstream/` (any status)
@@ -218,11 +236,11 @@ Check for duplicates in:
 
 If duplicate: delete proposal, log, skip.
 
-### 4. Create PR or Gate
+### 5. Create PR or Gate
 
-**Source = outcome or research:** Create GitHub PR:
+**Source = outcome or research:** Create GitHub PR automatically:
 - Branch: `auto-evolved/YYYY-MM-DD-<skill-name>-<mode>` (suffix `-v2` if branch exists)
-- Body: render `skills/evolve-self/pr-template.md`
+- Body: render `skills/evolve-self/pr-template.md` — include only skill diffs, no user data
 - Label: `auto-evolved`
 - Auth order: GitHub MCP → `gh` CLI → local-only fallback (log + notify)
 
@@ -234,7 +252,7 @@ Ask: *"I've prepared an improvement based on your feedback about [topic]: [chang
 - Yes → create PR as above
 - No → set `status: rejected`, keep local changes
 
-### 5. Check Pending PRs
+### 6. Check Pending PRs
 
 On every run, check all `status: pr_created` proposals:
 - Query GitHub API once per proposal
@@ -252,6 +270,7 @@ On every run, check all `status: pr_created` proposals:
 ## Rules
 
 - Mode 1 always before Mode 2
+- **Upstream = plugin code only.** Memory files NEVER go upstream, ever.
 - Never delete existing skills upstream — additive only
 - feedback.md is READ-ONLY for this skill — only read, never write
 - Max 1 upstream PR per 24 hours

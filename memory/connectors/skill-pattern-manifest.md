@@ -20,3 +20,6 @@ keywords: [learned, pattern, mistake, feedback, wrong, worked well, did not work
 
 ### evolve-self
 keywords: [evolve, improve plugin, generate skill, self-improve, /evolve, plugin update, new skill, skill gap, auto-improve]
+
+### prodmasterai
+keywords: [/prodmasterai, prodmaster, entry point, main command, what should i do, what next, status check, show me where we are]

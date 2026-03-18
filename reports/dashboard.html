@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProdMaster AI Dashboard</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+       background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+header { background: #1e293b; border-bottom: 1px solid #334155;
+         padding: .75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+header h1 { font-size: 1.1rem; font-weight: 700; color: #f8fafc; }
+.meta { font-size: .75rem; color: #94a3b8; }
+.dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; padding: 1rem; }
+@media(max-width:640px){ .dashboard { grid-template-columns: 1fr; } }
+.panel { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 1.25rem; }
+.panel-title { font-size: .65rem; font-weight: 700; text-transform: uppercase;
+               letter-spacing: .1em; color: #64748b; margin-bottom: .75rem; }
+.big-num { font-size: 2.25rem; font-weight: 800; color: #f8fafc; line-height: 1; }
+.sub-label { font-size: .75rem; color: #94a3b8; margin-top: .2rem; }
+.donut-row { display: flex; gap: 1.5rem; align-items: center; }
+.donut-info .stat { margin-top: .4rem; font-size: .8rem; color: #94a3b8; }
+.donut-info .stat b { color: #f8fafc; }
+.badge { display: inline-block; padding: 1px 7px; border-radius: 9999px;
+         font-size: .65rem; font-weight: 700; }
+.g { background:#14532d; color:#86efac; }
+.a { background:#78350f; color:#fcd34d; }
+.r { background:#7f1d1d; color:#fca5a5; }
+.row { padding: .5rem 0; border-bottom: 1px solid #0f172a;
+       display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
+.row:last-child { border-bottom: none; }
+.row-text { font-size: .8rem; flex: 1; }
+.row-fix { font-size: .7rem; color: #64748b; margin-top: 2px; }
+.row-right { flex-shrink: 0; }
+.empty { color: #475569; font-size: .8rem; font-style: italic; }
+footer { text-align: center; padding: .75rem; color: #334155; font-size: .7rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>&#9889; ProdMaster AI</h1>
+  <div class="meta" id="gen-meta">Dashboard — no data yet</div>
+</header>
+
+<div class="dashboard">
+  <div class="panel" id="panel-velocity">
+    <div class="panel-title">Feature Velocity</div>
+    <div class="big-num" id="vel-num">—</div>
+    <div class="sub-label">tasks / week</div>
+    <svg id="sparkline" width="100%" height="48" viewBox="0 0 260 48"
+         style="margin-top:.75rem" aria-label="velocity sparkline"></svg>
+  </div>
+  <div class="panel" id="panel-qa">
+    <div class="panel-title">QA Health</div>
+    <div class="donut-row">
+      <svg width="90" height="90" viewBox="0 0 90 90" aria-label="QA pass rate donut">
+        <circle cx="45" cy="45" r="32" fill="none" stroke="#1e293b" stroke-width="12"/>
+        <circle id="donut-arc" cx="45" cy="45" r="32" fill="none" stroke="#334155"
+          stroke-width="12" stroke-dasharray="0 201" stroke-linecap="round"
+          transform="rotate(-90 45 45)"/>
+        <text id="donut-pct" x="45" y="50" text-anchor="middle"
+          fill="#f8fafc" font-size="15" font-weight="800">—</text>
+      </svg>
+      <div class="donut-info">
+        <div class="sub-label">avg pass rate</div>
+        <div class="stat">Avg iterations: <b id="avg-iter">—</b></div>
+        <div style="margin-top:.4rem" id="qa-badge"></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Active Blockers</div>
+    <div id="blockers-list"><p class="empty">No active blockers.</p></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">BA Decisions Log</div>
+    <div id="decisions-list"><p class="empty">No decisions logged yet.</p></div>
+  </div>
+</div>
+
+<footer>ProdMaster AI &mdash; run the <code>report</code> skill to refresh</footer>
+
+<!-- Data injected by report skill. type=application/json prevents execution. -->
+<script type="application/json" id="prodmaster-data">
+{
+  "generated": "",
+  "velocity": [],
+  "qaPassRates": [],
+  "avgIterations": null,
+  "blockers": [],
+  "decisions": []
+}
+</script>
+
+<script>
+(function () {
+  'use strict';
+
+  // Safe: reads from <script type="application/json"> — not executable
+  var raw = document.getElementById('prodmaster-data');
+  var d = {};
+  try { d = JSON.parse(raw.textContent); } catch (e) { d = {}; }
+
+  // Header date — uses textContent only
+  if (d.generated) {
+    var dt = new Date(d.generated);
+    var meta = document.getElementById('gen-meta');
+    meta.textContent = 'Generated: ' + dt.toLocaleDateString('en-GB',
+      {day:'numeric', month:'short', year:'numeric'});
+  }
+
+  // Panel 1: Velocity sparkline
+  var vel = Array.isArray(d.velocity) ? d.velocity : [];
+  if (vel.length > 0) {
+    var cur = vel[vel.length - 1].value;
+    document.getElementById('vel-num').textContent = Number(cur).toFixed(1);
+    drawSparkline(vel.slice(-10).map(function(x){ return x.value; }));
+  }
+
+  // Panel 2: QA donut
+  var qa = Array.isArray(d.qaPassRates) ? d.qaPassRates : [];
+  if (qa.length > 0) {
+    var avg = qa.reduce(function(a,b){return a+b;},0) / qa.length;
+    var pct = Math.round(avg * 100);
+    document.getElementById('donut-pct').textContent = pct + '%';
+    var circ = 2 * Math.PI * 32; // r=32
+    var arc = document.getElementById('donut-arc');
+    arc.setAttribute('stroke-dasharray', (circ*avg).toFixed(2) + ' ' + (circ*(1-avg)).toFixed(2));
+    var col = avg >= 0.8 ? '#22c55e' : avg >= 0.6 ? '#f59e0b' : '#ef4444';
+    arc.setAttribute('stroke', col);
+    var badge = document.createElement('span');
+    badge.className = 'badge ' + (avg>=0.8?'g':avg>=0.6?'a':'r');
+    badge.textContent = avg>=0.8 ? 'Healthy' : avg>=0.6 ? 'Watch' : 'Critical';
+    document.getElementById('qa-badge').appendChild(badge);
+  }
+  if (d.avgIterations != null) {
+    document.getElementById('avg-iter').textContent = Number(d.avgIterations).toFixed(1);
+  }
+
+  // Panel 3: Blockers — safe DOM construction
+  var bl = Array.isArray(d.blockers) ? d.blockers : [];
+  var bList = document.getElementById('blockers-list');
+  if (bl.length > 0) {
+    bList.textContent = '';
+    bl.slice().sort(function(a,b){return b.age_days-a.age_days;}).forEach(function(b){
+      var row = document.createElement('div');
+      row.className = 'row';
+      var left = document.createElement('div');
+      left.className = 'row-text';
+      var t = document.createElement('div');
+      t.textContent = b.text || '';
+      left.appendChild(t);
+      if (b.recommended_fix) {
+        var fix = document.createElement('div');
+        fix.className = 'row-fix';
+        fix.textContent = '\u2192 ' + b.recommended_fix;
+        left.appendChild(fix);
+      }
+      var right = document.createElement('div');
+      right.className = 'row-right';
+      var ag = document.createElement('span');
+      ag.className = 'badge ' + (b.age_days > 7 ? 'r' : 'a');
+      ag.textContent = b.age_days + 'd';
+      right.appendChild(ag);
+      row.appendChild(left);
+      row.appendChild(right);
+      bList.appendChild(row);
+    });
+  }
+
+  // Panel 4: Decisions — safe DOM construction
+  var dec = Array.isArray(d.decisions) ? d.decisions : [];
+  var dList = document.getElementById('decisions-list');
+  if (dec.length > 0) {
+    dList.textContent = '';
+    dec.forEach(function(decision){
+      var row = document.createElement('div');
+      row.className = 'row';
+      var txt = document.createElement('div');
+      txt.className = 'row-text';
+      txt.textContent = decision.text || '';
+      var right = document.createElement('div');
+      right.className = 'row-right';
+      var badge = document.createElement('span');
+      var s = decision.status || '';
+      badge.className = 'badge ' + (s==='confirmed_good'?'g':s==='confirmed_bad'?'r':'a');
+      badge.textContent = s==='confirmed_good' ? '\u2713 Good'
+                        : s==='confirmed_bad'  ? '\u2717 Bad'
+                        : '\u23f3 Pending';
+      right.appendChild(badge);
+      row.appendChild(txt);
+      row.appendChild(right);
+      dList.appendChild(row);
+    });
+  }
+
+  // Sparkline using inline SVG polyline (values are numbers only — safe)
+  function drawSparkline(values) {
+    var svg = document.getElementById('sparkline');
+    if (values.length < 2) return;
+    var W = 260, H = 48, pad = 4;
+    var mn = Math.min.apply(null, values);
+    var mx = Math.max.apply(null, values);
+    var rng = mx - mn || 1;
+    var pts = values.map(function(v, i) {
+      var x = pad + (i / (values.length - 1)) * (W - 2*pad);
+      var y = H - pad - ((v - mn) / rng) * (H - 2*pad);
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    // Use setAttribute with safe numeric strings — no user text involved
+    var line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    line.setAttribute('points', pts);
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', '#3b82f6');
+    line.setAttribute('stroke-width', '2');
+    line.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(line);
+    var lastPt = pts.split(' ').pop().split(',');
+    var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('cx', lastPt[0]);
+    dot.setAttribute('cy', lastPt[1]);
+    dot.setAttribute('r', '3');
+    dot.setAttribute('fill', '#60a5fa');
+    svg.appendChild(dot);
+  }
+}());
+</script>
+</body>
+</html>

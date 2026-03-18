@@ -11,13 +11,13 @@ generated: false
 generated_from: ""
 ---
 
-# Help — ProdMaster AI Skill Reference
+# Help -- ProdMaster AI Skill Reference
 
 Print the card below exactly as formatted. Do not paraphrase. Do not add preamble.
 
 ---
 
-## ProdMaster AI — Skill Reference Card
+## ProdMaster AI -- Skill Reference Card
 
 ---
 
@@ -25,7 +25,7 @@ Print the card below exactly as formatted. Do not paraphrase. Do not add preambl
 
 | Skill | Trigger | Example |
 |---|---|---|
-| `prodmasterai` | `/prodmasterai` (no args) | `/prodmasterai` — reads state, acts or asks one question |
+| `prodmasterai` | `/prodmasterai` (no args) | `/prodmasterai` -- reads state, acts or asks one question |
 | `smooth-dev` | "pull latest" / "start dev" / "pre-flight" | `/prodmasterai pull latest` |
 
 ---
@@ -42,7 +42,7 @@ Print the card below exactly as formatted. Do not paraphrase. Do not add preambl
 
 | Skill | Trigger | Example |
 |---|---|---|
-| `measure` | "cycle done — N tasks, QA X%, Y reviews, Z hours" | `/prodmasterai cycle done — 5 tasks, QA 90%, 2 reviews, 3 hours` |
+| `measure` | "cycle done -- N tasks, QA X%, Y reviews, Z hours" | `/prodmasterai cycle done -- 5 tasks, QA 90%, 2 reviews, 3 hours` |
 | `report` | "report" / "dashboard" / "weekly summary" | `/prodmasterai report` |
 
 ---
@@ -52,7 +52,7 @@ Print the card below exactly as formatted. Do not paraphrase. Do not add preambl
 | Skill | Trigger | Example |
 |---|---|---|
 | `decide` | "should we A or B?" / "prioritise" / "which option" | `/prodmasterai should we use REST or GraphQL?` |
-| `learn` | "remember this" / "that was wrong" / "log this" | `/prodmasterai that approach worked well — log it` |
+| `learn` | "remember this" / "that was wrong" / "log this" | `/prodmasterai that approach worked well -- log it` |
 
 ---
 
@@ -65,4 +65,4 @@ Print the card below exactly as formatted. Do not paraphrase. Do not add preambl
 
 ---
 
-**Tip:** just type `/prodmasterai` and describe what you want — the plugin will route you automatically.
+**Tip:** just type `/prodmasterai` and describe what you want -- the plugin will route you automatically.

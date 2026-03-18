@@ -57,7 +57,8 @@ def test_all_skill_frontmatter():
 
 def test_project_context_counters():
     c = open(os.path.join(PLUGIN_ROOT, "memory", "project-context.md")).read()
-    for f in ["total_tasks_completed: 0", "last_evolved_at_task: 0", "evolve_every_n_tasks: 10"]:
+    # Check field presence only — values change as cycles are logged
+    for f in ["total_tasks_completed:", "last_evolved_at_task:", "evolve_every_n_tasks:"]:
         assert f in c, f"project-context.md missing: {f}"
 
 def test_hook_output(tmp_path):

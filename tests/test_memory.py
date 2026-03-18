@@ -23,7 +23,8 @@ def test_memory_file_exists(filename):
 
 def test_project_context_has_counters():
     content = open(os.path.join(MEMORY_DIR, "project-context.md")).read()
-    for f in ["total_tasks_completed: 0", "last_evolved_at_task: 0", "evolve_every_n_tasks: 10"]:
+    # Check field presence only — values change as cycles are logged
+    for f in ["total_tasks_completed:", "last_evolved_at_task:", "evolve_every_n_tasks:"]:
         assert f in content, f"Missing: {f}"
 
 def test_skill_performance_has_example():

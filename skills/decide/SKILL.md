@@ -1,7 +1,7 @@
 ---
 name: decide
 description: Use when user is at a decision fork — "should we do A or B?", "what should we prioritise?", "which approach?". Reads project state and metrics to rank options by ROI/risk and give one clear recommendation.
-version: 1.0.0
+version: 1.1.0
 triggers:
   - User asks "should we", "which option", "prioritise", "help me decide", "recommend"
   - User presents two or more options and asks what to do
@@ -20,8 +20,9 @@ Give data-backed recommendations at decision forks.
 
 ## Process
 
-### 1. Read Context
+### 1. Read Context (parallel)
 
+Read both files simultaneously — no shared state:
 - `memory/project-context.md` — active features, blockers, recent decisions
 - `memory/skill-performance.md` — last 5 entries (skip `example: true`)
 
@@ -75,7 +76,14 @@ status: pending_outcome
 ---
 ```
 
-Tell the user: *"Decision logged. When you see how it plays out, let me know and I'll update the status — this helps the system learn which decision patterns work."*
+Tell the user: *"Decision logged. When you see how it plays out, say `/prodmasterai decision on [topic] was good/bad` and I'll update the outcome — this helps the system learn which decision patterns work."*
+
+### 6. Close Prior Decisions (if outcome provided)
+
+If the user provides outcome feedback on a previously logged decision (e.g. "that decision worked" / "that decision failed"):
+1. Find the matching entry in `## Decisions Log` by topic/date.
+2. Update `status:` from `pending_outcome` to `confirmed_good` or `confirmed_bad`.
+3. Hand off to `learn` (feedback path) with the outcome as feedback.
 
 ## Rules
 

@@ -1,7 +1,7 @@
 ---
 name: evolve-self
-description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Runs a 2-iteration refinement loop automatically — no user confirmation between iterations. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
-version: 1.6.0
+description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Runs a convergence loop — no fixed cap, reruns until all changed skills are clean. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
+version: 1.7.0
 triggers:
   - User runs /evolve
   - measure notifies that evolution threshold was reached
@@ -161,7 +161,8 @@ upstream_status: pending_publish
 
 ### No-Op Case
 
-If neither mode produced output:
+If neither Mode 1 nor Mode 2 produced any output (no skills improved, no skills generated):
+1. Append to `memory/evolution-log.md`:
 ```yaml
 ---
 date: YYYY-MM-DD
@@ -172,12 +173,14 @@ change_summary: No improvements or new skills needed at this time
 upstream_status: n/a
 ---
 ```
-
-Tell user: *"Evolution check ran — nothing needed at this time."*
+2. Tell user: *"Evolution check ran — nothing needed at this time."*
+3. **Skip the Convergence Refinement Loop entirely.** Jump directly to Post-Phase-1 Update.
 
 ---
 
 ### Convergence Refinement Loop
+
+> Only runs when Mode 1 or Mode 2 produced at least one changed or created skill file. If No-Op case fired, skip this section.
 
 Phase 1 runs a **convergence loop** — no fixed iteration cap. It continues until a full pass over all changed skills produces zero further changes.
 

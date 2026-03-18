@@ -1,7 +1,7 @@
 ---
 name: measure
 description: Use after every completed Superpowers cycle to record metrics. Captures velocity, QA pass rate, review iterations, and blockers. Always hand off to learn after recording.
-version: 1.1.0
+version: 1.2.0
 triggers:
   - A Superpowers cycle has just completed
   - User says "cycle done", "feature finished", "tasks completed"
@@ -60,9 +60,11 @@ qa_pass_rate: <value>
 review_iterations: <value>
 time_per_feature_hours: <value>
 blockers: <value>
-blocker_age_days_avg: 0
+blocker_age_days_avg: <calculated — see below>
 ---
 ```
+
+`blocker_age_days_avg`: Read `## Blockers` in `project-context.md`. For each open blocker, compute `(today - blocker_date)` in days. Average all values. If no blockers: `0`.
 
 **Step 3 (parallel)** — Increment counter in `project-context.md`:
 Read frontmatter (between first `---` and second `---`). Add `tasks_completed` to `total_tasks_completed:`. Rewrite frontmatter block only — do not touch the rest of the file.
@@ -73,7 +75,7 @@ Run steps 4 and 5 simultaneously — they are independent:
 
 **Step 4 (parallel)** — Pass the same cycle outcome object to `learn`.
 
-**Step 5 (parallel)** — Compare updated `total_tasks_completed` to `last_evolved_at_task + evolve_every_n_tasks`. If threshold reached: notify user *"Evolution threshold reached — running evolve-self now."* and invoke `evolve-self` Phase 1 automatically.
+**Step 5 (parallel)** — Compare updated `total_tasks_completed` to `last_evolved_at_task + evolve_every_n_tasks`. If threshold reached: set a flag on the cycle outcome object (`evolution_threshold_reached: true`). The `prodmasterai` master skill owns the decision to invoke `evolve-self` — measure only records the flag. Do not invoke evolve-self directly from measure.
 
 ## Rules
 

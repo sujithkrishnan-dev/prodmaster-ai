@@ -30,6 +30,7 @@ That's it. The plugin reads your current state and decides what to do next — n
 
 | You say | Plugin does |
 |---|---|
+| `/prodmasterai pull latest` | `smooth-dev` — git pull, repo health check, run tests, surface blockers, print session card |
 | `/prodmasterai build X` | `orchestrate` — breaks feature into tracked tasks, dispatches independent subtasks in parallel |
 | `/prodmasterai cycle done — …` | `measure` → `learn` auto-fires (parallel writes) |
 | `/prodmasterai should we A or B?` | `decide` — scored recommendation |

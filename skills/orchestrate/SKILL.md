@@ -1,7 +1,7 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal — "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.1.0
+version: 1.2.0
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities
@@ -10,6 +10,7 @@ reads:
   - memory/patterns.md
   - memory/connectors/github.md
   - memory/connectors/linear.md
+  - memory/connectors/skill-pattern-manifest.md
 writes:
   - memory/project-context.md
 generated: false
@@ -67,6 +68,12 @@ Do not reimplement Superpowers. Hand off cleanly.
 Append to `memory/project-context.md` `## Active Features`:
 ```
 - YYYY-MM-DD: <feature name> [status: active]
+```
+
+When feature status changes (active → blocked → done), update the existing line in `## Active Features` in place — find the feature by name and rewrite only its status tag:
+```
+- YYYY-MM-DD: <feature name> [status: blocked]   ← update when blocked
+- YYYY-MM-DD: <feature name> [status: done]       ← update when shipped
 ```
 
 If blockers exist, append to `## Blockers`:

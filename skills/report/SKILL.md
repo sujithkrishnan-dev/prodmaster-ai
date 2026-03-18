@@ -1,7 +1,7 @@
 ---
 name: report
 description: Use to generate productivity reports and refresh the HTML dashboard. Run with /report or /report weekly. Reads all memory files, produces a markdown weekly summary and a self-contained HTML dashboard. When no data exists, auto-bootstraps a getting-started guide and kicks off orchestrate.
-version: 1.2.0
+version: 1.3.0
 triggers:
   - User runs /report
   - User asks for weekly summary, status update, management report, or dashboard refresh
@@ -12,6 +12,7 @@ reads:
   - memory/mistakes.md
   - memory/connectors/slack.md
   - memory/connectors/linear.md
+  - memory/connectors/github.md
 writes:
   - reports/weekly-YYYY-MM-DD.md
   - reports/dashboard.html
@@ -126,17 +127,6 @@ Embed all stats as a JSON object in a `<script>` tag with `type="application/jso
 
 If `memory/connectors/slack.md` has `active: true` and non-empty `webhook_url`: post the Summary section of the markdown report to the webhook.
 
-## Completion Message
-
-**If real data exists:**
-- *"Weekly report written to `reports/weekly-YYYY-MM-DD.md`"*
-- *"Dashboard updated at `reports/dashboard.html` — double-click to open"*
-
-**If Fresh-State Bootstrap ran:**
-- *"No cycle data yet — wrote `reports/getting-started-YYYY-MM-DD.md` instead."*
-- Then immediately ask: *"What are you building first? Tell me the feature name and I'll break it into tasks right now."*
-- Do NOT write `reports/dashboard.html` with zeros.
-
 ## Fresh-State Bootstrap (no real data detected)
 
 When `skill-performance.md` has no non-example entries:
@@ -161,8 +151,8 @@ No cycle data recorded yet. Here's your fast path to a live dashboard:
 ProdMaster AI will populate all metrics automatically after Step 2.
 ```
 
-2. **Auto-invoke `orchestrate`**: Ask the user *"What are you building first? Tell me the feature name and I'll break it into tasks right now."* — do not wait passively.
-3. **Do NOT write dashboard.html with zeros** — write a placeholder dashboard that shows the getting-started guide inline.
+2. **Do NOT write dashboard.html with zeros.** Skip dashboard generation entirely in fresh state.
+3. **Completion message** (fresh state): *"No cycle data yet — wrote `reports/getting-started-YYYY-MM-DD.md`."* Then ask: *"What are you building first? Tell me the feature name and I'll break it into tasks right now."*
 
 ## Rules
 

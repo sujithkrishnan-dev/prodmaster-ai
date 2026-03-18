@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Use after each Superpowers cycle to capture patterns, mistakes, and skill gaps. Also use when user provides explicit feedback ("that was wrong", "that worked well", "remember this").
-version: 1.1.0
+version: 1.2.0
 triggers:
   - measure hands off a cycle outcome object
   - User gives explicit feedback about a workflow or decision
@@ -41,9 +41,9 @@ unhandled_patterns: [keywords]
 
 ### Classify
 
-- `qa_pass_rate >= 0.9` AND `review_iterations <= 2` → write to `patterns.md`
-- `qa_pass_rate < 0.6` OR `review_iterations > 4` → write to `mistakes.md`
-- Neither condition → no write to patterns or mistakes
+- `qa_pass_rate >= 0.9` AND `review_iterations <= 2` → write to `patterns.md` (success)
+- `qa_pass_rate < 0.6` OR `review_iterations > 4` → write to `mistakes.md` (failure)
+- Middle range (QA 0.6–0.9 OR reviews 3–4, not hitting either threshold above) → write a **marginal entry** to `mistakes.md` with `root_cause: "marginal cycle — no clear failure but below success threshold"` and `fix_applied: "review for improvement opportunities"`. Do not discard mid-range cycles silently.
 
 ### Parallel Write Block
 
@@ -99,6 +99,8 @@ generated_skill: ""
 ```
 
 **Rule:** One increment per cycle per pattern — even if the pattern appeared multiple times within that cycle.
+
+**Gap threshold trigger:** After incrementing, if a gap entry now has `occurrences >= 3` and `status: open`, append a note to the cycle output: *"Skill gap '[pattern]' has reached 3 occurrences — run /evolve to auto-generate a skill for it."* Do not invoke evolve-self automatically from learn; just surface it.
 
 ---
 

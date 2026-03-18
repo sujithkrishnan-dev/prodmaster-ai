@@ -23,3 +23,6 @@ keywords: [evolve, improve plugin, generate skill, self-improve, /evolve, plugin
 
 ### prodmasterai
 keywords: [/prodmasterai, prodmaster, entry point, main command, what should i do, what next, status check, show me where we are]
+
+### smooth-dev
+keywords: [pull latest, take a pull, sync code, get latest, start dev, smooth dev, pre-flight, health check, ensure up to date, clean state, ready to code, start development session, begin session]

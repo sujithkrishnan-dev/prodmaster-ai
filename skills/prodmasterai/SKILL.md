@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
 description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic — runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
-version: 1.3.0
+version: 1.5.0
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -29,13 +29,15 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 
 | Pattern | Route to |
 |---|---|
+| "pull latest", "take a pull", "sync code", "start dev", "smooth dev", "pre-flight", "ensure up to date", "ready to code" | `smooth-dev` |
 | "build X", "implement X", "start X", "work on X" | `orchestrate` |
 | "cycle done", "N tasks, QA X%, Y reviews, Z hours" | `measure` → `learn` |
 | "should we A or B", "what to prioritise", "pick between" | `decide` |
 | "report", "summary", "dashboard", "weekly" | `report` |
 | "remember this", "log this", "that was wrong/right" | `learn` (feedback path) |
-| "evolve", "improve yourself", "generate skill" | `evolve-self` Phase 1 (local only) |
+| "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved" | `evolve-self` Phase 1 (local only) |
 | "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
+| "decision on X was good/bad", "that worked", "that failed", "update decision" | `decide` (outcome close path) |
 
 **If classified:** invoke the matched skill immediately with the supplied text as input. Do not re-present a menu.
 

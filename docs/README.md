@@ -81,7 +81,7 @@ Edit `memory/connectors/<name>.md`, set `active: true`, fill in config.
 
 - Outcome/research improvements → automatic PR (no confirmation needed)
 - Feedback improvements → asks you first, then creates PR on confirmation
-- Max 1 upstream PR per 24 hours
+- PRs created immediately on `/prodmasterai update` — no time-based rate limit
 - Run `/prodmasterai update` to push pending improvements
 
 ## Dashboard

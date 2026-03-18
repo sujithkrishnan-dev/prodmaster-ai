@@ -1,7 +1,7 @@
 ---
 name: evolve-self
 description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Runs a convergence loop — no fixed cap, reruns until all changed skills are clean. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
-version: 1.8.0
+version: 1.8.1
 triggers:
   - User runs /evolve
   - measure notifies that evolution threshold was reached
@@ -269,11 +269,7 @@ including memory data. Use aggregated signals only:
 Collect all `memory/evolution-log.md` entries with `upstream_status: pending_publish`.
 If none: tell user *"Nothing pending to publish upstream."* Stop.
 
-### 2. Rate Limit Check
-
-Read `memory/pending-upstream/last-pr.txt`. If fewer than 24 hours since last PR: queue and tell user *"Rate limit active until [timestamp + 24h] — queued for next available window."*
-
-### 3. Package Proposals
+### 2. Package Proposals
 
 For each pending change create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
 
@@ -315,7 +311,7 @@ Check existing files in `memory/pending-upstream/` (any status), existing `skill
 - Label: `auto-evolved`
 - Auth order: GitHub MCP → `gh` CLI → local-only fallback (log + notify)
 
-After each PR: set `upstream_status: pr_created` on the evolution-log entry, update proposal `status: pr_created`, write UTC timestamp to `memory/pending-upstream/last-pr.txt`.
+After each PR: set `upstream_status: pr_created` on the evolution-log entry, update proposal `status: pr_created`.
 
 ### 6. Check Pending PRs
 
@@ -339,6 +335,6 @@ For all `status: pr_created` proposals:
 - Memory data MAY go upstream as supporting evidence — MUST be anonymised first
 - Never delete existing skills upstream — additive only
 - feedback.md is READ-ONLY for this skill — only the learn skill writes to it
-- Max 1 upstream PR per 24 hours
+- PRs are created whenever the user explicitly runs `/prodmasterai update` — no time-based rate limit
 - PRs never self-merge
 - Generated skills must use the full standard frontmatter schema

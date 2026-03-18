@@ -101,3 +101,4 @@ Fill `unhandled_patterns` with patterns that arose but no manifest keyword cover
 - Never reimplement Superpowers — invoke it, don't replace it
 - Always update project-context.md before ending the session
 - One feature at a time unless user explicitly requests parallel work
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

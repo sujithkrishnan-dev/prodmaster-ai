@@ -82,3 +82,4 @@ Tell the user: *"Decision logged. When you see how it plays out, let me know and
 - Give ONE clear recommendation — no hedging without a conclusion
 - Use actual performance data when available; flag when there is none
 - Log every decision, even simple ones
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

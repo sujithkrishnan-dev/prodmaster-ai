@@ -78,3 +78,4 @@ After `learn` completes: compare `total_tasks_completed` to `last_evolved_at_tas
 - Always record even for failed/partial cycles (qa_pass_rate reflects reality)
 - Append only — never modify existing entries
 - Always hand off to `learn`
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

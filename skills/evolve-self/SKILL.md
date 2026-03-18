@@ -178,25 +178,34 @@ After Mode 1 and Mode 2 have both completed (whether or not they produced output
 
 ---
 
-## Upstream Pipeline (runs after any Mode 1 or Mode 2 output)
+## Upstream Pipeline (runs ONLY here, ONLY during evolve-self)
 
-> **Scope rule:** The upstream pipeline exists ONLY to improve the shared plugin code.
-> It MUST ONLY package changes to plugin files:
-> - `skills/*/SKILL.md`
-> - `skills/evolve-self/research-subagent-prompt.md`
-> - `skills/evolve-self/pr-template.md`
-> - `hooks/session-start.md`
->
-> **NEVER include memory files** (`memory/**`) in any upstream proposal or PR.
-> Memory files contain local user data — metrics, decisions, patterns, feedback — and are
-> always private to this installation. Sending them upstream would violate user privacy
-> and make the plugin non-standard.
+> **The upstream pipeline is the exclusive property of evolve-self.**
+> No other skill (orchestrate, measure, report, decide, learn, prodmasterai) ever
+> touches upstream. If you are not executing evolve-self, skip this section entirely.
+
+### What can go upstream
+
+**Plugin files (always eligible):**
+- `skills/*/SKILL.md` — improved or newly generated skill files
+- `skills/evolve-self/research-subagent-prompt.md`, `pr-template.md`
+- `hooks/session-start.md`
+
+**Memory / user data (eligible as supporting evidence):**
+- `memory/patterns.md`, `memory/mistakes.md`, `memory/skill-gaps.md` — anonymised aggregates only
+- `memory/feedback.md` — user-gated (see Step 5 gate rule)
+- `memory/skill-performance.md` — metrics trends, not raw project names
+- `memory/research-findings.md` — research conclusions only
+
+**Anonymisation rule:** Before including any memory data in an upstream proposal or PR body,
+strip or generalise identifiable project names, feature names, and personal details.
+Aggregate patterns are fine ("qa_pass_rate declined 3 cycles in a row").
+Raw entries with project names are not ("feature: user authentication login flow failed").
 
 ### 1. Identify Upstream-Eligible Changes
 
 Before anything else: build a list of files actually changed/created in Mode 1 and Mode 2.
-Keep ONLY files matching `skills/**` or `hooks/session-start.md`.
-If the list is empty: **skip the entire upstream pipeline** — log "no plugin files changed, upstream skipped."
+If the list is empty: **skip the entire upstream pipeline** — log "no changes, upstream skipped."
 
 ### 2. Rate Limit Check
 
@@ -204,7 +213,7 @@ Read `memory/pending-upstream/last-pr.txt`. Parse as ISO 8601 UTC. If fewer than
 
 ### 3. Package Proposal
 
-For each eligible changed/generated plugin file create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
+For each changed/generated item create `memory/pending-upstream/YYYY-MM-DD-<skill-name>-<mode>.md`:
 
 ```yaml
 ---
@@ -218,13 +227,14 @@ status: pending
 pr_url: ""
 ---
 ## What Changed
-<description of skill file changes — no user data>
+<description of plugin file changes>
 
 ## Why
-<trigger and evidence — cite patterns/performance trends, NOT raw memory entries>
+<trigger and evidence — cite anonymised patterns/performance trends>
 
-## Evidence
-<aggregated stats only: e.g. "qa_pass_rate declined 3 cycles in a row" — never paste user project names or decisions>
+## Supporting Data (anonymised)
+<aggregated memory signals that drove this change, stripped of project/user identifiers>
+<e.g. "qa_pass_rate declined 3 cycles in a row" not "feature: login page declined">
 ```
 
 ### 4. Validate (no duplicates)
@@ -238,6 +248,11 @@ If duplicate: delete proposal, log, skip.
 
 ### 5. Create PR or Gate
 
+**Feedback gate:** Any proposal with `source: feedback` MUST ask the user before creating a PR:
+*"I've prepared an improvement based on your feedback about [topic]: [change_summary]. Include your supporting patterns as anonymised evidence and contribute back?"*
+- Yes → proceed with PR (anonymise memory data in body)
+- No → `status: rejected`, keep local changes only
+
 **Source = outcome or research:** Create GitHub PR automatically:
 - Branch: `auto-evolved/YYYY-MM-DD-<skill-name>-<mode>` (suffix `-v2` if branch exists)
 - Body: render `skills/evolve-self/pr-template.md` — include only skill diffs, no user data
@@ -247,10 +262,7 @@ If duplicate: delete proposal, log, skip.
 Update `status: pr_created`, `pr_url: <url>`.
 Write current UTC timestamp to `memory/pending-upstream/last-pr.txt`.
 
-**Source = feedback:**
-Ask: *"I've prepared an improvement based on your feedback about [topic]: [change_summary]. Contribute this back for all users?"*
-- Yes → create PR as above
-- No → set `status: rejected`, keep local changes
+*(feedback already handled above — skip for feedback source)*
 
 ### 6. Check Pending PRs
 
@@ -270,7 +282,9 @@ On every run, check all `status: pr_created` proposals:
 ## Rules
 
 - Mode 1 always before Mode 2
-- **Upstream = plugin code only.** Memory files NEVER go upstream, ever.
+- **Upstream contributions happen ONLY here, ONLY during evolve-self.** No other skill ever touches upstream — not measure, not learn, not report, not decide, not orchestrate.
+- Memory data MAY go upstream as supporting evidence — but MUST be anonymised first (no raw project names, feature names, or personal identifiers)
+- Feedback-sourced contributions are always user-gated before PR creation
 - Never delete existing skills upstream — additive only
 - feedback.md is READ-ONLY for this skill — only read, never write
 - Max 1 upstream PR per 24 hours

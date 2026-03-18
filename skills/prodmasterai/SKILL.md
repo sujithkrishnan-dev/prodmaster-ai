@@ -99,3 +99,4 @@ Do not describe what you are about to do. Just do it.
 - Never show a numbered menu — route autonomously or ask exactly one question
 - Always execute; never just explain
 - If two conditions in Step 3 match, take the higher-priority one (A > B > C > D)
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

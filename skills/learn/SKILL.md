@@ -124,3 +124,4 @@ Tell the user: *"Logged. Run /evolve when you want to consider contributing this
 - feedback.md is WRITE-RESTRICTED — only this skill (feedback path) may write to it
 - Be specific in descriptions — "used small focused tasks with clear acceptance criteria" not just "good process"
 - Skill gap IDs must be unique: `gap-<date>-<slug>`
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

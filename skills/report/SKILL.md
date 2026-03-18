@@ -135,3 +135,4 @@ Tell the user:
 - Skip `example: true` entries in all calculations
 - If no real data: generate report with zeros and note "No cycle data yet — run orchestrate and measure first"
 - Never overwrite existing report files — create new dated files
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

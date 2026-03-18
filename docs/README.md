@@ -74,6 +74,7 @@ Edit `memory/connectors/<name>.md`, set `active: true`, fill in config.
 | `github.md` | GitHub Issues/PRs |
 | `slack.md` | Slack webhook |
 | `linear.md` | Linear issue tracking |
+| `superpowers.md` | Superpowers — auto-detected by `orchestrate`; offers install on first use |
 
 ## Upstream Evolution
 

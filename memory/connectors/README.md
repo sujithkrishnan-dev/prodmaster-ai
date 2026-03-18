@@ -9,6 +9,7 @@ Activate a connector by setting `active: true` in the connector file and filling
 | `github.md` | GitHub Issues and PRs | orchestrate, evolve-self |
 | `slack.md` | Slack webhook | report, evolve-self |
 | `linear.md` | Linear issue tracking | orchestrate, report |
+| `superpowers.md` | Superpowers plugin (TDD execution) | orchestrate — auto-detects, offers install on first use |
 
 ## Connector File Format
 

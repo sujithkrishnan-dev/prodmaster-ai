@@ -1,7 +1,7 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal — "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.2.1
+version: 1.3.0
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities
@@ -11,6 +11,7 @@ reads:
   - memory/connectors/github.md
   - memory/connectors/linear.md
   - memory/connectors/skill-pattern-manifest.md
+  - memory/connectors/superpowers.md
 writes:
   - memory/project-context.md
 generated: false
@@ -55,6 +56,28 @@ Do not show raw YAML or code-block wrappers around this breakdown — present it
 
 ### 3. Invoke Superpowers
 
+#### 3a. Detect Superpowers
+
+Read `memory/connectors/superpowers.md`. Check the `installed` field:
+
+**If `installed: true` and `active: true`:** proceed to invoke Superpowers normally (Step 3b).
+
+**If `installed: false` (first time this is needed):** ask the user exactly once:
+
+> Superpowers isn't installed — it adds automated TDD execution to your cycles (write tests → implement → review, all hands-free). Want me to install it now?
+>
+> - **Yes** → I'll clone it into `~/.claude/plugins/superpowers` right now
+> - **No** → I'll manage the task breakdown manually; you execute the tasks yourself
+
+- **Yes:** Run the install (Step 3c), then proceed to Step 3b.
+- **No:** Set `active: false` in `memory/connectors/superpowers.md` so this question is not asked again. Skip to Step 3d (manual fallback).
+
+**If `active: false` (user previously declined):** skip to Step 3d without asking again.
+
+---
+
+#### 3b. Invoke Superpowers (installed + active)
+
 For each task cycle, hand off to Superpowers:
 - Planning: trigger `superpowers:writing-plans`
 - Execution: trigger `superpowers:subagent-driven-development`
@@ -62,6 +85,45 @@ For each task cycle, hand off to Superpowers:
 **Parallelism rule:** Identify which subtasks have no shared state or output dependencies. Dispatch all independent subtasks in parallel. Only serialize tasks that depend on the output of a prior task. Never artificially queue tasks that could run concurrently.
 
 Do not reimplement Superpowers. Hand off cleanly.
+
+---
+
+#### 3c. Install Superpowers
+
+Read `repo_url` and `install_path` from `memory/connectors/superpowers.md`.
+
+Run:
+```bash
+git clone <repo_url> <install_path>
+```
+
+Expand `~` to the user's home directory before running.
+
+**On success:**
+- Set `installed: true` and `active: true` in `memory/connectors/superpowers.md`
+- Tell user: *"Superpowers installed at `<install_path>`. Restart your Claude Code session to load it, then re-run `/prodmasterai build [feature]` to kick off the cycle."*
+- Stop — do not continue to Step 3b in the same session (plugin load requires restart).
+
+**On failure (git not found, network error, permission denied):**
+- Tell user: *"Install failed: `<error>`. You can install manually: `git clone <repo_url> <install_path>`, then restart Claude Code."*
+- Fall through to Step 3d (manual mode for this session).
+
+---
+
+#### 3d. Manual fallback (no Superpowers)
+
+Present the task breakdown as a numbered list the user can execute themselves or with Claude directly:
+
+> **Ready to build — manual mode** (Superpowers not active)
+>
+> Work through these tasks in order. When done, log the cycle:
+> `/prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours`
+>
+> 1. `<Task 1 description>`
+> 2. `<Task 2 description>`
+> ...
+
+All metrics, patterns, and learning still work exactly the same in manual mode.
 
 ### 4. Update Memory
 
@@ -102,6 +164,8 @@ Fill `unhandled_patterns` with patterns that arose but no manifest keyword cover
 ## Rules
 
 - Never reimplement Superpowers — invoke it, don't replace it
+- Ask about Superpowers install exactly once — never repeat if user declined (`active: false`)
+- Always fall back to manual mode gracefully — all downstream skills (measure, learn, report) work identically
 - Always update project-context.md before ending the session
 - Within a feature: dispatch all independent subtasks in parallel; only serialize where output dependency exists
 - Across features: one active feature at a time unless user explicitly requests multi-feature parallel work

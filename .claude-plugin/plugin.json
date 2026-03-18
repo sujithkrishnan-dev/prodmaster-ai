@@ -2,14 +2,8 @@
   "name": "prodmaster-ai",
   "version": "1.0.0",
   "description": "Meta-orchestration, measurement, and self-evolving intelligence layer for Claude Code. Sits above Superpowers to orchestrate features, track velocity, generate reports, and auto-improve itself.",
-  "category": "productivity",
   "author": {
     "name": "sujithkrishnan-dev",
     "email": ""
-  },
-  "upstream": {
-    "repo": "sujithkrishnan-dev/prodmaster-ai",
-    "branch": "main",
-    "pr_label": "auto-evolved"
   }
 }

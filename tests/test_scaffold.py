@@ -12,8 +12,13 @@ def test_plugin_json_valid():
     assert data["name"] == "prodmaster-ai"
     assert "version" in data
     assert "description" in data
-    assert "upstream" in data
-    assert data["upstream"]["repo"] == "sujithkrishnan-dev/prodmaster-ai"
+
+def test_upstream_config_exists():
+    """Upstream config moved to memory/upstream.md (plugin.json schema rejects 'upstream' key)."""
+    path = os.path.join(PLUGIN_ROOT, "memory", "upstream.md")
+    assert os.path.exists(path)
+    content = open(path).read()
+    assert "sujithkrishnan-dev/prodmaster-ai" in content
 
 def test_evolution_log_exists():
     assert os.path.exists(os.path.join(PLUGIN_ROOT, "EVOLUTION-LOG.md"))

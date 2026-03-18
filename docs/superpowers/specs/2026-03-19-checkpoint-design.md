@@ -177,6 +177,14 @@ Add to the routing table in `skills/prodmasterai/SKILL.md`:
 
 Replace the current prodmasterai routing row `| "resume", ... | resume |` with this conditional logic. The `resume` skill remains reachable -- it just requires the checkpoint to be cleared first.
 
+The other two new routing rows are unconditional (no disambiguation needed):
+- "checkpoint discard" / "discard checkpoint" / "clear checkpoint" -- always routes to `checkpoint` clear operation
+- "checkpoint reset" / "reset in" / "limit resets in" -- always routes to `checkpoint` scheduled task update
+
+**Resume banner injection order:** Inject the resume banner AFTER the standard session context block and BEFORE the final tip line (`*One command: /prodmasterai...*`). This ensures active project context appears first, then the interruption notice.
+
+**Scheduled task command:** Schedule exactly `/prodmasterai resume` with no additional parameters. Only one checkpoint exists at a time (overwrite pattern), so no checkpoint ID is needed.
+
 ---
 
 ## Skill Updates: Checkpoint Write/Clear Calls

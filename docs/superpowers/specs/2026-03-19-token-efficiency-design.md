@@ -57,7 +57,7 @@ Reads all files in `skills/*/SKILL.md` and `hooks/session-start.md`. Checks agai
 
 | Rule | Severity | Detection |
 |---|---|---|
-| Full file read > 100 lines where only frontmatter or partial content needed | HIGH | Reads instruction uses full path with no `limit:` parameter |
+| Full file read > 100 lines where only frontmatter or partial content is needed | HIGH | Read instruction uses full path with no `limit:` parameter (same threshold as Enforce rule E1) |
 | Subagent prompt references session history or full file contents inline | HIGH | Prompt length signal in skill description > 500 words |
 | Code quality review dispatched on tasks touching <= 2 lines | MED | Review step present with no size guard |
 | Same memory file read in multiple sequential steps | MED | Multiple reads of same path in one skill body |
@@ -103,7 +103,7 @@ Before reading <file>: call token-efficiency enforce -- check if full read is ne
 | Rule ID | Trigger condition | Response |
 |---|---|---|
 | E1 | File read with no `limit:` and file > 100 lines | SUGGEST_ALTERNATIVE: use `limit: 30` + `offset: 0` |
-| E2 | Subagent prompt > 2000 tokens estimated | ALLOW_WITH_WARNING: trim session history from prompt |
+| E2 | Subagent prompt > 2000 tokens estimated (approximation: 1 token ~= 4 chars, so flag at > 8000 chars) | ALLOW_WITH_WARNING: trim session history from prompt |
 | E3 | Review subagent on task touching <= 2 lines | SUGGEST_ALTERNATIVE: self-review only |
 | E4 | Same file path read twice in same skill execution | SUGGEST_ALTERNATIVE: cache content from first read |
 | E5 | Memory file is empty (0 bytes or header-only) | SUGGEST_ALTERNATIVE: skip injection |
@@ -114,9 +114,9 @@ Before reading <file>: call token-efficiency enforce -- check if full read is ne
 - `ALLOW_WITH_WARNING <message>` -- proceed but log the warning. Example: `ALLOW_WITH_WARNING: subagent prompt is 2100 tokens -- trim session history before next dispatch`
 - `SUGGEST_ALTERNATIVE <leaner approach>` -- do not proceed; try the suggested alternative instead. Example for E1: `SUGGEST_ALTERNATIVE: use Read tool with limit: 30 offset: 0 instead of full file read`. Example for E3: `SUGGEST_ALTERNATIVE: task touches 1 line -- skip review subagent, use implementer self-review only`
 
-Enforce never blocks unconditionally -- it always provides an alternative. The calling skill decides whether to follow the suggestion.
+Enforce never blocks unconditionally -- it always provides an alternative. The calling skill decides whether to follow the suggestion. If the calling skill overrides a `SUGGEST_ALTERNATIVE`, it proceeds with the original action -- override is NOT logged (calling skill's autonomy is respected).
 
-Appends one line to `memory/token-efficiency-log.md` for each non-ALLOW result.
+Appends one line to `memory/token-efficiency-log.md` for each non-ALLOW result (regardless of whether the suggestion was followed).
 
 ---
 
@@ -159,7 +159,7 @@ reduction_pct: 23
 ### Safety rules
 
 - **Never remove functional behaviour.** Functional = steps, rules, routing logic, conditionals (if/else), error handlers, hard limits, tool call instructions. Non-functional = hedge phrases, verbose preambles, redundant re-statements, decorative comments.
-- **Trim frontmatter description to 2 lines**: keep the first line verbatim; if more than 2 lines exist, produce a summary second line combining the remaining content. Never drop meaning -- if content cannot be compressed without loss, keep 3 lines.
+- **Trim frontmatter description to 2 lines**: keep the first line verbatim; produce a summary second line combining remaining content. If meaning cannot be preserved in 2 lines without loss, keep 3 lines maximum. Never exceed 3 lines regardless.
 - Never rewrite tests or memory files -- skills only
 - Never batch-rewrite multiple skills in one invocation -- one skill per rewrite call
 - Always show diff before writing; never write without explicit user confirmation

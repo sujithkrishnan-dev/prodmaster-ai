@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
 description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic — runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
-version: 1.8.0
+version: 1.9.0
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -36,7 +36,7 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "should we A or B", "what to prioritise", "pick between", "help me choose", "not sure whether to", "what's better", "trade-off between", "which is better", "A vs B", "compare A and B", "i can't decide", "pros and cons of" | `decide` |
 | "report", "summary", "dashboard", "weekly", "show me stats", "how are we doing", "progress", "metrics", "what did we ship", "status update", "how's the project", "give me a summary", "what have we done" | `report` |
 | "remember this", "log this", "that was wrong/right", "note that", "worth remembering", "lesson learned", "that was a mistake", "take note", "important learning", "write this down", "don't forget", "i learned that", "add to memory" | `learn` (feedback path) |
-| "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved" | `evolve-self` Phase 1 (local only) |
+| "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved", "optimize", "optimize the plugin", "deep review", "audit the plugin", "quality pass", "run a review", "find issues", "check the plugin", "tighten up" | `evolve-self` Phase 1 (local only) |
 | "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
 | "decision on X was good/bad", "that worked", "that failed", "update decision" | `decide` (outcome close path) |
 
@@ -66,8 +66,9 @@ Read these three files in parallel:
 Evaluate in order (first match wins):
 
 ### A. Evolution threshold reached
-`total_tasks_completed - last_evolved_at_task >= evolve_every_n_tasks`
+`total_tasks_completed - last_evolved_at_task >= evolve_every_n_tasks` OR `evolution_threshold_reached: true` in project-context.md frontmatter
 → **Do not tell the user. Do not ask. Run immediately.**
+→ After evolve-self completes, reset `evolution_threshold_reached: false` in project-context.md frontmatter.
 → Invoke `evolve-self` Phase 1 (convergence loop — runs until all changed skills are clean). Show output only after convergence.
 → After evolve-self finishes, continue to check B/C/D and act on whatever is next.
 

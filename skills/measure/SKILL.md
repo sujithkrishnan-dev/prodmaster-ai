@@ -1,7 +1,7 @@
 ---
 name: measure
 description: Use after every completed Superpowers cycle to record metrics. Captures velocity, QA pass rate, review iterations, and blockers. Always hand off to learn after recording.
-version: 1.3.0
+version: 1.3.1
 triggers:
   - A Superpowers cycle has just completed
   - User says "cycle done", "feature finished", "tasks completed"
@@ -55,6 +55,8 @@ velocity_tasks_per_week = (tasks_completed / time_hours) * 40
 ```
 Round to 1 decimal.
 
+**Zero guard:** If `time_hours = 0` or was not provided, set `velocity_tasks_per_week = null` and note `"velocity not calculable (0 hours logged)"` in the cycle entry. Do not divide by zero.
+
 ### 2 + 3. Write in Parallel
 
 Run steps 2 and 3 simultaneously — they write to different files with no shared state:
@@ -64,7 +66,7 @@ Run steps 2 and 3 simultaneously — they write to different files with no share
 `blocker_age_days_avg`: Read `## Blockers` in `project-context.md`. For each open blocker, compute `(today - blocker_date)` in days. Average all values. If no blockers: `0`.
 
 **Step 3 (parallel)** — Increment counter in `project-context.md`:
-Read frontmatter (between first `---` and second `---`). Add `tasks_completed` to `total_tasks_completed:`. Rewrite frontmatter block only — do not touch the rest of the file.
+Read frontmatter (between first `---` and second `---`). Add the cycle's `tasks_completed` count (the integer from this cycle's input) to the current `total_tasks_completed:` value. Rewrite frontmatter block only — do not touch the rest of the file.
 
 ### 4 + 5. Hand Off and Threshold Check in Parallel
 
@@ -74,11 +76,11 @@ Run steps 4 and 5 simultaneously — they are independent:
 
 **Completion message to user** (after both steps 2 and 3 complete):
 
-> Cycle logged for **<feature>** — <tasks_completed> tasks, QA <qa_pass_rate as %>%, velocity <velocity_tasks_per_week> tasks/week.
+> Cycle logged for **<feature>** — <tasks_completed> tasks, QA <qa_pass_rate as %>%, velocity <velocity_tasks_per_week | "not calculable"> tasks/week.
 >
 > Next: `/prodmasterai build [next feature]` to start the next feature | `/prodmasterai report` to see your dashboard
 
-**Step 5 (parallel)** — Compare updated `total_tasks_completed` to `last_evolved_at_task + evolve_every_n_tasks`. If threshold reached: set a flag on the cycle outcome object (`evolution_threshold_reached: true`). The `prodmasterai` master skill owns the decision to invoke `evolve-self` — measure only records the flag. Do not invoke evolve-self directly from measure.
+**Step 5 (parallel)** — Compare updated `total_tasks_completed` to `last_evolved_at_task + evolve_every_n_tasks`. If threshold reached: write `evolution_threshold_reached: true` to the frontmatter of `memory/project-context.md` (alongside the `total_tasks_completed` update). The `prodmasterai` master skill reads this flag on its next invocation and owns the decision to invoke `evolve-self`. After evolve-self runs, it resets this flag to `false`. Do not invoke evolve-self directly from measure.
 
 ## Rules
 

@@ -116,3 +116,59 @@ trigger: explicit user feedback — always run independent tasks in parallel
 change_summary: Added global parallelism rule — all independent reads/writes/dispatches run in parallel; only serialized when explicit output dependency exists.
 upstream_status: pr_created
 ---
+---
+date: 2026-03-18
+mode: improve
+skill: prodmasterai
+trigger: structural-review — optimize keyword missing from routing table
+change_summary: Added "optimize", "deep review", "audit the plugin", "quality pass" to evolve-self routing keywords. Added evolution_threshold_reached flag check and reset to Step 3A.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: evolve-self
+trigger: structural-review — no structural quality pass when no performance data exists
+change_summary: Added Mode 0 (Structural Review) that checks all skill files for quality issues on explicit /evolve invocations; enables improvement before any cycle data is logged.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: measure
+trigger: structural-review — division by zero, ambiguous variable naming, stale flag mechanism
+change_summary: Zero guard for velocity when time_hours=0; clarified tasks_completed naming; evolution_threshold_reached now written to project-context.md frontmatter; null velocity in completion message.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: smooth-dev
+trigger: structural-review — default branch detection unspecified
+change_summary: Added explicit default branch detection via git remote show origin; $default_branch variable used throughout pull commands.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: learn
+trigger: structural-review — gap slug derivation unspecified
+change_summary: Defined gap ID slug algorithm: first 3 significant words, stop-word stripped, lowercase, hyphenated, max 20 chars.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: decide
+trigger: structural-review — topic matching algorithm undefined in Step 6
+change_summary: Added keyword-overlap scoring algorithm for finding matching decisions; fallback to asking user when overlap is zero.
+upstream_status: pending_publish
+---
+---
+date: 2026-03-18
+mode: improve
+skill: report
+trigger: structural-review — stale blocker age_days and JSON XSS risk
+change_summary: age_days now recomputed from date field at report generation time; XSS escaping added for </script> in embedded JSON.
+upstream_status: pending_publish
+---

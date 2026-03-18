@@ -1,7 +1,7 @@
 ---
 name: evolve-self
 description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Runs a convergence loop — no fixed cap, reruns until all changed skills are clean. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
-version: 1.7.0
+version: 1.8.0
 triggers:
   - User runs /evolve
   - measure notifies that evolution threshold was reached
@@ -42,11 +42,35 @@ Read `memory/project-context.md` frontmatter. Record `total_tasks_completed`. Do
 
 ---
 
+### Mode 0 — Structural Review (explicit trigger only)
+
+Runs ONLY when the user explicitly invokes `/evolve`, "deep review", "optimize the plugin", or similar — i.e., NOT on automatic threshold triggers.
+
+**Purpose:** Check all skill files for structural quality without requiring performance data. This enables improvement on fresh installs or early use before cycle data exists.
+
+1. Collect all `skills/*/SKILL.md` files.
+2. **Check all files in parallel** (same checks as the Convergence Refinement Loop):
+   - Vague or ambiguous process steps
+   - Missing edge-case rules (e.g., divide-by-zero, empty inputs, no-data states)
+   - `reads:`/`writes:` frontmatter declarations that don't match body references
+   - Contradicting rules within the same skill
+   - Missing "Next:" completion hints
+3. For each file with issues: apply targeted fixes, increment `version:` patch, append evolution-log entry with `trigger: structural-review`.
+4. Files with no issues: mark clean.
+
+If Mode 0 finds at least one changed skill: proceed to the **Convergence Refinement Loop** with those files as the initial set. Do NOT skip to No-Op.
+
+If Mode 0 finds zero issues: skip Mode 0's log entry and continue to Mode 1.
+
+---
+
 ### Mode 1 — Improve Existing Skills
 
 #### 1. Identify Underperforming Skills
 
 Read `memory/skill-performance.md`. A skill is underperforming if the last 5 entries show a declining `qa_pass_rate` trend.
+
+**No real data:** If `skill-performance.md` has no non-example entries, skip Mode 1 entirely (no data to analyse) and proceed to Mode 2.
 
 Map metrics to skills:
 - High blockers → check `orchestrate`
@@ -161,7 +185,7 @@ upstream_status: pending_publish
 
 ### No-Op Case
 
-If neither Mode 1 nor Mode 2 produced any output (no skills improved, no skills generated):
+If none of Mode 0, Mode 1, or Mode 2 produced any output (no skills improved, no skills generated):
 1. Append to `memory/evolution-log.md`:
 ```yaml
 ---

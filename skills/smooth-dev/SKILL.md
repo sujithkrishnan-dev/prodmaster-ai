@@ -1,7 +1,7 @@
 ---
 name: smooth-dev
 description: Use before starting any development session, after a context switch, or when the codebase state is uncertain. Pulls latest changes, checks repo health, verifies tests pass, and surfaces any blockers — ensuring the dev environment is clean before work begins.
-version: 1.0.1
+version: 1.1.0
 triggers:
   - User says "take a pull", "pull latest", "sync code", "get latest", "ensure code is up to date"
   - User says "start dev", "start development", "ready to code", "begin session"
@@ -31,13 +31,19 @@ Run these simultaneously:
 - Read `memory/project-context.md` — note active features and open blockers
 - If GitHub connector active: check for open PRs targeting current branch
 
+Determine the default branch before checking divergence:
+```
+git remote show origin | grep "HEAD branch" | awk '{print $NF}'
+```
+Store as `$default_branch`. Fall back to `main` if the command fails or returns empty.
+
 After fetch, check divergence:
 ```
 git status
-git log HEAD..origin/<default-branch> --oneline
+git log HEAD..origin/$default_branch --oneline
 ```
 
-**If remote is ahead:** run `git pull --ff-only`. If fast-forward fails (diverged history), surface the conflict and stop — do not force-merge. Tell user:
+**If remote is ahead:** run `git pull --ff-only origin $default_branch`. If fast-forward fails (diverged history), surface the conflict and stop — do not force-merge. Tell user:
 
 > Your branch has diverged from origin — a fast-forward pull isn't safe. Run `git status` to see what's different, resolve the conflict, then run `/prodmasterai` again to restart the check.
 

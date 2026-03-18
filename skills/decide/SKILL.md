@@ -1,7 +1,7 @@
 ---
 name: decide
 description: Use when user is at a decision fork — "should we do A or B?", "what should we prioritise?", "which approach?". Reads project state and metrics to rank options by ROI/risk and give one clear recommendation.
-version: 1.1.1
+version: 1.2.0
 triggers:
   - User asks "should we", "which option", "prioritise", "help me decide", "recommend"
   - User presents two or more options and asks what to do
@@ -73,7 +73,11 @@ Next: `/prodmasterai build [chosen option]` to start the work | `/prodmasterai` 
 ### 6. Close Prior Decisions (if outcome provided)
 
 If the user provides outcome feedback on a previously logged decision (e.g. "that decision worked" / "that decision failed"):
-1. Find the matching entry in `## Decisions Log` by topic/date.
+1. **Find the matching entry** in `## Decisions Log` using keyword overlap:
+   - Tokenise the user's topic phrase into significant words (strip stop words).
+   - Score each `pending_outcome` decision entry by counting how many of its `decision:` words match the user's tokens.
+   - Select the entry with the highest score. If tied, select the most recent.
+   - If highest score is zero (no word overlap), ask the user: *"Which decision are you referring to? Here are the open ones: [list decision summaries]."*
 2. Update `status:` from `pending_outcome` to `confirmed_good` or `confirmed_bad`.
 3. Hand off to `learn` (feedback path) with the outcome as feedback.
 

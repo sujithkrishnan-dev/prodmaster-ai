@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Use after each Superpowers cycle to capture patterns, mistakes, and skill gaps. Also use when user provides explicit feedback ("that was wrong", "that worked well", "remember this").
-version: 1.2.1
+version: 1.2.2
 triggers:
   - measure hands off a cycle outcome object
   - User gives explicit feedback about a workflow or decision
@@ -75,6 +75,8 @@ For each unhandled pattern:
 1. Search `skill-gaps.md` for existing entry with matching pattern text
 2. **Found:** increment `occurrences` by 1, update `last_seen` date
 3. **Not found:** append new entry (internal format — do not show raw YAML to the user)
+
+**Slug derivation for gap IDs:** Take the first 3 significant words of the pattern text, lowercase, hyphenated (strip stop words: a, an, the, to, for, in, of, with). Truncate total slug to 20 characters max. Example: pattern "user asked to export CSV data" → slug `user-export-csv`. The full ID: `gap-2026-03-18-user-export-csv`.
 
 **Rule:** One increment per cycle per pattern — even if the pattern appeared multiple times within that cycle.
 

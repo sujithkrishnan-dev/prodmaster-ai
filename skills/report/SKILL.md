@@ -1,7 +1,7 @@
 ---
 name: report
 description: Use to generate productivity reports and refresh the HTML dashboard. Run with /report or /report weekly. Reads all memory files, produces a markdown weekly summary and a self-contained HTML dashboard. When no data exists, auto-bootstraps a getting-started guide and kicks off orchestrate.
-version: 1.3.1
+version: 1.3.2
 triggers:
   - User runs /report
   - User asks for weekly summary, status update, management report, or dashboard refresh
@@ -98,6 +98,8 @@ Regenerate `reports/dashboard.html`. Requirements:
 
 Embed all stats as a JSON object in a `<script>` tag with `type="application/json"` id `prodmaster-data`, then read it with `JSON.parse(document.getElementById('prodmaster-data').textContent)` on load.
 
+**XSS safety:** Before embedding, escape any `</script>` sequences inside string values by replacing `</` with `<\/` so the JSON cannot accidentally close the script tag.
+
 **Required JSON shape** (the dashboard HTML reads exactly these keys):
 
 ```json
@@ -120,7 +122,7 @@ Embed all stats as a JSON object in a `<script>` tag with `type="application/jso
 - `velocity`: last 10 entries from `skill-performance.md` (excluding `example: true`), ordered oldest-first
 - `qaPassRates`: all `qa_pass_rate` values from non-example entries, ordered oldest-first
 - `avgIterations`: mean of all `review_iterations` values from non-example entries, or `null` if no data
-- `blockers`: parsed from `## Blockers` section of `project-context.md` — each line `- YYYY-MM-DD: <text> | age_days: <n> | recommended_fix: <text>`
+- `blockers`: parsed from `## Blockers` section of `project-context.md` — each line `- YYYY-MM-DD: <text> | age_days: <n> | recommended_fix: <text>`. **Always recompute `age_days` as `today - YYYY-MM-DD` at report generation time** — the value stored in the file is a snapshot; use the date field to get the live age.
 - `decisions`: parsed from `## Decisions Log` section of `project-context.md` — each YAML block's `decision` and `status` fields
 
 ## Slack (if connector active)

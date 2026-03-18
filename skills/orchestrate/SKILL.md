@@ -1,7 +1,7 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal — "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.2.0
+version: 1.2.1
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities
@@ -38,15 +38,15 @@ Fetch GitHub Issues and Linear issues in **parallel** while processing project-c
 
 ### 2. Classify the Request
 
-**Starting a new feature** → break it down:
-```
-Feature: <name>
-Subtasks:
-  1. <specific task> → Superpowers cycle
-  2. <specific task> → Superpowers cycle
-Dependencies: <list>
-Estimated cycles: <n>
-```
+**Starting a new feature** → break it down and present as a plain list:
+
+**Feature: <name>** — <N> tasks across <n> cycles
+
+- Task 1: <specific task>
+- Task 2: <specific task>
+- Dependencies: <list, or "none">
+
+Do not show raw YAML or code-block wrappers around this breakdown — present it as readable prose and bullet points.
 
 **Deciding what to work on next** → apply priority order:
 1. Unblock blocked features first (if the fix is small)
@@ -88,21 +88,16 @@ If Linear connector is active: update issue status to "In Progress".
 
 ### 6. Cycle Outcome Handoff
 
-When a cycle completes, construct this object and hand it to `measure`:
-
-```yaml
-feature: <feature name>
-tasks_completed: <n>
-qa_pass_rate: <0.0-1.0>
-review_iterations: <n>
-time_hours: <n>
-blockers_encountered: <n>
-patterns_used: []
-unhandled_patterns: []
-```
+When a cycle completes, pass the cycle data to `measure` (do not narrate this to the user — just do it). The data fields needed are: feature name, tasks completed, QA pass rate, review iterations, time in hours, blockers encountered, patterns used, and any unhandled patterns.
 
 Fill `patterns_used` with keyword matches from `memory/connectors/skill-pattern-manifest.md`.
 Fill `unhandled_patterns` with patterns that arose but no manifest keyword covers.
+
+**Completion message to user:**
+
+> Feature plan saved — <N> tasks queued across <n> cycles. Starting with: <first task>.
+>
+> Next: `/prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours` when the first cycle wraps up | `/prodmasterai` to check what's next
 
 ## Rules
 

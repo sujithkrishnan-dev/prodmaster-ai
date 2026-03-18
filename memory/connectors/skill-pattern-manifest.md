@@ -26,3 +26,6 @@ keywords: [/prodmasterai, prodmaster, entry point, main command, what should i d
 
 ### smooth-dev
 keywords: [pull latest, take a pull, sync code, get latest, start dev, smooth dev, pre-flight, health check, ensure up to date, clean state, ready to code, start development session, begin session]
+
+### help
+keywords: [help, what can you do, show commands, how does this work, what skills, confused, lost, guide me, tutorial, getting started]

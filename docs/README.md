@@ -49,6 +49,7 @@ The plugin reads your current state and decides what to do. No need to remember 
 | Skill | Trigger | Job |
 |---|---|---|
 | `prodmasterai` | `/prodmasterai` | Master entry point — reads state, routes to the right skill automatically |
+| `help` | "help" / "what can you do" / "show commands" | List all skills, triggers, and one-line examples |
 | `smooth-dev` | "pull latest" / "start dev" / "pre-flight" | Pull latest, health-check repo, run tests, surface blockers, print session card |
 | `orchestrate` | "Build X" / feature goal | Break into task cycles, dispatch independent subtasks in parallel |
 | `measure` | After each Superpowers cycle | Capture velocity, QA rate, blockers — parallel writes |

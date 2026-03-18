@@ -1,7 +1,7 @@
 ---
 name: decide
 description: Use when user is at a decision fork — "should we do A or B?", "what should we prioritise?", "which approach?". Reads project state and metrics to rank options by ROI/risk and give one clear recommendation.
-version: 1.1.0
+version: 1.1.1
 triggers:
   - User asks "should we", "which option", "prioritise", "help me decide", "recommend"
   - User presents two or more options and asks what to do
@@ -64,19 +64,11 @@ Also factor in:
 
 ### 5. Log Decision
 
-Append to `memory/project-context.md` `## Decisions Log`:
+Append the decision entry to `memory/project-context.md` `## Decisions Log` (internal format — do not show raw YAML to the user).
 
-```yaml
----
-date: YYYY-MM-DD
-decision: <one sentence summary>
-rationale: <reasoning>
-options_considered: [A, B]
-status: pending_outcome
----
-```
+Tell the user: *"Decision logged. When you see how it plays out, say `/prodmasterai decision on [topic] was good/bad` — I'll update the outcome and the system will learn from it."*
 
-Tell the user: *"Decision logged. When you see how it plays out, say `/prodmasterai decision on [topic] was good/bad` and I'll update the outcome — this helps the system learn which decision patterns work."*
+Next: `/prodmasterai build [chosen option]` to start the work | `/prodmasterai` to check what else needs attention
 
 ### 6. Close Prior Decisions (if outcome provided)
 

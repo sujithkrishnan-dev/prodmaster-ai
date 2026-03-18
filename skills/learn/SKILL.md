@@ -1,7 +1,7 @@
 ---
 name: learn
 description: Use after each Superpowers cycle to capture patterns, mistakes, and skill gaps. Also use when user provides explicit feedback ("that was wrong", "that worked well", "remember this").
-version: 1.2.0
+version: 1.2.1
 triggers:
   - measure hands off a cycle outcome object
   - User gives explicit feedback about a workflow or decision
@@ -51,31 +51,21 @@ Run the pattern/mistake write AND the skill-gap detection in **parallel** — th
 
 **Thread A — Pattern or Mistake write (parallel):**
 
-Write Pattern (if success):
-```yaml
----
-date: YYYY-MM-DD
-pattern: <specific description of what worked — not just "it worked">
-context: <task/feature type>
-qa_pass_rate: <value>
-review_iterations: <value>
----
-```
+Write the pattern or mistake entry to the appropriate file (internal format — do not show raw YAML to the user).
 
-Write Mistake (if failure) — analyse root cause first:
+Root cause analysis for mistakes:
 - High `review_iterations` → usually unclear spec or over-built solution
 - Low `qa_pass_rate` → usually insufficient upfront test coverage or wrong integration assumptions
 
-```yaml
----
-date: YYYY-MM-DD
-mistake: <specific actionable description>
-root_cause: <why it went wrong>
-fix_applied: <resolution or "unresolved">
-qa_pass_rate: <value>
-review_iterations: <value>
----
-```
+**Completion message to user** (success path):
+> Pattern saved — "<specific description of what worked>" added to your playbook.
+>
+> Next: `/prodmasterai report` to see trends | `/prodmasterai build [feature]` to start the next cycle
+
+**Completion message to user** (failure path):
+> Mistake logged — <specific description>. Root cause: <why it went wrong>.
+>
+> Next: `/prodmasterai build [fix]` to address this | `/prodmasterai report` to review recent mistakes
 
 **Thread B — Detect Skill Gaps (parallel):**
 
@@ -84,40 +74,23 @@ Read `memory/connectors/skill-pattern-manifest.md`. Compare `unhandled_patterns`
 For each unhandled pattern:
 1. Search `skill-gaps.md` for existing entry with matching pattern text
 2. **Found:** increment `occurrences` by 1, update `last_seen` date
-3. **Not found:** append new entry:
-
-```yaml
----
-id: gap-YYYY-MM-DD-<slugified-pattern-text>
-pattern: <description>
-first_seen: YYYY-MM-DD
-last_seen: YYYY-MM-DD
-occurrences: 1
-status: open
-generated_skill: ""
----
-```
+3. **Not found:** append new entry (internal format — do not show raw YAML to the user)
 
 **Rule:** One increment per cycle per pattern — even if the pattern appeared multiple times within that cycle.
 
-**Gap threshold trigger:** After incrementing, if a gap entry now has `occurrences >= 3` and `status: open`, append a note to the cycle output: *"Skill gap '[pattern]' has reached 3 occurrences — run /evolve to auto-generate a skill for it."* Do not invoke evolve-self automatically from learn; just surface it.
+**Gap threshold alert:** After incrementing, if a gap entry now has `occurrences >= 3` and `status: open`, surface this message:
+
+> Heads up — the pattern **"[pattern]"** has come up 3 times without a skill to handle it. Run `/evolve` to auto-generate one.
+
+Do not invoke evolve-self automatically from learn; just surface the alert.
 
 ---
 
 ## Feedback Path (user input)
 
-Write ONLY to `memory/feedback.md`:
+Write ONLY to `memory/feedback.md` (internal format — do not show raw YAML to the user).
 
-```yaml
----
-date: YYYY-MM-DD
-feedback: <exact words the user used>
-context: <what was happening — feature, decision, stage>
-contributed_upstream: false
----
-```
-
-Tell the user: *"Logged. Run /evolve when you want to consider contributing this back to the plugin."*
+Tell the user: *"Got it — feedback saved. Run `/evolve` whenever you want to consider contributing this back to the plugin."*
 
 **Strict rule:** Feedback path writes ONLY to feedback.md. Never to patterns.md or mistakes.md.
 

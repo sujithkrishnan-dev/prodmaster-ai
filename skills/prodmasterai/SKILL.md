@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
 description: Master entry point — invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic — runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
-version: 1.5.0
+version: 1.8.0
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -29,17 +29,26 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 
 | Pattern | Route to |
 |---|---|
-| "pull latest", "take a pull", "sync code", "start dev", "smooth dev", "pre-flight", "ensure up to date", "ready to code" | `smooth-dev` |
-| "build X", "implement X", "start X", "work on X" | `orchestrate` |
-| "cycle done", "N tasks, QA X%, Y reviews, Z hours" | `measure` → `learn` |
-| "should we A or B", "what to prioritise", "pick between" | `decide` |
-| "report", "summary", "dashboard", "weekly" | `report` |
-| "remember this", "log this", "that was wrong/right" | `learn` (feedback path) |
+| "help", "what can you do", "show commands", "how does this work" | `help` |
+| "pull latest", "take a pull", "sync code", "start dev", "smooth dev", "pre-flight", "ensure up to date", "ready to code", "let's get started", "beginning work", "check everything", "is everything ok", "set me up", "get me ready", "am I good to go", "before I start coding" | `smooth-dev` |
+| "build X", "implement X", "start X", "work on X", "let's build", "i want to work on", "kick off", "create", "new feature", "add", "i want to add", "we should build", "can we build", "feature request", "i need to implement", "let's create", "spin up" | `orchestrate` |
+| "cycle done", "N tasks, QA X%, Y reviews, Z hours", "just finished", "wrapped up", "completed", "logged N tasks", "done with", "that's done", "finished the cycle", "we're done", "shipping done", "sprint complete", "cycle complete", "done — N tasks" | `measure` → `learn` |
+| "should we A or B", "what to prioritise", "pick between", "help me choose", "not sure whether to", "what's better", "trade-off between", "which is better", "A vs B", "compare A and B", "i can't decide", "pros and cons of" | `decide` |
+| "report", "summary", "dashboard", "weekly", "show me stats", "how are we doing", "progress", "metrics", "what did we ship", "status update", "how's the project", "give me a summary", "what have we done" | `report` |
+| "remember this", "log this", "that was wrong/right", "note that", "worth remembering", "lesson learned", "that was a mistake", "take note", "important learning", "write this down", "don't forget", "i learned that", "add to memory" | `learn` (feedback path) |
 | "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved" | `evolve-self` Phase 1 (local only) |
 | "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
 | "decision on X was good/bad", "that worked", "that failed", "update decision" | `decide` (outcome close path) |
 
 **If classified:** invoke the matched skill immediately with the supplied text as input. Do not re-present a menu.
+
+---
+
+**Ambiguous input:** If the intent does not match any route with confidence, pick the most likely route and confirm with ONE question:
+
+> "That sounds like [route] — shall I [action]? (or tell me what you meant)"
+
+Never reject input silently. Always offer the best guess. Route on confirmation without further prompting.
 
 ---
 
@@ -76,7 +85,12 @@ Evaluate in order (first match wins):
 → Wait. Route response to `orchestrate` or `evolve-self`.
 
 ### D. Fresh / empty state (no active features, no gaps, <3 performance entries)
-→ Show the quick-start card:
+
+Read the `first_run_complete` field from the frontmatter of `memory/project-context.md`.
+
+**If `first_run_complete: false` (or the field is absent):** run the interactive onboarding flow below.
+
+**If `first_run_complete: true`:** show the quick-start card:
 
 ```
 ProdMaster AI is ready.
@@ -87,6 +101,27 @@ ProdMaster AI is ready.
   Make a decision:   /prodmasterai should we A or B?
   Self-improve:      /evolve
 ```
+
+#### First-Run Onboarding Flow
+
+Run this sequence exactly once, in order. Never ask more than 3 questions total.
+
+1. **Greet** — one sentence only, e.g.: *"Welcome to ProdMaster AI — let's get you set up in under a minute."*
+
+2. **Question 1 — Project name:**
+   Ask: *"What's the name of your project or codebase?"*
+   Store the answer in a local session variable `$project_name` (use it to personalise subsequent messages this session only — do not write it anywhere).
+
+3. **Question 2 — First feature:**
+   Ask: *"What are you building first in $project_name?"*
+   Take the answer and immediately invoke `orchestrate` with it as input — do not ask a third question unless orchestrate requires clarification.
+
+4. **After orchestrate returns** (or accepts the input), write `first_run_complete: true` into the frontmatter of `memory/project-context.md`. If the field does not exist yet, add it. Do not change any other frontmatter field.
+
+**Rules for the onboarding flow:**
+- Never exceed 3 questions. If clarification is needed, fold it into one of the two questions above.
+- Do not show the quick-start card during onboarding — the user is already being routed to action.
+- Do not explain what ProdMaster AI can do in detail — the greeting is one sentence; everything else is a question or an action.
 
 ---
 

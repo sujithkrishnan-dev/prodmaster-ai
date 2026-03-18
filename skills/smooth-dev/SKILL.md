@@ -1,7 +1,7 @@
 ---
 name: smooth-dev
 description: Use before starting any development session, after a context switch, or when the codebase state is uncertain. Pulls latest changes, checks repo health, verifies tests pass, and surfaces any blockers — ensuring the dev environment is clean before work begins.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - User says "take a pull", "pull latest", "sync code", "get latest", "ensure code is up to date"
   - User says "start dev", "start development", "ready to code", "begin session"
@@ -37,7 +37,9 @@ git status
 git log HEAD..origin/<default-branch> --oneline
 ```
 
-**If remote is ahead:** run `git pull --ff-only`. If fast-forward fails (diverged history), surface the conflict and stop — do not force-merge. Tell user: *"Branch has diverged from origin — resolve conflicts before proceeding."*
+**If remote is ahead:** run `git pull --ff-only`. If fast-forward fails (diverged history), surface the conflict and stop — do not force-merge. Tell user:
+
+> Your branch has diverged from origin — a fast-forward pull isn't safe. Run `git status` to see what's different, resolve the conflict, then run `/prodmasterai` again to restart the check.
 
 **If already up to date:** continue.
 
@@ -63,13 +65,23 @@ Surface the last 5 commits so the user knows what changed recently.
 
 ### 3. Run Tests
 
+**First-run check:** if `first_run_complete: false` (or absent) in `memory/project-context.md` frontmatter AND none of the test runners below are detected, skip this step entirely and note: *"First run — skipping tests (no test suite detected yet)."* Do not block onboarding on missing tests.
+
 Run the project test suite. Use these in order (first match wins):
 1. `python -m pytest tests/ -q` — if `tests/` directory exists
 2. `npm test` — if `package.json` exists with a `test` script
 3. `make test` — if `Makefile` has a `test` target
 4. Skip and note: *"No test runner detected — skipping test step."*
 
-**On failure:** Show failing test names. Do NOT proceed with feature work. Tell user: *"Tests failing — fix these before starting new work to avoid compounding issues."* Hand off to `orchestrate` if user wants to fix them as a feature.
+**On failure:** Show the failing test names. Do NOT proceed with feature work. Tell user:
+
+> <N> test(s) failing — fix these before starting new work to avoid compounding the problem.
+>
+> Failing: [test names]
+>
+> Next: `/prodmasterai build fix failing tests` to treat this as a task | fix manually then re-run this check
+
+Hand off to `orchestrate` if user wants to fix them as a feature.
 
 **On pass:** Proceed.
 

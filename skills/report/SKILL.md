@@ -1,7 +1,7 @@
 ---
 name: report
 description: Use to generate productivity reports and refresh the HTML dashboard. Run with /report or /report weekly. Reads all memory files, produces a markdown weekly summary and a self-contained HTML dashboard. When no data exists, auto-bootstraps a getting-started guide and kicks off orchestrate.
-version: 1.3.0
+version: 1.3.1
 triggers:
   - User runs /report
   - User asks for weekly summary, status update, management report, or dashboard refresh
@@ -152,11 +152,24 @@ ProdMaster AI will populate all metrics automatically after Step 2.
 ```
 
 2. **Do NOT write dashboard.html with zeros.** Skip dashboard generation entirely in fresh state.
-3. **Completion message** (fresh state): *"No cycle data yet — wrote `reports/getting-started-YYYY-MM-DD.md`."* Then ask: *"What are you building first? Tell me the feature name and I'll break it into tasks right now."*
+3. **Completion message** (fresh state):
+
+> Your getting-started guide is ready at `reports/getting-started-YYYY-MM-DD.md`. Complete one cycle and the dashboard will populate automatically.
+>
+> What are you building first? Tell me the feature name and I'll break it into tasks right now.
+
+## Completion Message (normal — data present)
+
+After writing the markdown report and regenerating the HTML dashboard:
+
+> Report written to `reports/weekly-YYYY-MM-DD.md`. Dashboard updated at `reports/dashboard.html` — open it by double-clicking.
+>
+> Next: `/prodmasterai build [feature]` to start a new cycle | `/prodmasterai cycle done — …` to log a completed one
 
 ## Rules
 
 - Skip `example: true` entries in all calculations
 - If no real data: run Fresh-State Bootstrap (above) — never silently output zero-metrics
 - Never overwrite existing report files — create new dated files
+- Do not show raw YAML or internal memory file contents in the report output
 - **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

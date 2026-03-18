@@ -8,7 +8,7 @@
     {
       "name": "prodmaster-ai",
       "description": "Meta-orchestration, measurement, and self-evolving intelligence layer for Claude Code.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "sujithkrishnan-dev",
         "email": ""

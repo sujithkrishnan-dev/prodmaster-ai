@@ -11,6 +11,7 @@ import sys
 
 BLOCKED_PATTERNS = [
     (r"rm\s+-[a-zA-Z]*r", "recursive rm"),
+    (r"rm\s+--recursive", "recursive rm (--recursive flag)"),
     (r"git\s+push\s.*--force", "force push"),
     (r"git\s+push\s.*\s-[a-zA-Z]*f", "force push"),
     (r"git\s+branch\s.*\s-D", "force branch delete"),
@@ -18,6 +19,11 @@ BLOCKED_PATTERNS = [
     (r"git\s+clean\s.*-[a-zA-Z]*f", "git clean -f"),
     (r"git\s+(checkout|restore)\s+\.\s*($|[;&|])", "discard all changes"),
     (r"(?i)drop\s+(table|database|schema)", "DROP operation"),
+    # Pipe-to-shell: fetching and executing remote code is never safe
+    (r"(curl|wget)\s+.*\|\s*(bash|sh|zsh|fish|python3?|ruby|perl|node)", "pipe remote content to shell"),
+    # eval with base64-decoded content — common obfuscation technique
+    (r"eval\s+.*base64", "eval with encoded payload"),
+    (r"base64\s+.*\|\s*(bash|sh|zsh|eval)", "base64 decode to shell"),
 ]
 
 SAFE_COMMANDS = {

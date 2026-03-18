@@ -11,6 +11,12 @@ Activate a connector by setting `active: true` in the connector file and filling
 | `linear.md` | Linear issue tracking | orchestrate, report |
 | `superpowers.md` | Superpowers plugin (TDD execution) | orchestrate — auto-detects, offers install on first use |
 
+## Security Notes
+
+- `slack.md` contains a `webhook_url` secret — it is listed in `.gitignore` and will not be committed to git. Never remove it from `.gitignore`.
+- `github.md` and `linear.md` use MCP servers — no tokens are stored in these files; credentials are managed by Claude Code.
+- `superpowers.md` contains only a repo URL — not a secret, safe to commit.
+
 ## Connector File Format
 
 ```yaml

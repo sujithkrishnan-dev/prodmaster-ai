@@ -1,0 +1,29 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# ── Reports (generated output — never commit) ─────────────────────────────────
+reports/
+
+# ── Memory — user data stays local ────────────────────────────────────────────
+# Core memory files are intentionally tracked (they are part of the plugin's
+# distributed state). Exception: any file that may contain secrets.
+
+# Slack webhook URL — contains a secret if active: true is set
+memory/connectors/slack.md
+
+# Pending upstream proposals — local staging only
+memory/pending-upstream/
+
+# ── Claude session data ───────────────────────────────────────────────────────
+.claude/
+
+# ── OS / editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo

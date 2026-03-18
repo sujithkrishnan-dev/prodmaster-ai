@@ -1,7 +1,7 @@
 ---
 name: evolve-self
-description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
-version: 1.3.0
+description: Use when total_tasks_completed reaches a multiple of evolve_every_n_tasks (check project-context.md frontmatter), or when user runs /evolve. Improves underperforming skills and generates new skills from gaps locally. Runs a 2-iteration refinement loop automatically — no user confirmation between iterations. Upstream PR is a separate explicit act — only when user says "update plugin" or "/prodmasterai update".
+version: 1.6.0
 triggers:
   - User runs /evolve
   - measure notifies that evolution threshold was reached
@@ -55,9 +55,11 @@ Map metrics to skills:
 
 #### 2. Research Better Approaches
 
+Dispatch **all research subagents in parallel** — one per underperforming skill simultaneously. Do not wait for one to complete before starting the next.
+
 For each underperforming skill, dispatch a research subagent using `skills/evolve-self/research-subagent-prompt.md`. Fill in `{{skill_name}}`, `{{current_skill_content}}`, `{{performance_data}}`, `{{research_question}}`.
 
-The research subagent writes its finding to `memory/research-findings.md`.
+Wait for all subagents to complete, then proceed. Each subagent writes its finding to `memory/research-findings.md`.
 
 #### 3. Apply Improvements
 
@@ -175,11 +177,29 @@ Tell user: *"Evolution check ran — nothing needed at this time."*
 
 ---
 
+### Convergence Refinement Loop
+
+Phase 1 runs a **convergence loop** — no fixed iteration cap. It continues until a full pass over all changed skills produces zero further changes.
+
+**Pass structure (repeat until clean):**
+
+1. Collect the list of all SKILL.md files changed or created in this evolution run (starts with Mode 1 + Mode 2 output; grows if a refinement pass modifies additional files).
+2. **Check all files in parallel** — dispatch independent file checks simultaneously:
+   a. Re-read the file.
+   b. Check for: vague steps, missing edge-case rules, missing `reads:`/`writes:` declarations, contradicting rules, incomplete process steps.
+   c. If issues found: apply targeted refinements, increment `version:` by a patch (e.g. 1.1.0 → 1.1.1), append an evolution-log entry with `trigger: convergence-pass-N` (N = pass number).
+   d. If no issues found: mark the file as clean for this pass.
+
+   Wait for all parallel checks to complete before running the convergence check.
+3. **Convergence check:** If every file in the list was clean in step 2d — stop. Otherwise run another pass (back to step 1).
+
+**Safeguard:** If the same file is modified in 5 consecutive passes without becoming clean, log a warning entry in `memory/evolution-log.md` (`trigger: stuck-after-5-passes`) and mark it clean to prevent infinite loops.
+
 ### Post-Phase-1 Update
 
-After Mode 1 and Mode 2 complete: update `last_evolved_at_task` in `memory/project-context.md` frontmatter to the recorded `total_tasks_completed`.
+After the convergence loop exits: update `last_evolved_at_task` in `memory/project-context.md` frontmatter to the recorded `total_tasks_completed`.
 
-Tell user: *"Local evolution complete. [N] skills improved, [M] new skills generated. Run `/prodmasterai update` when you want to contribute these improvements upstream."*
+Tell user: *"Local evolution complete ([N] passes, converged). [X] skills improved, [Y] new skills generated. Run `/prodmasterai update` when you want to contribute these improvements upstream."*
 
 **Stop here. Do NOT proceed to Phase 2 unless the user explicitly requests it.**
 

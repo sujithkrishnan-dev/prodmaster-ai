@@ -1,7 +1,7 @@
 ---
 name: report
-description: Use to generate productivity reports and refresh the HTML dashboard. Run with /report or /report weekly. Reads all memory files, produces a markdown weekly summary and a self-contained HTML dashboard.
-version: 1.0.0
+description: Use to generate productivity reports and refresh the HTML dashboard. Run with /report or /report weekly. Reads all memory files, produces a markdown weekly summary and a self-contained HTML dashboard. When no data exists, auto-bootstraps a getting-started guide and kicks off orchestrate.
+version: 1.2.0
 triggers:
   - User runs /report
   - User asks for weekly summary, status update, management report, or dashboard refresh
@@ -25,13 +25,15 @@ Generate the weekly markdown report and regenerate the HTML dashboard.
 
 ## Data Sources
 
-Read these files (skip entries with `example: true`):
+Read all sources in **parallel** (do not serialize):
 - `memory/skill-performance.md` — metrics per cycle
 - `memory/project-context.md` — Active Features, Blockers, Decisions Log
 - `memory/patterns.md` — top 3 patterns (most recent)
 - `memory/mistakes.md` — top 3 mistakes (most recent)
+- `memory/connectors/slack.md` — connector config
+- `memory/connectors/linear.md` — connector config + cycle data if active
 
-If Linear connector is active: include Linear cycle data in the summary.
+Skip entries with `example: true` when processing results. Wait for all reads to complete before computing stats.
 
 ## Computed Stats (from skill-performance.md, excluding example entries)
 
@@ -126,13 +128,45 @@ If `memory/connectors/slack.md` has `active: true` and non-empty `webhook_url`: 
 
 ## Completion Message
 
-Tell the user:
+**If real data exists:**
 - *"Weekly report written to `reports/weekly-YYYY-MM-DD.md`"*
 - *"Dashboard updated at `reports/dashboard.html` — double-click to open"*
+
+**If Fresh-State Bootstrap ran:**
+- *"No cycle data yet — wrote `reports/getting-started-YYYY-MM-DD.md` instead."*
+- Then immediately ask: *"What are you building first? Tell me the feature name and I'll break it into tasks right now."*
+- Do NOT write `reports/dashboard.html` with zeros.
+
+## Fresh-State Bootstrap (no real data detected)
+
+When `skill-performance.md` has no non-example entries:
+
+1. **Do not write a zero-metrics report.** Instead write `reports/getting-started-YYYY-MM-DD.md`:
+
+```markdown
+# ProdMaster AI — Getting Started
+**Date:** YYYY-MM-DD
+
+No cycle data recorded yet. Here's your fast path to a live dashboard:
+
+## Step 1 — Start a feature
+/prodmasterai build [feature name]
+
+## Step 2 — After your first work session, log the cycle
+/prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours
+
+## Step 3 — Generate your first real report
+/prodmasterai report
+
+ProdMaster AI will populate all metrics automatically after Step 2.
+```
+
+2. **Auto-invoke `orchestrate`**: Ask the user *"What are you building first? Tell me the feature name and I'll break it into tasks right now."* — do not wait passively.
+3. **Do NOT write dashboard.html with zeros** — write a placeholder dashboard that shows the getting-started guide inline.
 
 ## Rules
 
 - Skip `example: true` entries in all calculations
-- If no real data: generate report with zeros and note "No cycle data yet — run orchestrate and measure first"
+- If no real data: run Fresh-State Bootstrap (above) — never silently output zero-metrics
 - Never overwrite existing report files — create new dated files
 - **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

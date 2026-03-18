@@ -33,7 +33,7 @@ That's it. The plugin reads your current state and decides what to do next — n
 | `/prodmasterai cycle done — …` | `measure` → `learn` auto-fires |
 | `/prodmasterai should we A or B?` | `decide` — scored recommendation |
 | `/prodmasterai report` | Markdown + HTML dashboard in `reports/` |
-| `/evolve` | `evolve-self` — improves skills, generates new ones, PRs upstream |
+| `/evolve` | `evolve-self` — convergence loop: improves skills and generates new ones until all issues resolved; PRs upstream only on explicit publish |
 | `/prodmasterai` (no args) | Reads state, acts or prompts with one question |
 
 ---

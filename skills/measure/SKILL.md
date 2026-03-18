@@ -1,7 +1,7 @@
 ---
 name: measure
 description: Use after every completed Superpowers cycle to record metrics. Captures velocity, QA pass rate, review iterations, and blockers. Always hand off to learn after recording.
-version: 1.0.0
+version: 1.1.0
 triggers:
   - A Superpowers cycle has just completed
   - User says "cycle done", "feature finished", "tasks completed"
@@ -45,8 +45,11 @@ velocity_tasks_per_week = (tasks_completed / time_hours) * 40
 ```
 Round to 1 decimal.
 
-### 2. Append Entry to skill-performance.md
+### 2 + 3. Write in Parallel
 
+Run steps 2 and 3 simultaneously — they write to different files with no shared state:
+
+**Step 2 (parallel)** — Append entry to `skill-performance.md`:
 ```yaml
 ---
 date: YYYY-MM-DD
@@ -61,17 +64,16 @@ blocker_age_days_avg: 0
 ---
 ```
 
-### 3. Increment Counter in project-context.md
+**Step 3 (parallel)** — Increment counter in `project-context.md`:
+Read frontmatter (between first `---` and second `---`). Add `tasks_completed` to `total_tasks_completed:`. Rewrite frontmatter block only — do not touch the rest of the file.
 
-Read the frontmatter of `memory/project-context.md` (the block between the first `---` and second `---`). Find `total_tasks_completed:` and add `tasks_completed` to it. Rewrite the frontmatter block only — do not touch the rest of the file.
+### 4 + 5. Hand Off and Threshold Check in Parallel
 
-### 4. Hand Off to learn
+Run steps 4 and 5 simultaneously — they are independent:
 
-Pass the same cycle outcome object to `learn` immediately after recording.
+**Step 4 (parallel)** — Pass the same cycle outcome object to `learn`.
 
-### 5. Check Evolution Threshold
-
-After `learn` completes: compare `total_tasks_completed` to `last_evolved_at_task + evolve_every_n_tasks` in project-context.md frontmatter. If threshold reached, notify the user: *"Evolution check threshold reached — run /evolve when ready."*
+**Step 5 (parallel)** — Compare updated `total_tasks_completed` to `last_evolved_at_task + evolve_every_n_tasks`. If threshold reached: notify user *"Evolution threshold reached — running evolve-self now."* and invoke `evolve-self` Phase 1 automatically.
 
 ## Rules
 

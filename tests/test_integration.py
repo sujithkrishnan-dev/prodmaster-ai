@@ -26,6 +26,8 @@ def test_all_required_files_exist():
         "memory/connectors/linear.md",
         "skills/auto-pilot/SKILL.md", "skills/resume/SKILL.md",
         "memory/autonomous-log.md",
+        "skills/checkpoint/SKILL.md",
+        "memory/checkpoint.md",
         "reports/dashboard.html", "reports/.gitkeep",
         "docs/README.md", "EVOLUTION-LOG.md",
     ]

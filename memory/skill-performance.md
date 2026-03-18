@@ -3,6 +3,7 @@
 Written by: measure. Read by: report, decide, evolve-self.
 Skip entries with `example: true` in all calculations.
 
+<!-- Example entry below — skip in all calculations (example: true) -->
 ---
 date: 2026-01-01
 feature: example-feature

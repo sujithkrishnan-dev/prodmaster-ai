@@ -34,7 +34,7 @@ Improve existing skills, generate new ones, and contribute changes upstream.
 
 ## Pre-flight
 
-Read `memory/project-context.md` frontmatter. Update `last_evolved_at_task` to equal the current `total_tasks_completed`. This prevents repeated triggering.
+Read `memory/project-context.md` frontmatter. Record the current value of `total_tasks_completed` — you will use it later. Do NOT update `last_evolved_at_task` yet; that happens after Mode 1 and Mode 2 complete so that a mid-run failure does not silently skip the next evolution cycle.
 
 ---
 
@@ -42,7 +42,7 @@ Read `memory/project-context.md` frontmatter. Update `last_evolved_at_task` to e
 
 ### 1. Identify Underperforming Skills
 
-Read `memory/skill-performance.md`. A skill is underperforming if the last 3+ consecutive cycle entries show a declining `qa_pass_rate` trend (each lower than the previous).
+Read `memory/skill-performance.md`. A skill is underperforming if the last 5 entries (or all entries if fewer than 5 exist) show a declining `qa_pass_rate` trend — meaning each entry's `qa_pass_rate` is lower than the one before it across that window.
 
 Map cycle metrics to skills:
 - High blockers → check `orchestrate`
@@ -169,6 +169,12 @@ change_summary: No improvements or new skills needed at this time
 ```
 
 Tell user: *"Evolution check ran — nothing needed at this time."*
+
+---
+
+## Post-Mode Update
+
+After Mode 1 and Mode 2 have both completed (whether or not they produced output): update `last_evolved_at_task` in `memory/project-context.md` frontmatter to the value of `total_tasks_completed` recorded during Pre-flight. This prevents the threshold from triggering again until another `evolve_every_n_tasks` tasks are completed.
 
 ---
 

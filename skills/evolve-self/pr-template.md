@@ -2,6 +2,12 @@
 
 {{change_summary}}
 
+## Trigger
+
+- **Type:** {{type}}
+- **Source:** {{source}}
+- **Occurrences / Evidence:** {{occurrence_count}} | see Evidence section below
+
 ## What Changed
 
 {{what_changed}}
@@ -11,10 +17,6 @@
 {{why}}
 
 ## Evidence
-
-- **Type:** {{type}}
-- **Source:** {{source}}
-- **Occurrences:** {{occurrence_count}}
 
 {{evidence}}
 

@@ -37,7 +37,7 @@ extract_last_field() {
 
 ACTIVE_FEATURES=$(extract_section "${MEMORY_DIR}/project-context.md" "Active Features")
 TOP_PATTERNS=$(extract_last_field "${MEMORY_DIR}/patterns.md" "pattern: " 5)
-OPEN_GAPS=$(grep -B2 "status: open" "${MEMORY_DIR}/skill-gaps.md" 2>/dev/null \
+OPEN_GAPS=$(grep -B4 "status: open" "${MEMORY_DIR}/skill-gaps.md" 2>/dev/null \
   | grep "^pattern:" | sed 's/^pattern: /- /' | head -5 || printf '(none yet)')
 RECENT_EVOLUTIONS=$(extract_last_field "${MEMORY_DIR}/evolution-log.md" "change_summary: " 3)
 

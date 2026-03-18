@@ -42,18 +42,19 @@ function Get-LastField {
 function Get-OpenGaps {
     param([string]$FilePath)
     if (-not (Test-Path $FilePath)) { return "(none yet)" }
-    $content = Get-Content $FilePath -Raw -ErrorAction SilentlyContinue
-    if (-not $content) { return "(none yet)" }
+    $lines = Get-Content $FilePath -ErrorAction SilentlyContinue
+    if (-not $lines) { return "(none yet)" }
     $out = [System.Collections.Generic.List[string]]::new()
-    $lines = $content -split "`n"
-    $foundOpen = $false
+    # pattern: appears BEFORE status: in each gap entry, so buffer the most
+    # recently seen pattern line and emit it when status: open is encountered.
+    $lastPattern = $null
     foreach ($line in $lines) {
-        if ($line -match "^status: open") { $foundOpen = $true; continue }
-        if ($foundOpen -and $line -match "^pattern:") {
-            $out.Add("- " + ($line -replace "^pattern:\s*", ""))
-            $foundOpen = $false
+        if ($line -match "^---") { $lastPattern = $null; continue }
+        if ($line -match "^pattern:\s*(.+)") { $lastPattern = $Matches[1]; continue }
+        if ($line -match "^status: open" -and $lastPattern) {
+            $out.Add("- " + $lastPattern)
+            $lastPattern = $null
         }
-        if ($line -match "^---") { $foundOpen = $false }
     }
     if ($out.Count -eq 0) { return "(none yet)" }
     return ($out | Select-Object -First 5) -join "`n"

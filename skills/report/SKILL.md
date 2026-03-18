@@ -95,6 +95,31 @@ Regenerate `reports/dashboard.html`. Requirements:
 
 Embed all stats as a JSON object in a `<script>` tag with `type="application/json"` id `prodmaster-data`, then read it with `JSON.parse(document.getElementById('prodmaster-data').textContent)` on load.
 
+**Required JSON shape** (the dashboard HTML reads exactly these keys):
+
+```json
+{
+  "generated": "YYYY-MM-DD",
+  "velocity": [
+    { "feature": "<feature name>", "value": <velocity_tasks_per_week> }
+  ],
+  "qaPassRates": [0.0],
+  "avgIterations": 0.0,
+  "blockers": [
+    { "text": "<blocker description>", "age_days": 0, "recommended_fix": "<text>" }
+  ],
+  "decisions": [
+    { "text": "<decision summary>", "status": "pending_outcome | confirmed_good | confirmed_bad" }
+  ]
+}
+```
+
+- `velocity`: last 10 entries from `skill-performance.md` (excluding `example: true`), ordered oldest-first
+- `qaPassRates`: all `qa_pass_rate` values from non-example entries, ordered oldest-first
+- `avgIterations`: mean of all `review_iterations` values from non-example entries, or `null` if no data
+- `blockers`: parsed from `## Blockers` section of `project-context.md` — each line `- YYYY-MM-DD: <text> | age_days: <n> | recommended_fix: <text>`
+- `decisions`: parsed from `## Decisions Log` section of `project-context.md` — each YAML block's `decision` and `status` fields
+
 ## Slack (if connector active)
 
 If `memory/connectors/slack.md` has `active: true` and non-empty `webhook_url`: post the Summary section of the markdown report to the webhook.

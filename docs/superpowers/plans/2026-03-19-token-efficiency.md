@@ -34,7 +34,9 @@
 
 - [ ] **Step 1: Add "token-efficiency" to ALL_SKILLS in tests/test_skills.py**
 
-Change the `ALL_SKILLS` list from:
+**Prerequisite note:** This plan must be executed AFTER the checkpoint plan (`docs/superpowers/plans/2026-03-19-checkpoint.md`). If the checkpoint plan has already run, `ALL_SKILLS` ends with `"checkpoint"`. If it has NOT run yet, it ends with `"resume"` — in that case, also add `"checkpoint"` in this step.
+
+Change the `ALL_SKILLS` list from (post-checkpoint-plan state):
 ```python
 ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-self",
               "dev-loop", "research-resolve", "auto-pilot", "resume", "checkpoint"]
@@ -45,6 +47,8 @@ ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-sel
               "dev-loop", "research-resolve", "auto-pilot", "resume", "checkpoint",
               "token-efficiency"]
 ```
+
+If checkpoint plan has NOT run yet, the "before" ends with `"resume"` — add both `"checkpoint"` and `"token-efficiency"` in one edit.
 
 - [ ] **Step 2: Update tests/test_memory.py**
 
@@ -76,10 +80,11 @@ cd C:\Users\teame\Desktop\Plugin && python -m pytest tests/ -v 2>&1 | tail -20
 
 Expected failures (and only these):
 - `test_skill_exists[token-efficiency]`
-- `test_skill_frontmatter[token-efficiency]`
 - `test_memory_file_exists[token-efficiency-log.md]`
 - `test_skill_pattern_manifest_has_all_skills`
 - `test_all_required_files_exist`
+
+Note: `test_skill_frontmatter[token-efficiency]` will SKIP (not FAIL) — the test calls `pytest.skip("missing")` when the file does not exist. This is expected and correct.
 
 All other tests must still pass.
 

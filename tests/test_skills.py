@@ -3,7 +3,7 @@ import os, pytest
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SKILLS_DIR = os.path.join(PLUGIN_ROOT, "skills")
 
-ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-self"]
+ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-self", "dev-loop", "research-resolve"]
 REQUIRED_FIELDS = ["name:", "description:", "version:", "triggers:", "reads:", "writes:", "generated:"]
 
 @pytest.mark.parametrize("skill", ALL_SKILLS)

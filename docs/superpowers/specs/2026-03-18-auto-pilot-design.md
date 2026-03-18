@@ -34,11 +34,18 @@ Every skill reads `memory/project-context.md` on entry. No skill rewrites are re
 
 ### 2. `skills/auto-pilot/SKILL.md`
 
-Entry point for unattended execution. Triggers on:
+Entry point for unattended execution. Frontmatter values: `generated: false`, `generated_from: ""`.
+
+Triggers on (canonical list — must match prodmasterai routing table exactly):
 - `/prodmasterai auto <goal>`
 - "run autonomously"
 - "work while I sleep"
 - "unattended execution"
+- "autonomously" (substring match)
+- "while I sleep" (substring match)
+- "unattended" (substring match)
+
+Routing in `prodmasterai` uses substring matching: if any routing keyword appears anywhere in the user's input, the skill is invoked.
 
 Responsibilities:
 - Set `autonomous_mode: true` and `autonomous_session_id: YYYY-MM-DD-HHmm` in project-context.md
@@ -50,10 +57,13 @@ Responsibilities:
 
 ### 3. `skills/resume/SKILL.md`
 
-Audit and rollback skill. Triggers on:
+Audit and rollback skill. Frontmatter values: `generated: false`, `generated_from: ""`.
+
+Triggers on (canonical list — must match prodmasterai routing table exactly):
 - `/prodmasterai resume`
 - "what happened while I was away"
 - "show autonomous summary"
+- "autonomous summary"
 
 Responsibilities:
 - Read last session from `memory/autonomous-log.md`
@@ -63,6 +73,13 @@ Responsibilities:
 - Archive reviewed sessions in autonomous-log.md
 
 ### 4. `memory/autonomous-log.md` (new file)
+
+Header convention (matches all other memory files):
+```
+# Autonomous Session Log
+
+Written by: auto-pilot. Read by: resume.
+```
 
 Append-only log. One block per session:
 
@@ -167,6 +184,12 @@ The following are never bypassed regardless of autonomous_mode setting:
 **Concurrency lock:** On startup, if `autonomous_session_id` is non-empty, exit immediately:
 *"Auto-pilot already running (session: [id]). Run `/prodmasterai resume` to check status."*
 
+**Stale lock recovery:** If `autonomous_session_id` is non-empty, `resume` checks whether the lock is stale using:
+```bash
+git log auto/<session_id> -1 --format=%ct
+```
+Parse the `autonomous_session_id` value (`YYYY-MM-DD-HHmm`) as a UTC datetime and convert to a Unix timestamp. If the branch's last commit timestamp is earlier than the `autonomous_session_id` datetime (or the branch does not exist), the lock is stale. `resume` offers: *"Found stale auto-pilot lock (session: [id]) — no active run detected. Clear lock and start fresh?"* On confirm: reset `autonomous_mode: false`, `autonomous_session_id: ""`. `auto-pilot` never clears a lock itself — only `resume` may do so, after user confirmation.
+
 ---
 
 ## Resume Skill: Audit and Rollback Flow
@@ -201,7 +224,12 @@ For each decision, offer:
 
 If re-run chosen for a decision with downstream dependents:
 - List all affected decisions: *"Re-running [1] will also reset decisions [3], [5]. Continue?"*
-- On confirm: revert affected files to their pre_action_sha, remove downstream decisions from log, invoke relevant skill in normal mode from that decision point
+- On confirm:
+  1. Ensure the working tree is on the `auto/<session_id>` branch: run `git checkout auto/<session_id>`. If the branch does not exist, notify the user: *"Branch auto/<session_id> no longer exists — cannot revert. The session history is preserved in autonomous-log.md for reference."* Abort the cascade reset.
+  2. For each affected file in the decision's `affected_files` list, run `git checkout <pre_action_sha> -- <filepath>`.
+  3. `affected_files` lists are guaranteed non-overlapping across decisions by construction — each file is recorded under the first decision that touches it, so no two decisions share a file path.
+  4. Remove downstream decision entries from the session block in autonomous-log.md (mark each as `status: rolled_back`).
+  5. Invoke the relevant skill in normal attended mode from that decision point.
 
 ### Step 5 — Archive
 
@@ -216,8 +244,10 @@ Add to the routing table in `skills/prodmasterai/SKILL.md`:
 
 | Trigger keywords | Routes to |
 |---|---|
-| `auto`, `autonomously`, `while I sleep`, `unattended` | `auto-pilot` |
-| `resume`, `what happened while I was away`, `autonomous summary` | `resume` |
+| `auto`, `autonomously`, `run autonomously`, `while I sleep`, `work while I sleep`, `unattended`, `unattended execution` | `auto-pilot` |
+| `resume`, `what happened while I was away`, `show autonomous summary`, `autonomous summary` | `resume` |
+
+Note: Routing uses substring matching. The routing table keywords must cover all trigger phrases in each skill's `triggers:` frontmatter. Both lists above are the canonical definition — the SKILL.md triggers and the routing table keywords must match exactly (no addition or removal permitted at implementation time without updating both).
 
 ---
 
@@ -233,9 +263,10 @@ Add to the routing table in `skills/prodmasterai/SKILL.md`:
 
 | File | Change |
 |---|---|
-| `memory/project-context.md` | Add 4 new frontmatter fields |
-| `skills/prodmasterai/SKILL.md` | Add routing entries for auto-pilot and resume |
-| `memory/connectors/skill-pattern-manifest.md` | Add keyword entries for auto-pilot and resume |
-| `tests/test_skills.py` | Add `auto-pilot` and `resume` to ALL_SKILLS |
-| `tests/test_memory.py` | Add `autonomous-log.md` to REQUIRED_FILES |
-| `docs/README.md` | Add two rows to Skills table |
+| `memory/project-context.md` | Add 4 new frontmatter fields: `autonomous_mode`, `autonomous_session_id`, `autonomous_max_iterations`, `autonomous_confidence_floor` |
+| `skills/prodmasterai/SKILL.md` | Add routing entries for auto-pilot and resume (see prodmasterai Routing Updates) |
+| `memory/connectors/skill-pattern-manifest.md` | Add `### auto-pilot` and `### resume` keyword entries |
+| `tests/test_skills.py` | (a) Add `"auto-pilot"` and `"resume"` to `ALL_SKILLS` list. (b) Add `"generated_from:"` to the `REQUIRED_FIELDS` list (currently missing from all skill tests — this spec introduces it). |
+| `tests/test_memory.py` | (a) Add `"autonomous-log.md"` to `REQUIRED_FILES` list. (b) In `test_project_context_has_counters`, append `"autonomous_mode:"`, `"autonomous_session_id:"`, `"autonomous_max_iterations:"`, `"autonomous_confidence_floor:"` to the existing `for f in [...]` list — same pattern as existing entries. (c) In `test_skill_pattern_manifest_has_all_skills`, add `"auto-pilot"` and `"resume"` to the hardcoded skills list on the `for skill in [...]` line. |
+| `tests/test_integration.py` | (a) Add `"skills/auto-pilot/SKILL.md"` and `"skills/resume/SKILL.md"` to the hardcoded `required` list in `test_all_required_files_exist`. (b) Add `"memory/autonomous-log.md"` to the same `required` list. (c) In `test_project_context_counters`, append `"autonomous_mode:"`, `"autonomous_session_id:"`, `"autonomous_max_iterations:"`, `"autonomous_confidence_floor:"` to the existing `for f in [...]` list — same pattern as existing entries. (d) In `test_all_skill_frontmatter`, add `"generated_from:"` to the local `required` list (line 44 of the file — currently `["name:", "description:", "version:", "triggers:", "reads:", "writes:", "generated:"]`). |
+| `docs/README.md` | Add two rows to the Skills table (after the `research-resolve` row): `\| \`auto-pilot\` \| "auto" / "run autonomously" / "work while I sleep" \| Full autonomous pipeline: brainstorm, plan, implement, test, and create PR — no questions asked. \|` and `\| \`resume\` \| "resume" / "what happened while I was away" \| Show autonomous session audit: every decision made, with rationale and per-decision rollback. \|` |

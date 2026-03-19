@@ -40,3 +40,10 @@ PR: auto-evolved/2026-03-18-structural-review-improve | Type: skill_improvement 
 - learn: gap slug derivation algorithm
 - decide: keyword-overlap topic matching for Step 6
 - report: live blocker age_days + JSON XSS escaping
+
+## 2026-03-19 — Structural review v2: frontmatter accuracy + help card sync
+PR: auto-evolved/2026-03-18-structural-review-v2 | Type: skill_improvement | Trigger: structural-review
+
+- prodmasterai v2.0.1: removed stale reads declarations (evolution-log.md, patterns.md)
+- orchestrate v1.4.1: added superpowers.md to writes frontmatter
+- help v1.0.1: updated evolve-self triggers to include optimize/deep review/audit

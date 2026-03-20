@@ -32,7 +32,7 @@
 **Files:**
 - Create: `tests/test_auto_session.py`
 
-Tests are content checks on markdown files — the standard pattern in this repo. All tests will fail until the corresponding changes are made in Tasks 2-7.
+Tests are content checks on markdown files — the standard pattern in this repo. 14 tests map 1:1 to spec requirements; 4 additional structural checks validate frontmatter and file-level properties. All 18 will fail until the corresponding changes are made in Tasks 2-7.
 
 - [ ] **Step 1: Create the test file**
 
@@ -148,6 +148,32 @@ def test_report_bootstrap_excludes_inferred():
     # Bootstrap guard must reference inferred as non-real data — unique to the guard section
     assert "qualifies as real data" in content or "inferred: true` is absent" in content or \
            "real-data entries" in content
+
+# ── Additional structural checks ─────────────────────────────────────────────
+
+def test_usage_log_has_header():
+    """usage-log.md seed file has the correct two-line comment header."""
+    content = read("memory/usage-log.md")
+    assert "# Usage Log" in content
+    assert "prodmasterai appends" in content
+
+def test_prodmasterai_reads_usage_log():
+    """prodmasterai frontmatter reads: list includes memory/usage-log.md."""
+    content = read("skills/prodmasterai/SKILL.md")
+    assert "memory/usage-log.md" in content
+
+def test_prodmasterai_priority_includes_e():
+    """prodmasterai Rules section priority order includes E."""
+    content = read("skills/prodmasterai/SKILL.md")
+    assert "A > E > B > C > D" in content
+
+def test_evolve_self_excludes_inferred():
+    """evolve-self excludes inferred:true entries and has updated Mode 1 real-data guard."""
+    content = read("skills/evolve-self/SKILL.md")
+    assert "inferred: true" in content
+    # Mode 1 guard must reference the real-data concept, not just example:true
+    assert "real-data" in content or "inferred: true` is absent" in content or \
+           "inferred: true` are absent" in content
 ```
 
 - [ ] **Step 2: Run tests — verify all fail**
@@ -156,7 +182,7 @@ def test_report_bootstrap_excludes_inferred():
 python -m pytest tests/test_auto_session.py -v
 ```
 
-Expected: 14 failures (files/content don't exist yet). If any pass accidentally, note which ones and verify they aren't false positives.
+Expected: 18 failures (files/content don't exist yet). If any pass accidentally, re-read that test's assertion and confirm it cannot pass on pre-existing file content (e.g., a simple `"inferred" in content` check might pass if the word already exists somewhere in the file — if so, tighten the assertion).
 
 - [ ] **Step 3: Add usage-log.md to test_memory.py REQUIRED_FILES**
 
@@ -214,7 +240,7 @@ Exact file content — three lines, nothing else.
 python -m pytest tests/test_auto_session.py::test_usage_log_exists tests/test_auto_session.py::test_usage_log_has_header tests/test_memory.py::test_memory_file_exists[usage-log.md] -v
 ```
 
-Expected: 3 PASS
+Expected: 3 PASS (`test_usage_log_exists`, `test_usage_log_has_header`, `test_memory_file_exists[usage-log.md]`)
 
 - [ ] **Step 3: Commit**
 
@@ -434,7 +460,7 @@ git commit -m "feat: add auto-session input path to measure skill"
 
 **Files:**
 - Modify: `skills/report/SKILL.md`
-- Tests: `test_report_excludes_inferred_entries`, `test_report_bootstrap_excludes_inferred`
+- Tests: `test_report_excludes_inferred_from_averages`, `test_report_bootstrap_excludes_inferred`
 
 Two changes:
 
@@ -536,7 +562,7 @@ git commit -m "feat: exclude inferred entries from evolve-self pattern analysis"
 python -m pytest tests/test_auto_session.py -v
 ```
 
-Expected: 14 PASS, 0 FAIL
+Expected: 18 PASS, 0 FAIL
 
 - [ ] **Step 2: Run full test suite — verify no regressions**
 
@@ -572,11 +598,11 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 | Task | Spec tests covered | Plan test functions | Status |
 |---|---|---|---|
-| 1. Create test file | — (all written red) | all 14 | — |
-| 2. `memory/usage-log.md` | Spec 1 + memory REQUIRED_FILES | `test_usage_log_exists` + memory test | — |
+| 1. Create test file | — (all written red) | all 18 | — |
+| 2. `memory/usage-log.md` | Spec 1 + header + memory | `test_usage_log_exists`, `test_usage_log_has_header`, `test_memory_file_exists[usage-log.md]` | — |
 | 3. `skills/prodmasterai/SKILL.md` | Spec 2, 7, 8 + reads + priority | `test_prodmasterai_step0_describes_append_format`, `test_prodmasterai_step3e_marks_processed_true`, `test_prodmasterai_step3e_has_precondition_guard`, `test_prodmasterai_reads_usage_log`, `test_prodmasterai_priority_includes_e` | — |
 | 4. `hooks/session-start.md` | Spec 3, 4, 5, 6, 13 | `test_session_start_injects_when_unprocessed`, `test_session_start_silent_when_no_unprocessed`, `test_session_start_handles_missing_usage_log`, `test_session_start_last_measure_date_fallback`, `test_session_start_uses_processed_flag_not_date` | — |
 | 5. `skills/measure/SKILL.md` | Spec 9, 10, 11 | `test_measure_auto_session_path`, `test_measure_auto_session_sets_inferred`, `test_measure_minimum_tasks_completed` | — |
 | 6. `skills/report/SKILL.md` | Spec 12, 14 | `test_report_excludes_inferred_from_averages`, `test_report_bootstrap_excludes_inferred` | — |
-| 7. `skills/evolve-self/SKILL.md` | (Mode 1 guard + exclusion) | `test_evolve_self_excludes_inferred` | — |
-| 8. Full suite green | All 14 + regressions | Full test suite | — |
+| 7. `skills/evolve-self/SKILL.md` | Mode 1 guard + inferred exclusion | `test_evolve_self_excludes_inferred` | — |
+| 8. Full suite green | All 18 + regressions | Full test suite | — |

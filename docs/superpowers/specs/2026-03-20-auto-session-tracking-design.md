@@ -36,8 +36,8 @@ User runs /prodmasterai
 
 Session ends. New session starts.
   └─> session-start hook fires
-        └─> reads usage-log.md: count processed:false entries with ts > LAST_MEASURE_DATE
-        └─> reads skill-performance.md: get timestamp of last non-example entry
+        └─> reads usage-log.md: count all processed:false entries (flag is canonical, no date filter)
+        └─> reads skill-performance.md: get date of last non-example entry (for message only)
         └─> if unprocessed > 0:
               inject "Auto-session queued: N invocations (route breakdown) since last measure on DATE"
 
@@ -110,25 +110,20 @@ Add this section after the existing active-features/patterns/gaps injection:
 After injecting active features, patterns, and gaps:
 
 1. Read `memory/usage-log.md`.
-   - If file does not exist: set N = 0 and skip to step 4.
-   - Count lines where `processed: false`. Call this ALL_UNPROCESSED.
+   - If file does not exist: set N = 0 and skip to step 3.
+   - Count lines where `processed: false`. Call this N.
+   - The `processed` flag is the canonical "already counted" marker — no date filtering is needed.
+     Step 3E marks all entries as `processed: true` when it fires, so any `processed: false`
+     entries are by definition from after the last auto-measure, regardless of date.
 
 2. Read `memory/skill-performance.md`.
    - Find the most recent entry where `example: true` is absent (or false).
-   - Extract its `date` field as LAST_MEASURE_DATE.
-   - If no such entry exists: set LAST_MEASURE_DATE = "1970-01-01" (epoch — always trigger).
+   - Extract its `date` field as LAST_MEASURE_DATE (used only for the injection message, not for filtering).
+   - If no such entry exists: set LAST_MEASURE_DATE = "never".
 
-3. Count lines where `processed: false` AND date-prefix of timestamp > LAST_MEASURE_DATE.
-   Timestamp comparison rule: truncate the time component from the usage-log entry timestamp
-   (take only the `YYYY-MM-DD` prefix) before comparing to `LAST_MEASURE_DATE`.
-   Example: `2026-03-20T10:00` → compare `"2026-03-20" > "2026-03-18"` → true (include).
-   Example: `2026-03-18T14:00` with LAST_MEASURE_DATE `"2026-03-18"` → `"2026-03-18" > "2026-03-18"` → false (exclude).
-   This is a strict greater-than: entries on the exact same date as the last measure are excluded
-   (the previous measure already covers that day).
-   Call this N (entries from after the last measure date).
-
-4. If N > 0:
-   - Count route breakdown: how many of the N lines per route value.
+3. If N > 0:
+   - Count route breakdown: how many of the N `processed: false` lines per route value
+     (count only those N lines — not the full file).
    - Inject into context:
      "Auto-session queued: {N} invocations ({route: count, route: count, ...}) since last measure on {LAST_MEASURE_DATE}."
    Else: inject nothing (silent).
@@ -158,7 +153,9 @@ Add a new input path before the existing "Input" section:
 >
 > **Step 4 modification (auto-session only):** Skip the `learn` handoff. `patterns_used` and `unhandled_patterns` are both empty — there is no pattern data to capture. Passing empty arrays to `learn` would write meaningless entries. Omit Step 4 entirely for auto-session cycles.
 >
-> Proceed through Steps 2, 3, and 5 as normal (velocity will be null due to null `time_hours`).
+> **Step 5 (threshold check) still runs on auto-session path.** `tasks_completed` is at least 1, so the counter must be incremented and the evolution threshold must be checked. Step 5 runs independently of Step 4 — do not skip it.
+>
+> Proceed through Steps 2, 3, and 5 only (velocity will be null due to null `time_hours`).
 > Do not output a completion message to the user (fires silently).
 
 ---
@@ -218,17 +215,17 @@ Minimum `tasks_completed` = 1 (even if all routes are non-work, at least one ses
 
 1. `memory/usage-log.md` is created on first prodmasterai invocation if it did not exist
 2. Each invocation appends exactly one line with correct ISO 8601 format and `processed: false`
-3. session-start injects "Auto-session queued" when unprocessed entries exist with timestamp after LAST_MEASURE_DATE
-4. session-start injects nothing when no unprocessed entries exist
+3. session-start injects "Auto-session queued" when any `processed: false` entries exist in usage-log.md
+4. session-start injects nothing when no `processed: false` entries exist
 5. session-start injects nothing when `usage-log.md` does not exist (N=0 path)
-6. session-start uses epoch as LAST_MEASURE_DATE when `skill-performance.md` has no real entries
+6. session-start uses "never" as LAST_MEASURE_DATE label when `skill-performance.md` has no real entries (message only; does not affect trigger logic)
 7. prodmasterai Step 3E fires measure silently and marks all `processed: false` entries as `processed: true`
 8. prodmasterai Step 3E does NOT fire again on the same session if all entries are already `processed: true`
-9. measure auto-session path does not prompt the user and does not invoke `learn`
+9. measure auto-session path does not prompt the user, does not invoke `learn`, but does run Step 5 (threshold check)
 10. measure auto-session entries have `inferred: true` in `skill-performance.md`
 11. `tasks_completed` minimum is 1 for any non-empty session
 12. report excludes `inferred: true` entries from averages and shows them as separate count
-13. Same-day multi-session: if auto-session fired at 9am and new invocations occur before a 2pm session, the 2pm session-start correctly detects the new unprocessed entries (timestamp comparison, not date comparison)
+13. Same-day multi-session: if auto-session fired at 9am (marking all entries processed:true) and new invocations occur at 10am-1pm, the 2pm session-start detects those new entries because they are `processed: false` — the `processed` flag, not date filtering, is the mechanism
 
 ---
 

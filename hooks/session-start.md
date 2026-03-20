@@ -38,4 +38,29 @@ Run `/prodmasterai resume` to continue, or `/prodmasterai checkpoint discard` to
 ```
 
 ---
+
+## Auto-Session Detection
+
+After injecting active features, patterns, and gaps:
+
+1. Read `memory/usage-log.md`.
+   - If file does not exist: set N = 0 and skip to step 3.
+   - Count lines where `processed: false`. Call this N.
+   - The `processed` flag is the canonical "already counted" marker — no date filtering is needed.
+     Step 3E marks all entries as `processed: true` when it fires, so any `processed: false`
+     entries are by definition from after the last auto-measure, regardless of date.
+
+2. Read `memory/skill-performance.md`.
+   - Find the most recent entry where `example: true` is absent (or false) AND `inferred: true` is absent.
+   - Extract its `date` field as LAST_MEASURE_DATE (used only for the injection message, not for filtering).
+   - If no such entry exists: set LAST_MEASURE_DATE = "never".
+
+3. If N > 0:
+   - Count route breakdown: how many of the N `processed: false` lines per route value
+     (count only those N lines — not the full file).
+   - Inject into context:
+     "Auto-session queued: {N} invocations ({route: count, route: count, ...}) since last measure on {LAST_MEASURE_DATE}."
+   Else: inject nothing (silent).
+
+---
 *One command: `/prodmasterai` — reads your state and acts. Fresh? Try `/prodmasterai build [feature]`.*

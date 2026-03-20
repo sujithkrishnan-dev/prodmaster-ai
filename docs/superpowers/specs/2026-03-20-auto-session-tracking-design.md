@@ -98,6 +98,8 @@ User runs any /prodmasterai command
 
 Rationale: Evolution (A) always runs first. Auto-session close (E) captures the previous session before new work is evaluated. B/C/D then act on the freshly updated state.
 
+**Also update the existing Rules section** of `prodmasterai/SKILL.md`: change the priority line from `(A > B > C > D)` to `(A > E > B > C > D)`.
+
 ---
 
 ### `hooks/session-start.md` changes
@@ -155,8 +157,11 @@ Add a new input path before the existing "Input" section:
 >
 > **Step 5 (threshold check) still runs on auto-session path.** `tasks_completed` is at least 1, so the counter must be incremented and the evolution threshold must be checked. Step 5 runs independently of Step 4 — do not skip it.
 >
-> Proceed through Steps 2, 3, and 5 only (velocity will be null due to null `time_hours`).
-> Do not output a completion message to the user (fires silently).
+> **Step sequencing (auto-session):** Run Steps 2 and 3 in parallel (as in the normal path). After both complete, run Step 5. Step 4 is skipped entirely. Do not run 2, 3, and 5 concurrently — Step 5 depends on the Step 3 write to `project-context.md`.
+>
+> **Also update the existing Rules section** of `measure/SKILL.md`: change `"Always hand off to learn"` to `"Always hand off to learn — except on the source: auto-session path (Step 4 skipped; see Auto-Session Path above)"`.
+>
+> Do not output a completion message to the user (fires silently). Velocity will be null due to null `time_hours`.
 
 ---
 
@@ -169,11 +174,14 @@ Add to the existing skip rule (currently `example: true`):
 > In the dashboard output, show inferred entries as a separate count:
 > `Auto-tracked sessions: N (excluded from averages)`
 >
+> **Fresh-State Bootstrap guard update:** The bootstrap triggers when `skill-performance.md` has no entries that qualify as real data. An entry qualifies as real data only if both `example: true` is absent AND `inferred: true` is absent. Entries with `inferred: true` do not count as real data for this check — a user who has only auto-tracked sessions (no explicit "cycle done" entries) should still see the getting-started guide.
 ---
 
 ### `skills/evolve-self/SKILL.md` changes
 
 When reading `skill-performance.md` for pattern analysis or underperformance detection: exclude entries where `inferred: true`. These entries carry no real performance signal (all defaults) and would skew quality assessments. Apply the same skip rule already used for `example: true` entries.
+
+**Mode 1 skip guard update:** The existing `"If skill-performance.md has no non-example entries, skip Mode 1 entirely"` guard must be extended. Mode 1 should also skip when all non-example entries have `inferred: true`. Only entries where both `example: true` and `inferred: true` are absent count as real data for this guard.
 
 ---
 
@@ -226,6 +234,7 @@ Minimum `tasks_completed` = 1 (even if all routes are non-work, at least one ses
 11. `tasks_completed` minimum is 1 for any non-empty session
 12. report excludes `inferred: true` entries from averages and shows them as separate count
 13. Same-day multi-session: if auto-session fired at 9am (marking all entries processed:true) and new invocations occur at 10am-1pm, the 2pm session-start detects those new entries because they are `processed: false` — the `processed` flag, not date filtering, is the mechanism
+14. report Fresh-State Bootstrap fires when `skill-performance.md` contains only `inferred: true` entries (no explicit-cycle data)
 
 ---
 

@@ -428,13 +428,15 @@ Do not output a completion message to the user. Velocity will be null due to nul
 ---
 ```
 
-**Change 2 — Rules section.** Find the line:
+**Change 2 — Rules section.** The Rules section (near the bottom of the file) contains:
 ```
-Always hand off to learn
+- Always hand off to `learn`
 ```
-Change to:
+(Note: this is the bullet in `## Rules`, not the frontmatter `description:` field on line 3 which also mentions "learn". Target the Rules bullet specifically.)
+
+Change that Rules bullet to:
 ```
-Always hand off to learn — except on the `source: auto-session` path (Step 4 skipped; see Auto-Session Path above)
+- Always hand off to `learn` — except on the `source: auto-session` path (Step 4 skipped; see Auto-Session Path above)
 ```
 
 - [ ] **Step 1: Apply both changes to `skills/measure/SKILL.md`**

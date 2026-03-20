@@ -34,7 +34,12 @@ Read all sources in **parallel** (do not serialize):
 - `memory/connectors/slack.md` -- connector config
 - `memory/connectors/linear.md` -- connector config + cycle data if active
 
-Skip entries with `example: true` when processing results. Wait for all reads to complete before computing stats.
+Skip entries with `example: true` or `inferred: true` when processing results and computing averages. These entries do not reflect real measured outcomes.
+
+In the dashboard output, show auto-tracked sessions as a separate count (do not mix into averages):
+`Auto-tracked sessions: N (excluded from averages)`
+
+Wait for all reads to complete before computing stats.
 
 ## Computed Stats (from skill-performance.md, excluding example entries)
 
@@ -131,7 +136,7 @@ If `memory/connectors/slack.md` has `active: true` and non-empty `webhook_url`: 
 
 ## Fresh-State Bootstrap (no real data detected)
 
-When `skill-performance.md` has no non-example entries:
+When `skill-performance.md` has no real-data entries (an entry qualifies as real data only if both `example: true` is absent AND `inferred: true` is absent):
 
 1. **Do not write a zero-metrics report.** Instead write `reports/getting-started-YYYY-MM-DD.md`:
 
@@ -170,7 +175,7 @@ After writing the markdown report and regenerating the HTML dashboard:
 
 ## Rules
 
-- Skip `example: true` entries in all calculations
+- Skip `example: true` and `inferred: true` entries in all calculations and averages
 - If no real data: run Fresh-State Bootstrap (above) -- never silently output zero-metrics
 - Never overwrite existing report files -- create new dated files
 - Do not show raw YAML or internal memory file contents in the report output

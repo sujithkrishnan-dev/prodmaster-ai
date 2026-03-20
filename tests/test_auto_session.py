@@ -5,7 +5,7 @@ import pytest
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def read(rel):
-    return open(os.path.join(PLUGIN_ROOT, rel)).read()
+    return open(os.path.join(PLUGIN_ROOT, rel), encoding="utf-8").read()
 
 def exists(rel):
     return os.path.exists(os.path.join(PLUGIN_ROOT, rel))
@@ -40,7 +40,8 @@ def test_session_start_silent_when_no_unprocessed():
 def test_session_start_handles_missing_usage_log():
     """session-start sets N=0 and skips injection when usage-log.md does not exist."""
     content = read("hooks/session-start.md")
-    assert "does not exist" in content or "If file does not exist" in content
+    assert ("usage-log.md" in content and "does not exist" in content) or \
+           ("usage-log.md" in content and "If file does not exist" in content)
     # The N=0 path must lead to no injection — validated by presence of silent skip
     assert "inject nothing" in content or "skip to step" in content
 
@@ -48,7 +49,9 @@ def test_session_start_handles_missing_usage_log():
 def test_session_start_last_measure_date_fallback():
     """session-start uses 'never' as LAST_MEASURE_DATE when skill-performance has no real entries."""
     content = read("hooks/session-start.md")
-    assert '"never"' in content or "= \"never\"" in content or "set LAST_MEASURE_DATE" in content
+    assert "set LAST_MEASURE_DATE" in content or \
+           'LAST_MEASURE_DATE = "never"' in content or \
+           ("LAST_MEASURE_DATE" in content and '"never"' in content)
 
 # ── Spec test 7 ──────────────────────────────────────────────────────────────
 def test_prodmasterai_step3e_marks_processed_true():

@@ -19,6 +19,33 @@ generated_from: ""
 
 Record quantitative data after every Superpowers cycle.
 
+## Auto-Session Path
+
+Triggered when `source: auto-session` is passed by prodmasterai Step 3E.
+Skip all fuzzy parsing. Skip all user prompts. Use the inferred defaults passed in directly (already computed by Step 3E):
+
+| Field | Inferred value |
+|---|---|
+| `tasks_completed` | count of `orchestrate` + `decide` + `learn` route calls (min 1) |
+| `qa_pass_rate` | 1.0 |
+| `review_iterations` | 0 |
+| `time_hours` | null |
+| `feature` | last active feature, or "mixed-session" |
+| `blockers_encountered` | 0 |
+| `patterns_used` | [] |
+| `unhandled_patterns` | [] |
+| inferred | true |
+
+**Step 4 (auto-session only):** Skip the `learn` handoff entirely. `patterns_used` and `unhandled_patterns` are both empty — passing them to `learn` would write meaningless entries.
+
+**Step 5 still runs.** `tasks_completed` is at least 1, so the threshold counter must be incremented.
+
+**Step sequencing:** Run Steps 2 and 3 in parallel (as in the normal path). After both complete, run Step 5. Do not run 2, 3, and 5 concurrently — Step 5 depends on the Step 3 write to `project-context.md` (total_tasks_completed must be updated before Step 5 can check the threshold).
+
+Do not output a completion message to the user. Velocity will be null due to null `time_hours`.
+
+---
+
 ## Input
 
 Receive cycle outcome (from `orchestrate` or user). Expected fields: feature name, tasks completed, QA pass rate (0.0-1.0), review iterations, time in hours, blockers encountered, patterns used, unhandled patterns.
@@ -88,5 +115,5 @@ Run steps 4 and 5 simultaneously -- they are independent:
 
 - Always record even for failed/partial cycles (qa_pass_rate reflects reality)
 - Append only -- never modify existing entries
-- Always hand off to `learn`
+- Always hand off to `learn` — except on the `source: auto-session` path (Step 4 skipped; see Auto-Session Path above)
 - **Never contribute anything upstream** -- upstream is exclusively evolve-self's responsibility

@@ -18,6 +18,7 @@ REQUIRED_FILES = [
     "autonomous-log.md",
     "checkpoint.md",
     "token-efficiency-log.md",
+    "usage-log.md",
 ]
 
 @pytest.mark.parametrize("filename", REQUIRED_FILES)

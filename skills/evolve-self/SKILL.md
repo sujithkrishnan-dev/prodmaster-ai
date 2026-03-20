@@ -70,7 +70,9 @@ If Mode 0 finds zero issues: skip Mode 0's log entry and continue to Mode 1.
 
 Read `memory/skill-performance.md`. A skill is underperforming if the last 5 entries show a declining `qa_pass_rate` trend.
 
-**No real data:** If `skill-performance.md` has no non-example entries, skip Mode 1 entirely (no data to analyse) and proceed to Mode 2.
+**No real data:** If `skill-performance.md` has no real-data entries (an entry qualifies as real data only if both `example: true` and `inferred: true` are absent), skip Mode 1 entirely (no data to analyse) and proceed to Mode 2.
+
+**Exclude inferred entries:** When reading entries for underperformance detection or trend analysis, skip entries with `inferred: true`. These carry no real performance signal (all fields are default values) and would produce misleading quality assessments.
 
 Map metrics to skills:
 - High blockers -> check `orchestrate`

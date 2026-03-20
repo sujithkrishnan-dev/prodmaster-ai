@@ -9,6 +9,7 @@ reads:
   - memory/project-context.md
   - memory/skill-performance.md
   - memory/skill-gaps.md
+  - memory/usage-log.md
 writes:
   - delegates to the invoked skill
 generated: false
@@ -18,6 +19,22 @@ generated_from: ""
 # ProdMaster AI -- Master Entry Point
 
 This is the single command the user needs to know. Read context, decide the right action, execute it -- all without asking the user to remember which skill to invoke.
+
+---
+
+## Step 0 -- Log Invocation (synchronous, silent)
+
+Append one line to `memory/usage-log.md`:
+`- {ISO 8601 timestamp} | route: {classified route, or "unknown" if not yet classified} | processed: false`
+
+If the file does not exist, create it with this header first:
+
+    # Usage Log
+    <!-- prodmasterai appends one entry per invocation -->
+    <!-- session-start reads; prodmasterai marks processed:true after auto-measure fires -->
+
+This write is synchronous -- complete it before continuing to Step 1.
+Do not output anything to the user.
 
 ---
 
@@ -74,6 +91,25 @@ Evaluate in order (first match wins):
 -> After evolve-self completes, reset `evolution_threshold_reached: false` in project-context.md frontmatter.
 -> Invoke `evolve-self` Phase 1 (convergence loop -- runs until all changed skills are clean). Show output only after convergence.
 -> After evolve-self finishes, continue to check B/C/D and act on whatever is next.
+
+### E. Auto-session queued
+
+Precondition: session context contains `"Auto-session queued"` AND `memory/usage-log.md` has at least one `processed: false` line.
+If precondition is not met (already fired this session, or no unprocessed entries), skip E entirely and evaluate B.
+
+→ Count `processed: false` entries. Compute inferred metrics:
+  - `tasks_completed` = count of lines with `route: orchestrate`, `route: decide`, or `route: learn` (minimum 1)
+  - `qa_pass_rate` = 1.0
+  - `review_iterations` = 0
+  - `time_hours` = null
+  - `feature` = last active feature name from `project-context.md ## Active Features`, or "mixed-session" if none
+  - `blockers_encountered` = 0
+  - `inferred` = true
+
+→ Silently fire `measure` (auto-session path -- source: auto-session) with the above metrics.
+→ After measure completes: rewrite ALL `processed: false` lines in `memory/usage-log.md` to `processed: true` (including any stale entries, regardless of age). `processed: true` means "will not be counted again", not "was included in a measure entry".
+→ Do not tell the user that auto-measure fired. The cycle entry in `skill-performance.md` is the only record.
+→ Continue: evaluate B/C/D on the now-updated state and handle the user's actual command.
 
 ### B. Active feature in progress
 `## Active Features` section of project-context.md contains at least one non-empty feature entry.
@@ -163,6 +199,6 @@ Do not describe what you are about to do. Just do it.
 - Never ask the user to remember skill names
 - Never show a numbered menu -- route autonomously or ask exactly one question
 - Always execute; never just explain
-- If two conditions in Step 3 match, take the higher-priority one (A > B > C > D)
+- If two conditions in Step 3 match, take the higher-priority one (A > E > B > C > D)
 - **Parallelism:** whenever invoking multiple independent reads, writes, or skill dispatches, run them in parallel. Only serialize operations that have an explicit output dependency on a prior step. Never queue work that can run concurrently.
 - **Never contribute anything upstream** -- upstream is exclusively evolve-self's responsibility

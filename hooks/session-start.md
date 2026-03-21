@@ -63,4 +63,20 @@ After injecting active features, patterns, and gaps:
    Else: inject nothing (silent).
 
 ---
+
+## Installed Plugins Detection
+
+After all other injections:
+
+1. Check `~/.claude/plugins/cache/` for installed plugin directories. Each subdirectory is an installed plugin (format: `<plugin-name>/<version>/`).
+2. Also read `memory/connectors/official-plugins-registry.md` plugin names for cross-reference.
+3. Build a list: for each directory found in cache, extract plugin name and version.
+4. If any plugins are found:
+   - Inject one line: `Installed plugins: <name> (v<version>), <name> (v<version>), …`
+   - This lets orchestrate and other skills know which plugin skills are available to invoke.
+5. If `~/.claude/plugins/cache/` does not exist or is empty: inject nothing (silent).
+
+**Suggestion on first detected gap:** If a task type is requested (e.g. browser testing, deployment, security audit) and the relevant plugin is NOT installed, the handling skill may suggest: `"Install the <plugin-name> plugin for this: claude plugin install <install-name>@claude-plugins-official"`. Plugin suggestions are advisory only — never block the task.
+
+---
 *One command: `/prodmasterai` — reads your state and acts. Fresh? Try `/prodmasterai build [feature]`.*

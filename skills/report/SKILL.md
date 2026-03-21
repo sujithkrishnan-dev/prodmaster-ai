@@ -1,7 +1,7 @@
 ---
 name: report
-description: Use to generate productivity reports and refresh the HTML dashboard. Run with /report or /report weekly. Reads all memory files, produces a markdown weekly summary and a self-contained HTML dashboard. When no data exists, auto-bootstraps a getting-started guide and kicks off orchestrate.
-version: 1.3.2
+description: Print a productivity report directly in the terminal. Run with /report or /report weekly. All output appears inline — no files written. When no data exists, prints a getting-started guide in the terminal.
+version: 1.4.0
 triggers:
   - User runs /report
   - User asks for weekly summary, status update, management report, or dashboard refresh
@@ -13,16 +13,14 @@ reads:
   - memory/connectors/slack.md
   - memory/connectors/linear.md
   - memory/connectors/github.md
-writes:
-  - reports/weekly-YYYY-MM-DD.md
-  - reports/dashboard.html
+writes: []
 generated: false
 generated_from: ""
 ---
 
 # Report
 
-Generate the weekly markdown report and regenerate the HTML dashboard.
+Print a full productivity report directly in the terminal. No files are written. Everything appears inline.
 
 ## Data Sources
 
@@ -36,147 +34,100 @@ Read all sources in **parallel** (do not serialize):
 
 Skip entries with `example: true` or `inferred: true` when processing results and computing averages. These entries do not reflect real measured outcomes.
 
-In the dashboard output, show auto-tracked sessions as a separate count (do not mix into averages):
-`Auto-tracked sessions: N (excluded from averages)`
-
 Wait for all reads to complete before computing stats.
 
-## Computed Stats (from skill-performance.md, excluding example entries)
+## Computed Stats (from skill-performance.md, excluding example and inferred entries)
 
 - Total features delivered
 - Average QA pass rate (mean of qa_pass_rate values)
-- Average velocity (mean of velocity_tasks_per_week)
+- Average velocity (mean of velocity_tasks_per_week, null if no time data)
 - Average review iterations
 - Active blockers (count from project-context.md Blockers section)
 - Pending decisions (status: pending_outcome count)
+- Auto-tracked sessions count (inferred: true entries — shown separately, not in averages)
 
-## Output 1: Markdown Report
+## Terminal Output (normal — data present)
 
-Write to `reports/weekly-YYYY-MM-DD.md`:
+Print this block directly to the terminal. Use `—` for any null/unavailable metric. Do not write to any file.
 
-```markdown
-# ProdMaster AI -- Weekly Report
-**Date:** YYYY-MM-DD
+```
+===============================================
+  ProdMaster AI — Report · {DATE}
+===============================================
 
-## Summary
-- Features delivered: N
-- Avg QA pass rate: N%
-- Avg velocity: N tasks/week
-- Avg review iterations: N
-- Active blockers: N
-- Pending decisions: N
+  Features delivered:    {N}
+  Avg QA pass rate:     {N%}
+  Avg velocity:         {N tasks/week | —}
+  Review iterations:    {N}
+  Active blockers:      {N}
+  Pending decisions:    {N}
 
-## Features Delivered
-<list from skill-performance.md this period>
+  Auto-tracked sessions: {N} (excluded from averages)
 
-## Active Blockers
-<from project-context.md ## Blockers>
+---Features ───────────────────────────────────
+{list each non-example, non-inferred entry: "  · {feature} ({date}) — {tasks_completed} tasks"}
+(none) if empty
 
-## Top Patterns
-<top 3 from patterns.md>
+---Top Patterns ───────────────────────────────
+{top 3 from patterns.md: "  · {pattern description}"}
+(none yet) if empty
 
-## Recent Mistakes
-<top 3 from mistakes.md>
+---Recent Mistakes ────────────────────────────
+{top 3 from mistakes.md: "  · {mistake description}"}
+(none yet) if empty
 
-## Decisions
-<from project-context.md ## Decisions Log>
+---Active Blockers ────────────────────────────
+{each blocker from project-context.md ## Blockers: "  · {description} (age: {age_days}d) → {recommended_fix}"}
+(none) if empty
+
+---Decisions ──────────────────────────────────
+{each decision YAML block from project-context.md ## Decisions Log: "  · [{status}] {decision}"}
+(none) if empty
+
+===============================================
+Next: /prodmasterai build [feature]  ·  /prodmasterai cycle done — …
 ```
 
-## Output 2: HTML Dashboard
-
-Regenerate `reports/dashboard.html`. Requirements:
-- Single self-contained file, no CDN, no external scripts or stylesheets
-- Vanilla JS only -- use `createElement` and `textContent` for all dynamic content (never `innerHTML` with unsanitised data)
-- Opens by double-clicking -- no server needed
-- Four panels in 2x2 grid
-
-**Panel data mapping:**
-
-| Panel | Source | Key fields |
-|---|---|---|
-| Feature Velocity | skill-performance.md | velocity_tasks_per_week (sparkline of last 10), current value |
-| QA Health | skill-performance.md | qa_pass_rate (donut), avg review_iterations |
-| Active Blockers | project-context.md ## Blockers | text, age_days, recommended_fix |
-| BA Decisions Log | project-context.md ## Decisions Log | decision text, status |
-
-**DOM safety rule:** When rendering user data (feature names, blocker text, decision text), always use `textContent` or `createTextNode` -- never string-interpolate into HTML markup. Build elements with `document.createElement` and set their `textContent`.
-
-Embed all stats as a JSON object in a `<script>` tag with `type="application/json"` id `prodmaster-data`, then read it with `JSON.parse(document.getElementById('prodmaster-data').textContent)` on load.
-
-**XSS safety:** Before embedding, escape any `</script>` sequences inside string values by replacing `</` with `<\/` so the JSON cannot accidentally close the script tag.
-
-**Required JSON shape** (the dashboard HTML reads exactly these keys):
-
-```json
-{
-  "generated": "YYYY-MM-DD",
-  "velocity": [
-    { "feature": "<feature name>", "value": <velocity_tasks_per_week> }
-  ],
-  "qaPassRates": [0.0],
-  "avgIterations": 0.0,
-  "blockers": [
-    { "text": "<blocker description>", "age_days": 0, "recommended_fix": "<text>" }
-  ],
-  "decisions": [
-    { "text": "<decision summary>", "status": "pending_outcome | confirmed_good | confirmed_bad" }
-  ]
-}
-```
-
-- `velocity`: last 10 entries from `skill-performance.md` (excluding `example: true`), ordered oldest-first
-- `qaPassRates`: all `qa_pass_rate` values from non-example entries, ordered oldest-first
-- `avgIterations`: mean of all `review_iterations` values from non-example entries, or `null` if no data
-- `blockers`: parsed from `## Blockers` section of `project-context.md` -- each line `- YYYY-MM-DD: <text> | age_days: <n> | recommended_fix: <text>`. **Always recompute `age_days` as `today - YYYY-MM-DD` at report generation time** -- the value stored in the file is a snapshot; use the date field to get the live age.
-- `decisions`: parsed from `## Decisions Log` section of `project-context.md` -- each YAML block's `decision` and `status` fields
-
-## Slack (if connector active)
-
-If `memory/connectors/slack.md` has `active: true` and non-empty `webhook_url`: post the Summary section of the markdown report to the webhook.
+**age_days** for blockers: always compute as `today − YYYY-MM-DD` at report time — the value in the file is a snapshot, use the date field for the live age.
 
 ## Fresh-State Bootstrap (no real data detected)
 
 When `skill-performance.md` has no real-data entries (an entry qualifies as real data only if both `example: true` is absent AND `inferred: true` is absent):
 
-1. **Do not write a zero-metrics report.** Instead write `reports/getting-started-YYYY-MM-DD.md`:
+Print this directly in the terminal — do not write any file:
 
-```markdown
-# ProdMaster AI -- Getting Started
-**Date:** YYYY-MM-DD
+```
+===============================================
+  ProdMaster AI — Getting Started
+===============================================
 
-No cycle data recorded yet. Here's your fast path to a live dashboard:
+  No cycle data recorded yet.
+  Here's your fast path to a live report:
 
-## Step 1 -- Start a feature
-/prodmasterai build [feature name]
+  Step 1 — Start a feature
+    /prodmasterai build [feature name]
 
-## Step 2 -- After your first work session, log the cycle
-/prodmasterai cycle done -- N tasks, QA X%, Y reviews, Z hours
+  Step 2 — After your first work session, log the cycle
+    /prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours
 
-## Step 3 -- Generate your first real report
-/prodmasterai report
+  Step 3 — Generate your first real report
+    /prodmasterai report
 
-ProdMaster AI will populate all metrics automatically after Step 2.
+  ProdMaster AI will populate all metrics automatically after Step 2.
+
+===============================================
 ```
 
-2. **Do NOT write dashboard.html with zeros.** Skip dashboard generation entirely in fresh state.
-3. **Completion message** (fresh state):
+Then ask: *"What are you building first? Tell me the feature name and I'll break it into tasks right now."*
 
-> Your getting-started guide is ready at `reports/getting-started-YYYY-MM-DD.md`. Complete one cycle and the dashboard will populate automatically.
->
-> What are you building first? Tell me the feature name and I'll break it into tasks right now.
+## Slack (if connector active)
 
-## Completion Message (normal -- data present)
-
-After writing the markdown report and regenerating the HTML dashboard:
-
-> Report written to `reports/weekly-YYYY-MM-DD.md`. Dashboard updated at `reports/dashboard.html` -- open it by double-clicking.
->
-> Next: `/prodmasterai build [feature]` to start a new cycle | `/prodmasterai cycle done -- …` to log a completed one
+If `memory/connectors/slack.md` has `active: true` and non-empty `webhook_url`: post the computed stats block (Features delivered, QA pass rate, velocity, blockers, decisions) to the webhook after printing to terminal.
 
 ## Rules
 
 - Skip `example: true` and `inferred: true` entries in all calculations and averages
-- If no real data: run Fresh-State Bootstrap (above) -- never silently output zero-metrics
-- Never overwrite existing report files -- create new dated files
+- If no real data: run Fresh-State Bootstrap (above) — print in terminal, write no files
+- **Do not write any files** — all output is printed to the terminal inline
 - Do not show raw YAML or internal memory file contents in the report output
-- **Never contribute anything upstream** -- upstream is exclusively evolve-self's responsibility
+- **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility

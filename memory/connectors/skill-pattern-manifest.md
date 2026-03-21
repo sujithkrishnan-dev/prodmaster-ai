@@ -47,3 +47,10 @@ keywords: [checkpoint, resume session, pick up where I left off, continue after 
 
 ### token-efficiency
 keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too many tokens, optimize tokens, token waste, token usage, plan limit, efficiency audit]
+
+### auto-pilot-revoke
+- trigger: /auto-pilot-revoke
+- trigger: stop auto-pilot
+- trigger: cancel autonomous
+- reads: memory/project-context.md, memory/autonomous-log.md
+- writes: memory/project-context.md, memory/autonomous-log.md

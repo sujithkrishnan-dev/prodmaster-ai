@@ -36,13 +36,23 @@ The plugin reads your current state and decides what to do. No need to remember 
 
 | You say | Plugin does |
 |---|---|
-| `/prodmasterai build X` | `orchestrate` — breaks feature into tracked task cycles |
-| `/prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours` | `measure` → `learn` auto-fires |
-| `/prodmasterai should we A or B?` | `decide` — ROI-ranked recommendation |
-| `/prodmasterai report` | Markdown weekly report + HTML dashboard in `reports/` |
-| `/evolve` | `evolve-self` — convergence loop until all skills clean; upstream PR only on explicit publish |
+| `/prodmasterai help` | `help` — shows all skills, triggers, and examples |
+| `/prodmasterai pull latest` | `smooth-dev` — git pull, repo health check, run tests |
+| `/prodmasterai build X` | `orchestrate` — breaks feature into tracked tasks, parallel subtasks, auto-installs needed plugins |
+| `/prodmasterai cycle done — …` | `measure` → `learn` auto-fires (parallel writes) |
+| `/prodmasterai should we A or B?` | `decide` — scored recommendation |
+| `/prodmasterai report` | Prints full report directly in terminal (no files written) |
+| `/prodmasterai queue add X` | `task-queue` — adds goal to sequential execution queue |
+| `/prodmasterai queue list` | `task-queue` — shows pending/running/done queue |
+| `/prodmasterai queue run` | `task-queue` — runs all queued tasks sequentially, auto-advances |
+| `/prodmasterai explore X` | `parallel-explore` — runs 2+ approaches in separate worktrees, picks best by test pass rate |
+| `/prodmasterai auto X` | `auto-pilot` — fully autonomous: brainstorm → plan → implement → test → PR |
+| `/auto-pilot-revoke` | `auto-pilot-revoke` — stops running auto-pilot, commits progress, resets lock |
+| `/prodmasterai resume` | `resume` — shows what auto-pilot did, per-decision review and rollback |
+| `/prodmasterai plugins` | `plugin-manager` — shows installed/available plugins, auto-installs when needed |
+| `/evolve` | `evolve-self` — convergence loop until all skills clean |
 | `/prodmasterai update` | Push locally evolved improvements upstream via PR |
-| `/prodmasterai` (no args) | Reads state, acts or asks exactly one question |
+| `/prodmasterai` (no args) | Reads state, acts or prompts with exactly one question |
 
 ## Skills
 
@@ -50,19 +60,20 @@ The plugin reads your current state and decides what to do. No need to remember 
 |---|---|---|
 | `prodmasterai` | `/prodmasterai` | Master entry point — reads state, routes to the right skill automatically |
 | `help` | "help" / "what can you do" / "show commands" | List all skills, triggers, and one-line examples |
-| `smooth-dev` | "pull latest" / "start dev" / "pre-flight" | Pull latest, health-check repo, run tests, surface blockers, print session card |
-| `orchestrate` | "Build X" / feature goal | Break into task cycles, dispatch independent subtasks in parallel |
-| `measure` | After each Superpowers cycle | Capture velocity, QA rate, blockers — parallel writes |
-| `report` | `/prodmasterai report` | Markdown report + HTML dashboard; fresh-state bootstrap if no data yet |
+| `smooth-dev` | "pull latest" / "start dev" / "pre-flight" | Pull latest, health-check repo, run tests, surface blockers |
+| `orchestrate` | "Build X" / feature goal | Break into task cycles, dispatch independent subtasks in parallel, auto-install needed plugins |
+| `measure` | After each cycle | Capture velocity, QA rate, blockers — parallel writes |
+| `report` | `/prodmasterai report` | Print full report directly in terminal; bootstrap if no cycle data yet |
 | `decide` | At a decision fork | ROI-ranked recommendation |
 | `learn` | After cycle or on feedback | Patterns, mistakes, gaps — parallel write ‖ gap detection |
+| `task-queue` | `/prodmasterai queue` | Manage sequential execution queue — add, list, run |
+| `parallel-explore` | `/prodmasterai explore` | Run 2+ approaches in separate worktrees, pick best by test pass rate |
+| `auto-pilot` | `/prodmasterai auto` | Full autonomous pipeline: brainstorm, plan, implement, test, PR — no questions asked |
+| `auto-pilot-revoke` | `/auto-pilot-revoke` | Stop running auto-pilot, commit progress, reset lock |
+| `resume` | `/prodmasterai resume` | Show autonomous session audit: every decision made, with per-decision rollback |
+| `plugin-manager` | `/prodmasterai plugins` | Show installed/available plugins, auto-install when needed |
 | `evolve-self` | Every N tasks or `/evolve` | Convergence loop: improve skills + generate new ones until clean |
-| `dev-loop` | "loop until passing" / "keep iterating" / "dev loop" | Iterate a task in a loop until tests pass, quality thresholds are met, or max iterations reached. Escalates to research-resolve when stuck. |
-| `research-resolve` | "research and resolve" / "loop is stuck" / "can't make progress" | Autonomous fix loop in an isolated git worktree. Researches failures, applies hypotheses, merges back only on success. |
-| `auto-pilot` | "auto" / "run autonomously" / "work while I sleep" | Full autonomous pipeline: brainstorm, plan, implement, test, and create PR -- no questions asked. |
-| `resume` | "resume" / "what happened while I was away" | Show autonomous session audit: every decision made, with rationale and per-decision rollback. |
-| `checkpoint` | "resume" / "continue" / "checkpoint reset Xh" | Save in-flight task state before each step. Resumes automatically after plan usage limit resets — with scheduled auto-resume. |
-| `token-efficiency` | "token efficiency" / "reduce tokens" / "I'm hitting limits" | Audit, enforce, and rewrite plugin operations to reduce token consumption and delay plan usage limit. |
+| `token-efficiency` | "token efficiency" / "reduce tokens" / "I'm hitting limits" | Audit, enforce, and rewrite plugin operations to reduce token consumption |
 
 ## Hooks
 
@@ -80,7 +91,8 @@ Edit `memory/connectors/<name>.md`, set `active: true`, fill in config.
 | `github.md` | GitHub Issues/PRs |
 | `slack.md` | Slack webhook |
 | `linear.md` | Linear issue tracking |
-| `superpowers.md` | Superpowers — auto-detected by `orchestrate`; offers install on first use |
+
+Official plugins (47 available) are auto-detected from `~/.claude/plugins/cache/` and auto-installed when needed. See `memory/connectors/official-plugins-registry.md` for the full list.
 
 ## Upstream Evolution
 
@@ -91,11 +103,9 @@ Edit `memory/connectors/<name>.md`, set `active: true`, fill in config.
 - PRs created immediately on `/prodmasterai update` — no time-based rate limit
 - Run `/prodmasterai update` to push pending improvements
 
-## Dashboard
+## Report
 
-After `/prodmasterai report`, open `reports/dashboard.html` in any browser. No server needed.
-
-If no cycle data exists yet, report writes `reports/getting-started-YYYY-MM-DD.md` and immediately asks what you want to build — no passive zero-metrics output.
+`/prodmasterai report` prints a full report directly in the terminal. If no cycle data exists yet, it asks what you want to build — no passive zero-metrics output.
 
 ## Auto-Evolution Flow
 
@@ -107,6 +117,10 @@ Superpowers cycle completes
     Mode 2: generate skills for gaps with 3+ occurrences
     Convergence loop: rerun until all changed skills are clean
     (explicit /prodmasterai update) → upstream PR pipeline
+
+Auto-session tracking: Every /prodmasterai invocation is logged to memory/usage-log.md.
+At next session start, if unprocessed invocations exist, measure cycle fires silently
+with inferred defaults — no "cycle done" command needed.
 ```
 
 ## Parallelism

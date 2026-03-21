@@ -54,3 +54,10 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - trigger: cancel autonomous
 - reads: memory/project-context.md, memory/autonomous-log.md
 - writes: memory/project-context.md, memory/autonomous-log.md
+
+### task-queue
+- trigger: /prodmasterai queue add
+- trigger: /prodmasterai queue list
+- trigger: /prodmasterai queue run
+- reads: memory/task-queue.md, memory/project-context.md
+- writes: memory/task-queue.md

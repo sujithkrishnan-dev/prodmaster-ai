@@ -1,63 +1,32 @@
 # Design: GitHub-based Plugin Install
 
 **Date:** 2026-03-21
-**Goal:** Enable `claude plugin install prodmaster-ai@github:sujithkrishnan-dev/prodmaster-ai` without cloning.
+**Status:** Implemented (2026-03-21) — see notes below.
 
-## Problem
+**Goal:** Enable users to install from GitHub without a local clone.
 
-Currently the only install path is manual clone + `/plugin install --local`. Users cannot install without a local clone.
+## How It Works
 
-## Approach
+`claude plugin install` does not support `@github:` as a source format. The correct approach is a two-step process:
 
-Add a root-level `claude-plugin.json` install manifest that the Claude Code CLI reads when resolving a `@github:` source. Sync version numbers across all manifests. Update README with the one-line install command.
+1. Register the GitHub repo as a marketplace
+2. Install the plugin from that marketplace
+
+```bash
+claude plugin marketplace add sujithkrishnan-dev/prodmaster-ai
+claude plugin install prodmaster-ai@prodmaster-ai-marketplace
+```
+
+## Root Cause of Original Failure
+
+`.claude-plugin/marketplace.json` had `"source": { "type": "github", "url": "..." }` which fails schema validation. The CLI requires `"source": "./"` (relative path string pointing to the plugin directory within the repo).
 
 ## Files Changed
 
 | File | Action |
 |---|---|
-| `claude-plugin.json` | Create — root-level install manifest |
-| `.claude-plugin/marketplace.json` | Update — fix version `1.3.0` → `2.0.0` |
-| `docs/README.md` | Update — add one-line install command, keep manual section for dev use |
-
-## `claude-plugin.json` Schema
-
-```json
-{
-  "name": "prodmaster-ai",
-  "version": "2.0.0",
-  "description": "Meta-orchestration, measurement, and self-evolving intelligence layer for Claude Code.",
-  "author": "sujithkrishnan-dev",
-  "source": {
-    "type": "github",
-    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
-  },
-  "skills": "skills/"
-}
-```
-
-**Notes:**
-- `hooks` is intentionally omitted — hook registration is already defined in `.claude-plugin/hooks.json` with correct matchers and nested structure. The CLI discovers hooks from the plugin directory structure.
-- `requires` is omitted — not a documented Claude Code CLI standard field.
-- `source.url` uses the `.git` suffix to match the format in `marketplace.json` which is the known-working format.
-
-## Version Sync
-
-All manifests must agree on version `2.0.0`:
-- `claude-plugin.json` — `2.0.0` (new)
-- `.claude-plugin/plugin.json` — already `2.0.0` (no change needed)
-- `.claude-plugin/marketplace.json` — fix `1.3.0` → `2.0.0`
-
-## README Install Block
-
-Replace the current "Manual" section header with a primary install command:
-
-```
-## Installation
-
-claude plugin install prodmaster-ai@github:sujithkrishnan-dev/prodmaster-ai
-```
-
-Keep the existing `--local` instructions under a "Local Development" subsection for contributors.
+| `.claude-plugin/marketplace.json` | Fix `source` field: object → `"./"`, version `1.3.0` → `2.0.0` |
+| `docs/README.md` | Update install commands to two-step marketplace flow |
 
 ## Out of Scope
 

@@ -4,19 +4,17 @@ A Claude Code plugin that sits above Superpowers to orchestrate features, measur
 
 ## Installation
 
-```
-claude plugin install prodmaster-ai@github:sujithkrishnan-dev/prodmaster-ai
+```bash
+claude plugin marketplace add sujithkrishnan-dev/prodmaster-ai
+claude plugin install prodmaster-ai@prodmaster-ai-marketplace
 ```
 
 ### Local Development
 
 ```bash
 git clone https://github.com/sujithkrishnan-dev/prodmaster-ai ~/.claude/plugins/prodmaster-ai
-```
-
-Then in Claude Code:
-```
-/plugin install --local ~/.claude/plugins/prodmaster-ai
+cd ~/.claude/plugins/prodmaster-ai
+claude plugin install prodmaster-ai@prodmaster-ai-marketplace
 ```
 
 ### Platform Hook Setup

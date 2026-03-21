@@ -4,10 +4,14 @@ A Claude Code plugin that sits above Superpowers to orchestrate features, measur
 
 ## Installation
 
-### Manual (local development)
+```
+claude plugin install prodmaster-ai@github:sujithkrishnan-dev/prodmaster-ai
+```
+
+### Local Development
 
 ```bash
-git clone <this-repo> ~/.claude/plugins/prodmaster-ai
+git clone https://github.com/sujithkrishnan-dev/prodmaster-ai ~/.claude/plugins/prodmaster-ai
 ```
 
 Then in Claude Code:

@@ -61,3 +61,10 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - trigger: /prodmasterai queue run
 - reads: memory/task-queue.md, memory/project-context.md
 - writes: memory/task-queue.md
+
+### parallel-explore
+- trigger: /prodmasterai explore
+- trigger: try multiple approaches
+- trigger: parallel worktrees
+- reads: memory/project-context.md, memory/patterns.md, memory/parallel-explore-log.md
+- writes: memory/parallel-explore-log.md, memory/patterns.md

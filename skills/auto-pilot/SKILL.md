@@ -146,6 +146,16 @@ Decisions: <N> made autonomously
 Run `/prodmasterai resume` to review decisions and optionally re-run any step.
 ```
 
+### Queue Advance
+
+After printing the completion card:
+1. Read `memory/task-queue.md`. If the file does not exist, skip silently.
+2. Find the entry with `status: running` whose `session_id` matches this session. If none, skip silently (queue not in use).
+3. Update that entry: `status: done`, `completed_at: <ISO 8601 now>`.
+4. Find the next entry with `status: pending`.
+5. If found: update to `status: running`, `started_at: <now>`. Re-invoke `task-queue run` with that entry's goal.
+6. If none: output *"Queue complete. All tasks processed."*
+
 ---
 
 ## Hard Limits

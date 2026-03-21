@@ -4,16 +4,17 @@ last_evolved_at_task: 8
 evolution_threshold_reached: false
 evolve_every_n_tasks: 10
 last_evolved_date: 2026-03-18
-first_run_complete: false
+first_run_complete: true
 autonomous_mode: false
 autonomous_session_id: ""
 autonomous_max_iterations: 5
 autonomous_confidence_floor: medium
+auto_pilot_on_idle_after: 2
 ---
 
 ## Active Features
 <!-- orchestrate appends: "- YYYY-MM-DD: <feature name> [status: active|blocked|done]" -->
-- 2026-03-18: user-friendly-plugin [status: active]
+- 2026-03-18: user-friendly-plugin [status: done]
 
 ## Blockers
 <!-- append: "- YYYY-MM-DD: <description> | age_days: 0 | recommended_fix: <text>" -->

@@ -63,4 +63,37 @@ After injecting active features, patterns, and gaps:
    Else: inject nothing (silent).
 
 ---
+
+## Idle Auto-Pilot: Missed-Session Counter
+
+After all other injections, before plugin detection:
+
+1. Read `memory/pending-input.md`.
+   - If file does not exist or has no YAML blocks (no `---` delimited entries): skip (silent).
+2. For each YAML block in the file:
+   - Extract `asked_on` date and compare to today's date.
+   - If `asked_on` < today: this question was asked in a prior session and not answered.
+     - Increment `missed_sessions` by 1.
+     - Update `asked_on` to today's date (so it is not double-counted next session).
+   - If `asked_on` == today: skip (already incremented or question was asked this session).
+3. Write the updated `memory/pending-input.md` back with the incremented counters.
+4. Inject nothing into the session context — this update is silent.
+
+---
+
+## Installed Plugins Detection
+
+After all other injections:
+
+1. Check `~/.claude/plugins/cache/` for installed plugin directories. Each subdirectory is an installed plugin (format: `<plugin-name>/<version>/`).
+2. Also read `memory/connectors/official-plugins-registry.md` plugin names for cross-reference.
+3. Build a list: for each directory found in cache, extract plugin name and version.
+4. If any plugins are found:
+   - Inject one line: `Installed plugins: <name> (v<version>), <name> (v<version>), …`
+   - This lets orchestrate and other skills know which plugin skills are available to invoke.
+5. If `~/.claude/plugins/cache/` does not exist or is empty: inject nothing (silent).
+
+**Suggestion on first detected gap:** If a task type is requested (e.g. browser testing, deployment, security audit) and the relevant plugin is NOT installed, the handling skill may suggest: `"Install the <plugin-name> plugin for this: claude plugin install <install-name>@claude-plugins-official"`. Plugin suggestions are advisory only — never block the task.
+
+---
 *One command: `/prodmasterai` — reads your state and acts. Fresh? Try `/prodmasterai build [feature]`.*

@@ -68,3 +68,10 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - trigger: parallel worktrees
 - reads: memory/project-context.md, memory/patterns.md, memory/parallel-explore-log.md
 - writes: memory/parallel-explore-log.md, memory/patterns.md
+
+### plugin-manager
+- trigger: /prodmasterai plugins
+- trigger: install plugin
+- trigger: what plugins are installed
+- reads: memory/connectors/official-plugins-registry.md
+- writes: (none)

@@ -21,6 +21,7 @@ REQUIRED_FILES = [
     "usage-log.md",
     "task-queue.md",
     "parallel-explore-log.md",
+    "pending-input.md",
 ]
 
 @pytest.mark.parametrize("filename", REQUIRED_FILES)
@@ -33,6 +34,7 @@ def test_project_context_has_counters():
         "total_tasks_completed:", "last_evolved_at_task:", "evolve_every_n_tasks:",
         "autonomous_mode:", "autonomous_session_id:",
         "autonomous_max_iterations:", "autonomous_confidence_floor:",
+        "auto_pilot_on_idle_after:",
     ]:
         assert f in content, f"Missing: {f}"
 

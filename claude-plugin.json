@@ -1,0 +1,11 @@
+{
+  "name": "prodmaster-ai",
+  "version": "2.0.0",
+  "description": "Meta-orchestration, measurement, and self-evolving intelligence layer for Claude Code.",
+  "author": "sujithkrishnan-dev",
+  "source": {
+    "type": "github",
+    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
+  },
+  "skills": "skills/"
+}

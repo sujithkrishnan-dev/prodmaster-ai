@@ -47,3 +47,24 @@ keywords: [checkpoint, resume session, pick up where I left off, continue after 
 
 ### token-efficiency
 keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too many tokens, optimize tokens, token waste, token usage, plan limit, efficiency audit]
+
+### auto-pilot-revoke
+- trigger: /auto-pilot-revoke
+- trigger: stop auto-pilot
+- trigger: cancel autonomous
+- reads: memory/project-context.md, memory/autonomous-log.md
+- writes: memory/project-context.md, memory/autonomous-log.md
+
+### task-queue
+- trigger: /prodmasterai queue add
+- trigger: /prodmasterai queue list
+- trigger: /prodmasterai queue run
+- reads: memory/task-queue.md, memory/project-context.md
+- writes: memory/task-queue.md
+
+### parallel-explore
+- trigger: /prodmasterai explore
+- trigger: try multiple approaches
+- trigger: parallel worktrees
+- reads: memory/project-context.md, memory/patterns.md, memory/parallel-explore-log.md
+- writes: memory/parallel-explore-log.md, memory/patterns.md

@@ -19,6 +19,8 @@ REQUIRED_FILES = [
     "checkpoint.md",
     "token-efficiency-log.md",
     "usage-log.md",
+    "task-queue.md",
+    "parallel-explore-log.md",
 ]
 
 @pytest.mark.parametrize("filename", REQUIRED_FILES)

@@ -13,10 +13,7 @@
         "name": "sujithkrishnan-dev",
         "email": ""
       },
-      "source": {
-        "type": "github",
-        "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
-      },
+      "source": "./",
       "homepage": "https://github.com/sujithkrishnan-dev/prodmaster-ai",
       "category": "productivity"
     }

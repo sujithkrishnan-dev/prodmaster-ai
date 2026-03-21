@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
 description: Master entry point -- invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic -- runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
-version: 2.0.1
+version: 2.1.0
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -64,8 +64,11 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 
 ---
 
-**Ambiguous input:** If the intent does not match any route with confidence, pick the most likely route and confirm with ONE question:
+**Ambiguous input:** If the intent does not match any route with confidence, pick the most likely route and confirm with ONE question.
 
+Before asking, run the **Idle Auto-Pilot Check** (see below). If escalation fires, skip the question.
+
+Otherwise ask:
 > "That sounds like [route] -- shall I [action]? (or tell me what you meant)"
 
 Never reject input silently. Always offer the best guess. Route on confirmation without further prompting.
@@ -114,7 +117,8 @@ If precondition is not met (already fired this session, or no unprocessed entrie
 ### B. Active feature in progress
 `## Active Features` section of project-context.md contains at least one non-empty feature entry.
 -> Show a single-line status for each active feature (name + last known stage).
--> Ask ONE question: *"Update on [most recently active feature]? (or say 'cycle done -- N tasks, QA X%, Y reviews, Z hours' to log a cycle)"*
+-> Run the **Idle Auto-Pilot Check** (see below). If escalation fires, skip the question.
+-> Otherwise ask ONE question: *"Update on [most recently active feature]? (or say 'cycle done -- N tasks, QA X%, Y reviews, Z hours' to log a cycle)"*
 -> Wait for response, then route:
   - Metrics given -> `measure` -> `learn`
   - Progress update -> continue `orchestrate` from current stage
@@ -191,6 +195,44 @@ Otherwise -> run the **New Project variant**.
 
 Invoke the target skill as if the user had called it directly -- pass all relevant context.
 Do not describe what you are about to do. Just do it.
+
+---
+
+## Idle Auto-Pilot Check
+
+Run this check whenever you are about to ask a blocking question (Step 3B and ambiguous-input path).
+
+### Read
+1. Read `memory/project-context.md` frontmatter: extract `auto_pilot_on_idle_after` (default: 2 if absent).
+2. Read `memory/pending-input.md`: look for any YAML block (delimited by `---`) with `missed_sessions` present.
+
+### Escalate
+If any entry has `missed_sessions >= auto_pilot_on_idle_after`:
+- Do NOT ask the question.
+- Print: `"User has been away for {missed_sessions} sessions — switching to auto-pilot for: {entry.goal}"`
+- Remove that entry from `memory/pending-input.md` (delete the YAML block and its surrounding `---` delimiters).
+- Invoke `auto-pilot` with `goal: {entry.goal}`.
+
+### Record (when no escalation)
+When you are about to ask a blocking question and no entry currently exists for the same goal:
+- Append a new YAML block to `memory/pending-input.md`:
+
+```
+---
+goal: <feature name or topic being asked about>
+question: <the exact question you are about to ask>
+asked_on: <YYYY-MM-DD today>
+missed_sessions: 0
+---
+```
+
+If an entry for the same goal already exists (same `goal` value), do not append a duplicate — the existing entry is already being tracked.
+
+### Clear (when user responds)
+When the user gives a real answer to a question:
+- Find the matching entry in `memory/pending-input.md` by `goal`.
+- Delete that YAML block (including its surrounding `---` delimiters).
+- Continue routing normally.
 
 ---
 

@@ -64,6 +64,23 @@ After injecting active features, patterns, and gaps:
 
 ---
 
+## Idle Auto-Pilot: Missed-Session Counter
+
+After all other injections, before plugin detection:
+
+1. Read `memory/pending-input.md`.
+   - If file does not exist or has no YAML blocks (no `---` delimited entries): skip (silent).
+2. For each YAML block in the file:
+   - Extract `asked_on` date and compare to today's date.
+   - If `asked_on` < today: this question was asked in a prior session and not answered.
+     - Increment `missed_sessions` by 1.
+     - Update `asked_on` to today's date (so it is not double-counted next session).
+   - If `asked_on` == today: skip (already incremented or question was asked this session).
+3. Write the updated `memory/pending-input.md` back with the incremented counters.
+4. Inject nothing into the session context — this update is silent.
+
+---
+
 ## Installed Plugins Detection
 
 After all other injections:

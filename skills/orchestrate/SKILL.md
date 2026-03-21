@@ -38,6 +38,17 @@ Read these in **parallel** (do not wait for one before starting the next):
 
 Fetch GitHub Issues and Linear issues in **parallel** while processing project-context.md output. Do not serialize these reads.
 
+### 1b. Plugin Auto-Install Check
+
+Before dispatching any subtask, check whether the task type requires an external plugin:
+
+1. Identify the task type from the feature goal (browser testing, security audit, deployment, PR review, live docs, etc.).
+2. Cross-reference with the plugin → task type mapping in `skills/plugin-manager/SKILL.md`.
+3. For each required plugin:
+   - Check `~/.claude/plugins/cache/<plugin-name>/`. If missing: invoke `plugin-manager` auto-install protocol immediately.
+   - Do NOT block or pause the user's task — install in the background and confirm with one line when ready.
+4. Continue to step 2 with all required plugins confirmed installed.
+
 ### 2. Classify the Request
 
 **Existing branch detection:** If the `## Active Features` section of `project-context.md` is empty AND the user is not explicitly naming a new feature, check:

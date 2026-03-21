@@ -29,16 +29,16 @@ Add a root-level `claude-plugin.json` install manifest that the Claude Code CLI 
   "author": "sujithkrishnan-dev",
   "source": {
     "type": "github",
-    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai"
+    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
   },
-  "skills": "skills/",
-  "hooks": {
-    "SessionStart": "hooks/run-hook.cmd",
-    "PreToolUse": "hooks/pre-tool-bash.py"
-  },
-  "requires": ["superpowers"]
+  "skills": "skills/"
 }
 ```
+
+**Notes:**
+- `hooks` is intentionally omitted — hook registration is already defined in `.claude-plugin/hooks.json` with correct matchers and nested structure. The CLI discovers hooks from the plugin directory structure.
+- `requires` is omitted — not a documented Claude Code CLI standard field.
+- `source.url` uses the `.git` suffix to match the format in `marketplace.json` which is the known-working format.
 
 ## Version Sync
 

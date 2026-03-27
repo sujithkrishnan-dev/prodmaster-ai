@@ -1,7 +1,10 @@
 ---
 name: codex
 description: Cross-model adversarial review — runs Claude and a second AI model independently on the same code, compares results to catch blind spots. Three modes (review, challenge, consult). Session memory for continuity. Cost tracking per invocation.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[review | challenge | consult] [question]"
+effort: max
+model: claude-opus-4-6
 triggers:
   - /prodmasterai codex
   - second opinion

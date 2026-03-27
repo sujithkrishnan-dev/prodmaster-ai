@@ -1,7 +1,10 @@
 ---
 name: deploy
 description: Deployment pipeline — auto-detects platform (Fly/Vercel/Render/Railway/custom), runs dry-run validation first, checks pre-merge readiness gates, waits for CI, verifies the live deployment with canary checks, and provides a revert escape hatch if production breaks.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[--dry-run] [--env staging|prod]"
+disable-model-invocation: true
+effort: medium
 triggers:
   - /prodmasterai deploy
   - deploy this

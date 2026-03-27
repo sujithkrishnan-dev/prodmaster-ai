@@ -1,7 +1,10 @@
 ---
 name: ship
 description: Completeness-principle pre-merge pipeline — tests, coverage, review, changelog, scope check, PR. Boils the lake by default: 100% coverage, full error handling, comprehensive review. One command takes a branch from working to PR-ready.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[--skip-coverage] [--skip-review]"
+disable-model-invocation: true
+effort: medium
 triggers:
   - /prodmasterai ship
   - ship this

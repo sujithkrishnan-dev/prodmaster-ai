@@ -1,7 +1,15 @@
 ---
 name: review
 description: Systematic code review — two-pass approach (critical then informational), test coverage diagrams, scope drift detection, adversarial scaling by diff size, and fix-first triage that auto-fixes mechanical issues and batches judgment calls for approval.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[--quick | --deep] [branch]"
+effort: medium
+hooks:
+  PostToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; case \"$f\" in *.ts|*.tsx|*.js|*.jsx) npx eslint --fix \"$f\" 2>/dev/null || true;; *.py) python -m ruff check --fix \"$f\" 2>/dev/null || true;; esac; }"
 triggers:
   - /prodmasterai review
   - code review

@@ -1,7 +1,14 @@
 ---
 name: document-release
 description: Post-ship documentation sync — analyzes diff, auto-updates README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md, polishes CHANGELOG voice (never regenerates), cleans TODOs, optional VERSION bump. Conservative: auto-execute safe updates, ask for risky changes. Cross-doc consistency checks.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[--bump patch|minor|major]"
+effort: low
+paths:
+  - "**/*.md"
+  - "docs/**"
+  - "CHANGELOG*"
+  - "README*"
 triggers:
   - /prodmasterai document-release
   - sync docs

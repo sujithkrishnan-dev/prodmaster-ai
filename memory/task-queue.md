@@ -5,19 +5,19 @@
 ---
 id: tq-2026-03-27-0001
 goal: Build a qa skill for prodmaster-ai — systematic QA pipeline inspired by gstack: 11-phase testing (authenticate, orient, explore, document, triage, fix-loop, final-qa, report), three depth tiers (quick/standard/exhaustive), health scoring across 8 categories, atomic fix commits per discovered bug, regression test generation, WTF-likelihood heuristics to auto-regulate
-status: running
+status: done
 added_at: 2026-03-27T00:00:00Z
 started_at: 2026-03-27T00:02:00Z
-completed_at: null
-session_id: null
+completed_at: 2026-03-27T00:15:00Z
+session_id: 2026-03-27-0002
 ---
 
 ---
 id: tq-2026-03-27-0002
 goal: Build a review skill for prodmaster-ai — systematic code review inspired by gstack: two-pass approach (Pass 1 critical: SQL safety/race conditions/LLM trust boundaries/enum completeness; Pass 2 informational: side effects/magic numbers/dead code/test gaps/performance), test coverage ASCII diagrams, scope drift detection, adversarial scaling by diff size (small/medium/large with multi-pass), fix-first triage (auto-fix mechanicals, batch judgment calls for approval)
-status: pending
+status: running
 added_at: 2026-03-27T00:01:00Z
-started_at: null
+started_at: 2026-03-27T00:16:00Z
 completed_at: null
 session_id: null
 ---

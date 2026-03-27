@@ -72,6 +72,15 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 ### qa
 keywords: [qa, quality check, QA pass, test the app, run qa, systematic qa, health check, health score, fix bugs, regression tests, qa pipeline]
 
+### review
+keywords: [code review, review PR, review diff, review changes, pre-merge review, review before ship, two-pass review, critical review]
+
+### deploy
+keywords: [deploy, ship it, push to production, release, land and deploy, deployment pipeline, canary, rollback]
+
+### cso
+keywords: [security audit, vulnerabilities, threat model, OWASP, pentest, CSO, secrets, supply chain, LLM security, STRIDE]
+
 ### plugin-manager
 - trigger: /prodmasterai plugins
 - trigger: install plugin

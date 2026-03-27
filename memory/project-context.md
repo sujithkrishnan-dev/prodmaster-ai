@@ -19,6 +19,12 @@ auto_pilot_on_idle_after: 2
 - 2026-03-27: review-skill [status: done]
 - 2026-03-27: deploy-skill [status: done]
 - 2026-03-27: cso-skill [status: done]
+- 2026-03-27: ship-skill [status: done]
+- 2026-03-27: benchmark-skill [status: done]
+- 2026-03-27: codex-skill [status: done]
+- 2026-03-27: document-release-skill [status: done]
+- 2026-03-27: qa-only-skill [status: done]
+- 2026-03-27: skill-forge-skill [status: done]
 
 ## Blockers
 <!-- append: "- YYYY-MM-DD: <description> | age_days: 0 | recommended_fix: <text>" -->

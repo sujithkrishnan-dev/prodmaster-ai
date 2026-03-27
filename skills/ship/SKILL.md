@@ -30,6 +30,13 @@ Pre-merge pipeline that takes a branch from working code to a reviewed, document
 
 Run this instead of manually creating PRs. It catches what you'd miss at 11pm.
 
+## Live Context (injected at load time)
+
+- Branch: !`git branch --show-current`
+- Commits on branch: !`git log main...HEAD --oneline 2>/dev/null | head -20`
+- Files changed: !`git diff main...HEAD --name-only 2>/dev/null`
+- Working tree: !`git status --porcelain`
+
 ---
 
 ## The Completeness Principle

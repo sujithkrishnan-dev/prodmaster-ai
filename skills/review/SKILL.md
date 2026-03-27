@@ -32,15 +32,18 @@ generated_from: ""
 
 Two-pass systematic code review. Pass 1 catches critical correctness and security issues. Pass 2 catches informational quality issues. Scales depth to diff size. Auto-fixes mechanical issues immediately; batches judgment calls for a single human approval gate at the end.
 
+## Live Context (injected at load time)
+
+- Branch: !`git branch --show-current`
+- Changed files: !`git diff main...HEAD --name-only 2>/dev/null || git diff HEAD~1 --name-only`
+- Diff summary: !`git diff main...HEAD --stat 2>/dev/null || git diff HEAD~1 --stat`
+- Recent commits: !`git log --oneline -5`
+
 ---
 
 ## Adversarial Scaling
 
-Before starting, measure the diff:
-
-```bash
-git diff main...HEAD --stat
-```
+Before starting, measure the diff (already injected above — use the stat from Live Context):
 
 | Diff size | Strategy |
 |---|---|

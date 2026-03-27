@@ -1,7 +1,10 @@
 ---
 name: auto-pilot
 description: Fully autonomous unattended execution -- runs the complete brainstorm->plan->implement->test->PR pipeline without blocking on questions. Every decision is logged with source and confidence. User returns to a completion card and full decision audit.
-version: 1.1.0
+version: 1.2.0
+argument-hint: "[goal description]"
+disable-model-invocation: true
+effort: high
 triggers:
   - /prodmasterai auto <goal>
   - run autonomously

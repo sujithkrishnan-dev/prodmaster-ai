@@ -1,7 +1,15 @@
 ---
 name: qa
 description: Systematic QA pipeline — runs 11 phases of testing with health scoring across 8 categories, atomic fix commits per bug, and regression test generation. Three depth tiers adapt to available time and severity threshold.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[--quick | --standard | --exhaustive]"
+effort: medium
+paths:
+  - "src/**"
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "tests/**"
+  - "test/**"
 triggers:
   - /prodmasterai qa
   - run qa

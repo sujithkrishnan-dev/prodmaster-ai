@@ -1,0 +1,10 @@
+# Files to copy into new worktrees (gitignored files that are needed to run the project)
+# parallel-explore and auto-pilot use worktrees — these files are automatically copied in
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test.local
+config/secrets.json
+config/local.json
+.secrets

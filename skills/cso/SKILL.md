@@ -1,7 +1,16 @@
 ---
 name: cso
 description: Security audit — 14-phase infrastructure-first audit covering architecture through STRIDE threat modeling. Two modes (daily/comprehensive). Every finding requires a concrete exploit path, not theoretical risk. Covers supply chain, CI/CD, LLM/AI security, and OWASP Top 10.
-version: 1.0.0
+version: 1.1.0
+argument-hint: "[--daily | --comprehensive]"
+effort: high
+allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
+paths:
+  - "src/**/*.{js,ts,py,go,rb,java}"
+  - "**/*.env*"
+  - ".github/**"
+  - "docker*"
+  - "Dockerfile*"
 triggers:
   - /prodmasterai cso
   - security audit

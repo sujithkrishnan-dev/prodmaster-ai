@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-03-18
+last_updated: 2026-03-27
 ---
 ## Skills
 
@@ -87,3 +87,21 @@ keywords: [security audit, vulnerabilities, threat model, OWASP, pentest, CSO, s
 - trigger: what plugins are installed
 - reads: memory/connectors/official-plugins-registry.md
 - writes: (none)
+
+### ship
+keywords: [ship, ready to merge, pre-merge, create PR, prepare for merge, ready to ship, completeness, coverage audit, changelog, pre-merge pipeline]
+
+### benchmark
+keywords: [benchmark, performance check, perf regression, measure performance, Core Web Vitals, bundle size, how fast is this, LCP, FCP, TTFB]
+
+### codex
+keywords: [codex, second opinion, cross-model review, adversarial review, challenge this, ask codex, blind spots, dual model, get a second opinion]
+
+### document-release
+keywords: [sync docs, update docs, post-ship docs, document this release, docs sync, update readme, CHANGELOG polish, documentation sync]
+
+### qa-only
+keywords: [qa report, test report only, findings only, what's broken, audit without fixing, qa without fix, what needs fixing, health score report]
+
+### skill-forge
+keywords: [learn how to use, add skill for, teach me about, create skill for, generate skill for, add capability for, build skill from, /prodmasterai learn]

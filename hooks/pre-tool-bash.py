@@ -14,7 +14,7 @@ BLOCKED_PATTERNS = [
     (r"rm\s+--recursive", "recursive rm (--recursive flag)"),
     (r"git\s+push\s.*--force", "force push"),
     (r"git\s+push\s.*\s-[a-zA-Z]*f", "force push"),
-    (r"git\s+branch\s.*\s-D", "force branch delete"),
+    (r"git\s+branch\b[^|;&]*-D\b", "force branch delete"),
     (r"git\s+reset\s.*--hard", "git reset --hard"),
     (r"git\s+clean\s.*-[a-zA-Z]*f", "git clean -f"),
     (r"git\s+(checkout|restore)\s+\.\s*($|[;&|])", "discard all changes"),
@@ -160,12 +160,6 @@ def is_safe_fragment(fragment):
     stripped = fragment.strip()
     if stripped.startswith(".venv/bin/") or "/venv/bin/" in stripped:
         return True
-    if "docs/" in stripped:
-        return True
-    if "/tmp/" in stripped or stripped.startswith("tmp/"):
-        return True
-    if "pytest" in stripped or "unittest" in stripped:
-        return True
     return False
 
 
@@ -197,7 +191,7 @@ def main():
     except SystemExit:
         raise
     except Exception:
-        sys.exit(0)  # never crash, just pass through
+        emit("deny", "hook parse error — command blocked for safety")
 
 
 if __name__ == "__main__":

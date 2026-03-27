@@ -16,6 +16,9 @@ reports/
 # Slack webhook URL — contains a secret if active: true is set
 memory/connectors/slack.md
 
+# Linear workspace_id — may contain org-identifying IDs if filled in
+memory/connectors/linear.md
+
 # Pending upstream proposals — local staging only
 memory/pending-upstream/
 

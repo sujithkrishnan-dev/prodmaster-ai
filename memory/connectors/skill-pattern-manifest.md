@@ -69,6 +69,9 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - reads: memory/project-context.md, memory/patterns.md, memory/parallel-explore-log.md
 - writes: memory/parallel-explore-log.md, memory/patterns.md
 
+### qa
+keywords: [qa, quality check, QA pass, test the app, run qa, systematic qa, health check, health score, fix bugs, regression tests, qa pipeline]
+
 ### plugin-manager
 - trigger: /prodmasterai plugins
 - trigger: install plugin

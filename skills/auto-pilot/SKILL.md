@@ -1,7 +1,7 @@
 ---
 name: auto-pilot
 description: Fully autonomous unattended execution -- runs the complete brainstorm->plan->implement->test->PR pipeline without blocking on questions. Every decision is logged with source and confidence. User returns to a completion card and full decision audit.
-version: 1.0.0
+version: 1.1.0
 triggers:
   - /prodmasterai auto <goal>
   - run autonomously
@@ -25,6 +25,26 @@ generated_from: ""
 # Auto-Pilot
 
 Run the full ProdMaster AI pipeline autonomously -- brainstorm, plan, implement, test, and create a PR -- without pausing for questions. Every decision is logged with its source and confidence. On completion, run `/prodmasterai resume` to review what was done and optionally re-run any decision manually.
+
+---
+
+## Goal Resolution (runs before everything else)
+
+**Never ask the user for a goal.** Resolve autonomously in this priority order:
+
+1. **Explicit argument** — if the user supplied text after the command (e.g. `/prodmasterai auto build qa skill`), use that as the goal. Strip command prefixes; keep the intent.
+
+2. **Task queue** — read `memory/task-queue.md`. If an entry has `status: running`, use its `goal`. If no running entry but a `pending` entry exists, use the first `pending` entry's goal (mark it `running` before proceeding).
+
+3. **Active feature** — read `memory/project-context.md` ## Active Features. If any entry has `status: active` or `status: blocked`, use that feature name as the goal.
+
+4. **Conversation context** — scan the current conversation for the most recently discussed feature, task, or build request. Use that as the goal. Prefer concrete nouns (skill names, feature names) over vague references.
+
+5. **Research findings** — read `memory/research-findings.md`. Use the highest-confidence unapplied finding's skill as the goal.
+
+6. **Default** — if none of the above yield a goal, use `"improve plugin quality"` and log source: `default`, confidence: `low`.
+
+Log the resolved goal as the first decision entry before proceeding to Pre-flight.
 
 ---
 

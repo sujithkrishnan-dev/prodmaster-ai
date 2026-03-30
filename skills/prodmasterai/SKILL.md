@@ -57,6 +57,16 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "queue add X", "add X to queue", "queue this" | `task-queue` add operation |
 | "queue list", "show queue", "what's queued" | `task-queue` list operation |
 | "queue run", "start queue", "run queue", "all of them in order", "do all of them", "queue them all", "run all" | `task-queue` run -- invoke immediately, do NOT ask "when you're ready" |
+| "ship", "ship this", "ready to merge", "pre-merge", "create PR", "prepare for merge", "ready to ship" | `ship` |
+| "benchmark", "benchmark this", "performance check", "perf regression", "how fast is this", "measure performance" | `benchmark` |
+| "codex", "second opinion", "cross-model review", "adversarial review", "challenge this", "ask codex", "get a second opinion" | `codex` |
+| "sync docs", "update docs", "post-ship docs", "document this release", "docs sync", "document-release" | `document-release` |
+| "qa report", "findings only", "what's broken", "audit without fixing", "qa without fix", "qa-only" | `qa-only` |
+| "deploy", "deploy this", "ship to production", "push to production", "deploy to prod", "land and deploy", "release this" | `deploy` |
+| "cso", "security audit", "check for vulnerabilities", "threat model", "OWASP check" | `cso` |
+| "learn <topic>", "add skill for", "teach me about", "create skill for", "generate skill for" | `skill-forge` |
+| "review", "code review", "review this PR", "review the diff", "review my changes", "pre-merge review" | `review` |
+| "qa", "run qa", "quality check", "QA pass", "test the app", "systematic qa" | `qa` |
 | "resume", "continue", "pick up where", "checkpoint resume", "what happened while I was away", "show autonomous summary", "autonomous summary" | `checkpoint` if `memory/checkpoint.md` has `status: active`; otherwise `resume` skill |
 | "checkpoint discard", "discard checkpoint", "clear checkpoint" | `checkpoint` clear operation |
 | "checkpoint reset", "reset in", "limit resets in" | `checkpoint` update scheduled task with user-supplied reset time |

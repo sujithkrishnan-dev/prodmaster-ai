@@ -1,7 +1,8 @@
 ---
 name: measure
 description: Use after every completed Superpowers cycle to record metrics. Captures velocity, QA pass rate, review iterations, and blockers. Always hand off to learn after recording.
-version: 1.4.0
+version: 1.4.1
+effort: low
 triggers:
   - A Superpowers cycle has just completed
   - User says "cycle done", "feature finished", "tasks completed"

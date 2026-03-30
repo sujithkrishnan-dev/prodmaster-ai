@@ -53,7 +53,10 @@ If the user wrote `/prodmasterai <text>`, classify the text immediately:
 | "remember this", "log this", "that was wrong/right", "note that", "worth remembering", "lesson learned", "that was a mistake", "take note", "important learning", "write this down", "don't forget", "i learned that", "add to memory" | `learn` (feedback path) |
 | "evolve", "improve yourself", "generate skill", "review plugin", "research plugin", "analyze plugin", "how can this be improved", "optimize", "optimize the plugin", "deep review", "audit the plugin", "quality pass", "run a review", "find issues", "check the plugin", "tighten up" | `evolve-self` Phase 1 (local only) |
 | "update plugin", "update", "publish", "contribute upstream" | `evolve-self` Phase 2 (upstream PR) |
-| "auto", "autonomously", "run autonomously", "while I sleep", "work while I sleep", "unattended", "unattended execution" | `auto-pilot` |
+| "auto", "autonomously", "run autonomously", "while I sleep", "work while I sleep", "unattended", "unattended execution" | `auto-pilot` -- invoke immediately, no confirmation |
+| "queue add X", "add X to queue", "queue this" | `task-queue` add operation |
+| "queue list", "show queue", "what's queued" | `task-queue` list operation |
+| "queue run", "start queue", "run queue", "all of them in order", "do all of them", "queue them all", "run all" | `task-queue` run -- invoke immediately, do NOT ask "when you're ready" |
 | "resume", "continue", "pick up where", "checkpoint resume", "what happened while I was away", "show autonomous summary", "autonomous summary" | `checkpoint` if `memory/checkpoint.md` has `status: active`; otherwise `resume` skill |
 | "checkpoint discard", "discard checkpoint", "clear checkpoint" | `checkpoint` clear operation |
 | "checkpoint reset", "reset in", "limit resets in" | `checkpoint` update scheduled task with user-supplied reset time |
@@ -241,6 +244,8 @@ When the user gives a real answer to a question:
 - Never ask the user to remember skill names
 - Never show a numbered menu -- route autonomously or ask exactly one question
 - Always execute; never just explain
+- Never say "run X when you're ready" -- if the intent is clear, execute immediately
+- When tasks are queued as part of a "do all" request, fire `task-queue run` immediately after adding -- do not wait for a separate command
 - If two conditions in Step 3 match, take the higher-priority one (A > E > B > C > D)
 - **Parallelism:** whenever invoking multiple independent reads, writes, or skill dispatches, run them in parallel. Only serialize operations that have an explicit output dependency on a prior step. Never queue work that can run concurrently.
 - **Never contribute anything upstream** -- upstream is exclusively evolve-self's responsibility

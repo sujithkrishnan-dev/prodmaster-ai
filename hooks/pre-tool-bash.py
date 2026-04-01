@@ -24,6 +24,17 @@ BLOCKED_PATTERNS = [
     # eval with base64-decoded content — common obfuscation technique
     (r"eval\s+.*base64", "eval with encoded payload"),
     (r"base64\s+.*\|\s*(bash|sh|zsh|eval)", "base64 decode to shell"),
+    # chmod 777 — world-writable permissions are almost never correct
+    (r"chmod\s+777\b", "world-writable chmod 777"),
+    # Package installs from unverified sources (git+http, direct http URLs)
+    (r"pip\s+install\s+git\+http://", "pip install from unverified git+http source"),
+    (r"npm\s+install\s+https?://", "npm install from direct HTTP URL"),
+    # Secret key exports in shell — exporting AWS/GCP/private keys inline
+    (r"export\s+AWS_SECRET_ACCESS_KEY\s*=\s*\S+", "AWS secret key export in shell"),
+    (r"export\s+AWS_ACCESS_KEY_ID\s*=\s*AKIA\S+", "AWS access key export in shell"),
+    (r"export\s+GOOGLE_APPLICATION_CREDENTIALS\s*=", "GCP credentials export in shell"),
+    # PATH hijacking via /tmp prepend
+    (r"export\s+PATH\s*=\s*/tmp[/:]", "PATH hijack via /tmp prepend"),
 ]
 
 SAFE_COMMANDS = {

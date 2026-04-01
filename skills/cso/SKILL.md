@@ -21,9 +21,11 @@ triggers:
   - OWASP check
   - pentest review
 reads:
+  - memory/security-gate-state.json
   - memory/project-context.md
   - memory/mistakes.md
 writes:
+  - memory/security-gate-state.json
   - memory/cso-log.md
   - memory/project-context.md
 generated: false
@@ -314,3 +316,4 @@ When `autonomous_mode: true`:
 - Phase 3 (secrets archaeology) must check git history, not just current HEAD
 - Comprehensive mode runs all 14 phases; daily mode may skip Phase 6 (infra) and Phase 12 (data classification) if no changes detected in those areas
 - **Never contribute anything upstream** — upstream is exclusively evolve-self's responsibility
+- After audit, update `memory/security-gate-state.json` with critical findings so stop-quality-gate hook can block session exit

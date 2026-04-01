@@ -6,7 +6,7 @@ SKILLS_DIR = os.path.join(PLUGIN_ROOT, "skills")
 ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-self",
               "dev-loop", "research-resolve", "auto-pilot", "resume", "checkpoint",
               "token-efficiency", "auto-pilot-revoke", "task-queue", "parallel-explore",
-              "plugin-manager"]
+              "plugin-manager", "cso", "dependency-audit", "secret-scan"]
 REQUIRED_FIELDS = ["name:", "description:", "version:", "triggers:", "reads:", "writes:",
                    "generated:", "generated_from:"]
 

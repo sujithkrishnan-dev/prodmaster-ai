@@ -1,125 +1,103 @@
-"""Stop hook — quality gate for ship and deploy skills.
+"""Stop hook — quality and security gate.
 
-Checks if a ship or deploy was in progress (detected via memory/ship-log.md or
-memory/deploy-log.md having an open session). If so, checks that tests are passing
-before allowing Claude to stop.
+Fires on Claude stop events. Blocks session exit if:
+  1. Critical secret leaks were detected by post-tool-write.py this session
+  2. Critical CVEs were flagged by dependency-audit skill this session
+  3. Tests are failing during an active ship/deploy cycle
 
-Only activates when a ship/deploy session is actively running (prevents blocking
-normal conversations). Uses stop_hook_active guard to prevent infinite loops.
+State is written to memory/security-gate-state.json by skills/hooks.
+If the state file does not exist, gate allows (clean state assumption).
 
-Output: JSON on stdout. Exit 0 always.
+Output (JSON on stdout, always exit 0):
+  - Block: {"hookSpecificOutput": {"permissionDecision": "block", "permissionDecisionReason": "..."}}
+  - Allow: no output (silent)
 """
 import json
 import os
-import re
-import subprocess
 import sys
 
-def read_stdin():
+DEFAULT_STATE_FILE = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "memory",
+    "security-gate-state.json",
+)
+
+
+def load_state(state_file):
+    """Load gate state. Returns empty/clean state if file missing or unreadable."""
+    if not os.path.exists(state_file):
+        return {"secret_leaks": [], "critical_cves": [], "tests_failing": False}
     try:
-        return json.loads(sys.stdin.read())
+        with open(state_file) as f:
+            return json.load(f)
     except Exception:
-        return {}
+        return {"secret_leaks": [], "critical_cves": [], "tests_failing": False}
 
-def has_open_ship_session():
-    """Check if ship or deploy was explicitly started this session by reading Claude's memory."""
-    # Check if ship or deploy log has a recent open entry
-    # This is a lightweight check — we don't block unless there's a real in-progress session
-    for log_file in ["memory/ship-log.md", "memory/deploy-log.md"]:
-        if os.path.exists(log_file):
-            try:
-                with open(log_file, "r", encoding="utf-8") as f:
-                    content = f.read()
-                # If last entry is missing completed_at or pr_url it may be in-progress
-                # Simple heuristic: look for "session_id:" without "pr_url:" on same entry block
-                if "session_id:" in content:
-                    return True
-            except Exception:
-                pass
-    return False
 
-def run_tests():
-    """Try to run tests. Returns (passed, failed, error_message)."""
-    test_commands = [
-        ["npm", "test", "--", "--passWithNoTests"],
-        ["npx", "jest", "--passWithNoTests"],
-        ["python", "-m", "pytest", "--tb=no", "-q"],
-        ["bun", "test"],
+def check_gate(state_file=None):
+    """Evaluate gate conditions. Returns {"allow": bool, "reason": str}.
+
+    Accepts optional state_file path for testability.
+    """
+    if state_file is None:
+        state_file = DEFAULT_STATE_FILE
+
+    state = load_state(state_file)
+
+    critical_leaks = [
+        leak for leak in state.get("secret_leaks", [])
+        if leak.get("severity") == "critical"
     ]
-    for cmd in test_commands:
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=60,
-                cwd=os.getcwd()
-            )
-            output = result.stdout + result.stderr
+    critical_cves = state.get("critical_cves", [])
+    tests_failing = state.get("tests_failing", False)
 
-            # Parse pytest output
-            m = re.search(r"(\d+) passed", output)
-            passed = int(m.group(1)) if m else 0
-            m = re.search(r"(\d+) failed", output)
-            failed = int(m.group(1)) if m else 0
+    if critical_leaks:
+        files = ", ".join(leak.get("file", "unknown") for leak in critical_leaks[:3])
+        reason = (
+            "Session blocked: %d critical secret leak(s) detected in %s. "
+            "Rotate the exposed credentials before ending the session." % (len(critical_leaks), files)
+        )
+        return {"allow": False, "reason": reason}
 
-            # Parse jest output
-            m = re.search(r"Tests:\s+.*?(\d+) failed", output)
-            if m:
-                failed = int(m.group(1))
+    if critical_cves:
+        cve_list = ", ".join(critical_cves[:5])
+        reason = (
+            "Session blocked: critical CVE(s) detected in dependencies: %s. "
+            "Run /prodmasterai dependency-audit and apply fixes before ending the session." % cve_list
+        )
+        return {"allow": False, "reason": reason}
 
-            if result.returncode == 0:
-                return passed, 0, None
-            elif failed > 0:
-                return passed, failed, f"{failed} test(s) failing"
-            else:
-                return passed, 0, None  # non-zero exit but no parsed failures
+    if tests_failing:
+        reason = (
+            "Session blocked: tests are failing during an active ship/deploy cycle. "
+            "Fix failing tests before ending the session."
+        )
+        return {"allow": False, "reason": reason}
 
-        except FileNotFoundError:
-            continue  # try next command
-        except subprocess.TimeoutExpired:
-            return 0, 0, None  # timeout — don't block
+    return {"allow": True, "reason": ""}
 
-    return 0, 0, None  # no test runner found — don't block
+
+def emit_block(reason):
+    output = {
+        "hookSpecificOutput": {
+            "hookEventName": "Stop",
+            "permissionDecision": "block",
+            "permissionDecisionReason": reason,
+        }
+    }
+    print(json.dumps(output))
+
 
 def main():
-    data = read_stdin()
-
-    # Guard: prevent infinite loop if this hook triggered a stop itself
-    if data.get("stop_hook_active"):
-        sys.stdout.write(json.dumps({"continue": True}))
-        return
-
-    # Only activate when a ship/deploy session appears active
-    if not has_open_ship_session():
-        # No ship/deploy in progress — let Claude stop normally
-        sys.stdout.write(json.dumps({"continue": True}))
-        return
-
-    passed, failed, error = run_tests()
-
-    if failed and failed > 0:
-        sys.stdout.write(json.dumps({
-            "continue": False,
-            "stopReason": (
-                f"Quality gate: {failed} test(s) failing. "
-                "Fix failing tests before completing ship/deploy, or run "
-                "`/prodmasterai ship --skip-coverage` to override."
-            ),
-            "decision": "block",
-            "reason": f"{failed} tests failing — ship/deploy blocked",
-            "hookSpecificOutput": {
-                "hookEventName": "Stop",
-                "additionalContext": (
-                    f"Stop hook blocked because {failed} test(s) are failing. "
-                    "The ship/deploy skill requires all tests to pass. "
-                    "Fix the failures and then the session can complete."
-                )
-            }
-        }))
-    else:
-        # Tests pass or no test runner — allow stop
-        sys.stdout.write(json.dumps({"continue": True}))
+    try:
+        result = check_gate()
+        if not result["allow"]:
+            emit_block(result["reason"])
+        # allow = silent (no output)
+    except SystemExit:
+        raise
+    except Exception:
+        sys.exit(0)  # fail open — never crash-block a session
 
 if __name__ == "__main__":
     main()

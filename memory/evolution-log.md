@@ -204,3 +204,51 @@ trigger: scheduled evolution check
 change_summary: No improvements or new skills needed at this time
 upstream_status: n/a
 ---
+---
+date: 2026-04-01
+mode: generate
+skill: cso
+trigger: user request — 14-phase security audit skill missing from plugin
+change_summary: New cso skill — 14-phase audit with OWASP Top 10, exploit-path requirement, scored report, security gate state integration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-01
+mode: generate
+skill: dependency-audit
+trigger: user request — CVE scanning skill missing from plugin
+change_summary: New dependency-audit skill — auto-detects npm/pip/bundler/go/rust, reports CVEs by severity, writes critical CVEs to security gate state.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-01
+mode: generate
+skill: secret-scan
+trigger: user request — credential scanning skill missing from plugin
+change_summary: New secret-scan skill — 25+ credential patterns, staged-file scan, git history mode, per-finding remediation commands.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-01
+mode: improve
+skill: pre-tool-bash (hook)
+trigger: user request — expand bash hook with more dangerous patterns
+change_summary: Added 8 blocked patterns — chmod 777, pip/npm installs from unverified sources, AWS key exports in shell, PATH hijacking via /tmp.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-01
+mode: generate
+skill: post-tool-write (hook)
+trigger: user request — passive security scanning on every file write
+change_summary: New PostToolUse hook scanning all Write/Edit calls for secrets, SQL injection, unsafe deserialization, subprocess misuse. Advisory for high; blocks on critical.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-01
+mode: generate
+skill: stop-quality-gate (hook)
+trigger: user request — security gate blocking session exit
+change_summary: New Stop hook blocking session exit when critical secret leaks or CVEs are flagged via security-gate-state.json.
+upstream_status: pending_publish
+---

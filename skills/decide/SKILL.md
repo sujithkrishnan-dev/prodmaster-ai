@@ -1,7 +1,9 @@
 ---
 name: decide
 description: Use when user is at a decision fork -- "should we do A or B?", "what should we prioritise?", "which approach?". Reads project state and metrics to rank options by ROI/risk and give one clear recommendation.
-version: 1.2.0
+version: 1.2.1
+argument-hint: "[option A] vs [option B]"
+effort: high
 triggers:
   - User asks "should we", "which option", "prioritise", "help me decide", "recommend"
   - User presents two or more options and asks what to do
@@ -16,7 +18,7 @@ generated_from: ""
 
 # Decide
 
-Give data-backed recommendations at decision forks.
+Give data-backed recommendations at decision forks. ultrathink before scoring — reason through tradeoffs deeply before committing to a recommendation.
 
 ## Process
 

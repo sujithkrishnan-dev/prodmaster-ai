@@ -1,7 +1,9 @@
 ---
 name: orchestrate
 description: Use when the user states a high-level feature goal -- "Build X", "Start work on Y", "Implement Z". Breaks the goal into Superpowers-compatible task cycles, tracks cross-feature dependencies, and manages what gets built next.
-version: 1.4.1
+version: 1.4.2
+argument-hint: "[feature goal description]"
+effort: medium
 triggers:
   - User says "build", "implement", "start work on", "create feature", or names a new feature goal
   - User asks what to work on next given blockers or priorities

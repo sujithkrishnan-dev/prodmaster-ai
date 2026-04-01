@@ -99,6 +99,5 @@ def main():
     except Exception:
         sys.exit(0)  # fail open — never crash-block a session
 
-
 if __name__ == "__main__":
     main()

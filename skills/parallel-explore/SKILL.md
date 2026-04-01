@@ -42,11 +42,20 @@ Parse goal and approach count from the trigger. Default: 2 approaches. Accept `-
 
 Generate `session_id: pe-<YYYY-MM-DD-HHmm>`.
 
-Create N worktrees in parallel:
+Use the `EnterWorktree` tool to create N isolated worktrees (preferred over manual `git worktree add` — Claude Code handles naming, cleanup, and `.worktreeinclude` file copying automatically):
+
+```
+EnterWorktree(name: "explore-<session_id>-1")
+EnterWorktree(name: "explore-<session_id>-2")
+# … up to N — run all in parallel
+```
+
+Each `EnterWorktree` creates an isolated branch `explore/<session_id>-<n>`. `.worktreeinclude` files (`.env`, etc.) are automatically copied in.
+
+Fallback to manual worktree creation if `EnterWorktree` is unavailable:
 ```bash
 git worktree add ../Plugin-explore-<session_id>-1 -b explore/<session_id>-1
 git worktree add ../Plugin-explore-<session_id>-2 -b explore/<session_id>-2
-# … up to N
 ```
 
 Append session-open block to `memory/parallel-explore-log.md`:
@@ -78,13 +87,24 @@ Log `strategy_seed` per approach.
 
 ## Step 3 — Parallel Execution
 
-Dispatch one auto-pilot subagent per worktree simultaneously. Each subagent:
-- Works exclusively in its worktree directory (`../Plugin-explore-<session_id>-<n>`)
+Dispatch one subagent per worktree **simultaneously using the Agent tool with `run_in_background: true`**. Each subagent:
+- Uses `isolation: worktree` (works in its own isolated worktree)
+- Runs with `background: true` so all N approaches execute concurrently
 - Receives the same goal + its `strategy_seed` as context
 - Has `autonomous_mode: true` (no blocking prompts)
-- Commits to `explore/<session_id>-<n>` branch only
+- Commits to its `explore/<session_id>-<n>` branch only
 
-Wait for all subagents to complete. Timeout: `autonomous_max_iterations × 2 minutes` per approach.
+Example dispatch (all N at once in one message):
+```
+Agent(subagent_type: "general-purpose", isolation: "worktree", run_in_background: true,
+      prompt: "Implement: <goal>. Strategy: <strategy_seed_1>. Branch: explore/<session_id>-1.
+               Commit all changes. Run tests. Report test_pass_rate.")
+Agent(subagent_type: "general-purpose", isolation: "worktree", run_in_background: true,
+      prompt: "Implement: <goal>. Strategy: <strategy_seed_2>. Branch: explore/<session_id>-2.
+               Commit all changes. Run tests. Report test_pass_rate.")
+```
+
+Wait for all background agents to complete. Timeout: `autonomous_max_iterations × 2 minutes` per approach.
 
 If an approach fails entirely (stuck/parked): mark it `status: failed`, assign `test_pass_rate: 0, quality_score: 0`. Continue evaluation with remaining approaches.
 

@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-03-18
+last_updated: 2026-03-27
 ---
 ## Skills
 
@@ -69,6 +69,18 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - reads: memory/project-context.md, memory/patterns.md, memory/parallel-explore-log.md
 - writes: memory/parallel-explore-log.md, memory/patterns.md
 
+### qa
+keywords: [qa, quality check, QA pass, test the app, run qa, systematic qa, health check, health score, fix bugs, regression tests, qa pipeline]
+
+### review
+keywords: [code review, review PR, review diff, review changes, pre-merge review, review before ship, two-pass review, critical review]
+
+### deploy
+keywords: [deploy, ship it, push to production, release, land and deploy, deployment pipeline, canary, rollback]
+
+### cso
+keywords: [security audit, vulnerabilities, threat model, OWASP, pentest, CSO, secrets, supply chain, LLM security, STRIDE]
+
 ### plugin-manager
 - trigger: /prodmasterai plugins
 - trigger: install plugin
@@ -84,3 +96,21 @@ keywords: [dependency audit, CVE, vulnerable packages, check dependencies, audit
 
 ### secret-scan
 keywords: [secret scan, credential scan, scan for secrets, leaked keys, hardcoded secrets, pre-commit check, api key leak, token leak, credential leak]
+
+### ship
+keywords: [ship, ready to merge, pre-merge, create PR, prepare for merge, ready to ship, completeness, coverage audit, changelog, pre-merge pipeline]
+
+### benchmark
+keywords: [benchmark, performance check, perf regression, measure performance, Core Web Vitals, bundle size, how fast is this, LCP, FCP, TTFB]
+
+### codex
+keywords: [codex, second opinion, cross-model review, adversarial review, challenge this, ask codex, blind spots, dual model, get a second opinion]
+
+### document-release
+keywords: [sync docs, update docs, post-ship docs, document this release, docs sync, update readme, CHANGELOG polish, documentation sync]
+
+### qa-only
+keywords: [qa report, test report only, findings only, what's broken, audit without fixing, qa without fix, what needs fixing, health score report]
+
+### skill-forge
+keywords: [learn how to use, add skill for, teach me about, create skill for, generate skill for, add capability for, build skill from, /prodmasterai learn]

@@ -1,5 +1,5 @@
 ---
-last_updated: 2026-03-18
+last_updated: 2026-03-27
 ---
 ## Skills
 
@@ -69,6 +69,18 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - reads: memory/project-context.md, memory/patterns.md, memory/parallel-explore-log.md
 - writes: memory/parallel-explore-log.md, memory/patterns.md
 
+### qa
+keywords: [qa, quality check, QA pass, test the app, run qa, systematic qa, health check, health score, fix bugs, regression tests, qa pipeline]
+
+### review
+keywords: [code review, review PR, review diff, review changes, pre-merge review, review before ship, two-pass review, critical review]
+
+### deploy
+keywords: [deploy, ship it, push to production, release, land and deploy, deployment pipeline, canary, rollback]
+
+### cso
+keywords: [security audit, vulnerabilities, threat model, OWASP, pentest, CSO, secrets, supply chain, LLM security, STRIDE]
+
 ### plugin-manager
 - trigger: /prodmasterai plugins
 - trigger: install plugin
@@ -76,29 +88,20 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - reads: memory/connectors/official-plugins-registry.md
 - writes: (none)
 
-### qa
-keywords: [qa, quality assurance, quality check, run QA, health score, 11-phase, code quality, QA pass]
-
 ### qa-only
-keywords: [qa-only, findings only, don't fix, QA report, just show issues, read-only QA, baseline regression]
+keywords: [qa report, test report only, findings only, what's broken, audit without fixing, qa without fix, what needs fixing, health score report, qa-only, don't fix, just show issues, read-only QA, baseline regression]
 
 ### ship
-keywords: [ship, ship it, ready to merge, create PR, pre-merge, completeness check, prepare for merge]
-
-### deploy
-keywords: [deploy, push to production, release to prod, go live, canary, dry-run, rollback, deployment]
+keywords: [ship, ready to merge, pre-merge, create PR, prepare for merge, ready to ship, completeness, coverage audit, changelog, pre-merge pipeline, ship it, completeness check]
 
 ### benchmark
-keywords: [benchmark, performance, bundle size, Core Web Vitals, regression, speed, latency, LCP, CLS, TTFB]
+keywords: [benchmark, performance check, perf regression, measure performance, Core Web Vitals, bundle size, how fast is this, LCP, FCP, TTFB, regression, speed, latency, CLS]
 
 ### codex
-keywords: [codex, cross-model review, adversarial review, second opinion, PASS/FAIL gate, independent review]
+keywords: [codex, second opinion, cross-model review, adversarial review, challenge this, ask codex, blind spots, dual model, get a second opinion, PASS/FAIL gate, independent review]
 
 ### document-release
-keywords: [document-release, release notes, CHANGELOG, sync docs, documentation, post-ship docs, stale docs]
-
-### review
-keywords: [review, code review, review my code, check my changes, diff review, two-pass review, auto-fix mechanicals]
+keywords: [sync docs, update docs, post-ship docs, document this release, docs sync, update readme, CHANGELOG polish, documentation sync, release notes, stale docs]
 
 ### skill-forge
-keywords: [skill-forge, learn topic, create skill, generate skill, build skill, research topic, new skill]
+keywords: [learn how to use, add skill for, teach me about, create skill for, generate skill for, add capability for, build skill from, /prodmasterai learn, skill-forge, learn topic, research topic, new skill]

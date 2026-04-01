@@ -1,7 +1,7 @@
 {
   "name": "prodmaster-ai",
-  "version": "2.0.0",
-  "description": "Meta-orchestration, measurement, and self-evolving intelligence layer for Claude Code. Sits above Superpowers to orchestrate features, track velocity, generate reports, and auto-improve itself.",
+  "version": "2.1.0",
+  "description": "Full-stack AI development operations for Claude Code. Orchestrate features, run systematic QA, enforce code review, manage deployments, audit security, benchmark performance, cross-model review, generate docs, and self-evolve — all from /prodmasterai.",
   "author": {
     "name": "sujithkrishnan-dev",
     "email": ""

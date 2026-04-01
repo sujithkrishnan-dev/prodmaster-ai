@@ -4,6 +4,41 @@ Written by: auto-pilot. Read by: resume.
 
 <!-- Session blocks appended below.
 ---
+session_id: 2026-03-27-0002
+goal: Build qa skill — 11-phase systematic QA pipeline
+status: complete
+branch: auto/2026-03-27-0002
+pr_url: "not created — push auth required"
+tests_final: n/a (skill file, no test runner)
+reviewed: false
+archived: false
+decisions:
+  - id: d1
+    type: goal_resolution
+    question: What is the goal?
+    answer: Build qa skill from explicit argument
+    source: argument
+    confidence: high
+  - id: d2
+    type: archetype
+    question: Which archetype?
+    answer: plugin-skill
+    source: patterns.md
+    confidence: high
+  - id: d3
+    type: depth_default
+    question: Default depth tier for auto-pilot?
+    answer: quick (standard when spec_confidence high)
+    source: best-practice default
+    confidence: medium
+  - id: d4
+    type: health_categories
+    question: What 8 health categories?
+    answer: functionality, test-coverage, error-handling, code-quality, security, performance, accessibility, UX
+    source: conversation context (gstack review)
+    confidence: high
+---
+---
 session_id: 2026-04-01-1500
 goal: Build 9 missing skills advertised in CLAUDE.md
 status: complete

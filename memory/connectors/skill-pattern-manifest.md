@@ -75,3 +75,30 @@ keywords: [token efficiency, reduce tokens, token audit, I'm hitting limits, too
 - trigger: what plugins are installed
 - reads: memory/connectors/official-plugins-registry.md
 - writes: (none)
+
+### qa
+keywords: [qa, quality assurance, quality check, run QA, health score, 11-phase, code quality, QA pass]
+
+### qa-only
+keywords: [qa-only, findings only, don't fix, QA report, just show issues, read-only QA, baseline regression]
+
+### ship
+keywords: [ship, ship it, ready to merge, create PR, pre-merge, completeness check, prepare for merge]
+
+### deploy
+keywords: [deploy, push to production, release to prod, go live, canary, dry-run, rollback, deployment]
+
+### benchmark
+keywords: [benchmark, performance, bundle size, Core Web Vitals, regression, speed, latency, LCP, CLS, TTFB]
+
+### codex
+keywords: [codex, cross-model review, adversarial review, second opinion, PASS/FAIL gate, independent review]
+
+### document-release
+keywords: [document-release, release notes, CHANGELOG, sync docs, documentation, post-ship docs, stale docs]
+
+### review
+keywords: [review, code review, review my code, check my changes, diff review, two-pass review, auto-fix mechanicals]
+
+### skill-forge
+keywords: [skill-forge, learn topic, create skill, generate skill, build skill, research topic, new skill]

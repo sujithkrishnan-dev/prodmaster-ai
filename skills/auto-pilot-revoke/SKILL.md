@@ -1,7 +1,7 @@
 ---
 name: auto-pilot-revoke
 description: Gracefully stop a running auto-pilot session — commits progress, resets concurrency lock, logs revoked status.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - /auto-pilot-revoke
   - /prodmasterai revoke
@@ -68,7 +68,9 @@ note: "Session cancelled by user via auto-pilot-revoke"
 Auto-pilot revoked.
 Session: <session_id>
 Branch:  auto/<session_id> (progress preserved)
-Run `/prodmasterai resume` to review what was completed before revoke.
+
+Next: /prodmasterai resume  — review what was completed before revoke
+      /prodmasterai         — return to normal operation
 ```
 
 ---

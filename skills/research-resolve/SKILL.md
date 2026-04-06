@@ -1,7 +1,7 @@
 ---
 name: research-resolve
 description: Use when a dev-loop or any development task is stuck with no progress after N iterations. Spins up an isolated git worktree, researches the failure, applies fixes autonomously, and merges back only on success.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - dev-loop reaches stuck_threshold consecutive no-progress iterations
   - User says "research and resolve", "investigate failure", "loop is stuck", "can't make progress"
@@ -91,6 +91,8 @@ Log conflict as a blocker, proceed to Step 5 with `outcome: exhausted`.
    - YYYY-MM-DD: research-resolve exhausted on <task-name> | age_days: 0 | recommended_fix: manual review required
    ```
 4. Return `exhausted` to `dev-loop`.
+
+Next: `/prodmasterai build fix <task-name>` to treat as a new task | `/prodmasterai` to reassess priorities
 
 ### Step 6 -- Log Findings (always runs -- after Step 4 or Step 5)
 

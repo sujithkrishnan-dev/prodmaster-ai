@@ -251,4 +251,58 @@ skill: stop-quality-gate (hook)
 trigger: user request — security gate blocking session exit
 change_summary: New Stop hook blocking session exit when critical secret leaks or CVEs are flagged via security-gate-state.json.
 upstream_status: pending_publish
+date: 2026-04-06
+mode: improve
+skill: auto-pilot
+trigger: structural-review -- writes: missing memory/task-queue.md (Queue Advance section reads and writes it)
+change_summary: Added memory/task-queue.md to both reads: and writes: frontmatter declarations to match Queue Advance step body.
+upstream_status: pr_created
+---
+---
+date: 2026-04-06
+mode: improve
+skill: prodmasterai
+trigger: structural-review -- reads:/writes: missing memory/pending-input.md and writes: missing memory/usage-log.md
+change_summary: Added memory/pending-input.md to reads/writes and memory/usage-log.md to writes to match Idle Auto-Pilot Check and Step 0 body references.
+upstream_status: pr_created
+---
+---
+date: 2026-04-06
+mode: improve
+skill: auto-pilot-revoke
+trigger: structural-review -- output block missing explicit Next: hint
+change_summary: Added Next: completion hints to Step 5 output block so users know how to proceed after revoke.
+upstream_status: pr_created
+---
+---
+date: 2026-04-06
+mode: improve
+skill: dev-loop
+trigger: structural-review -- missing Next: hint and no edge-case for max_iterations=0
+change_summary: Added Next: hint to loop summary output and documented max_iterations minimum-1 guard in parameter table.
+upstream_status: pr_created
+---
+---
+date: 2026-04-06
+mode: improve
+skill: research-resolve
+trigger: structural-review -- exhaustion path (Step 5) missing Next: hint
+change_summary: Added Next: completion hint to Step 5 exhaustion path so users know how to treat the blocker as a new task.
+upstream_status: pr_created
+---
+---
+date: 2026-04-06
+mode: improve
+skill: parallel-explore
+trigger: structural-review -- no explicit error path when --approaches N > 4
+change_summary: Added explicit stop-and-error output when N > 4 is passed, matching the stated hard limit in the rules section.
+upstream_status: pr_created
+---
+---
+date: 2026-04-06
+mode: improve
+skill: help
+trigger: structural-review -- reference card missing 10 skills added since last help update
+change_summary: Added Automate section (auto-pilot, auto-pilot-revoke, resume, checkpoint, task-queue) and expanded Build/Improve sections with dev-loop, parallel-explore, research-resolve, plugin-manager, token-efficiency.
+upstream_status: pr_created
 ---

@@ -38,6 +38,60 @@ decisions:
     source: trial-and-error with installed hook
     confidence: high
 ---
+session_id: 2026-04-06-1200
+goal: "Close plugin parity gap vs playground/gstack — build stakeholder approval skill"
+status: complete
+branch: auto/2026-04-06-1200
+pr_url: "https://github.com/sujithkrishnan-dev/prodmaster-ai/pull/new/auto/2026-04-06-1200"
+tests_final: n/a (skill file)
+reviewed: true
+archived: false
+spec_confidence: high
+decisions:
+  - id: D1
+    type: goal_resolution
+    question: "What feature gap to address?"
+    answer: "Stakeholder approval workflows — gstack/Playground have role-based sign-off, ProdMaster AI does not"
+    source: research (web — playground/gstack gap analysis)
+    confidence: high
+  - id: D2
+    type: archetype
+    question: "Which archetype?"
+    answer: plugin-skill
+    source: pattern match
+    confidence: high
+  - id: D3
+    type: scope
+    question: "What does the skill cover?"
+    answer: "request/approve/status/list sub-commands, role defaults, 7-day expiry, ship integration"
+    source: research + best-practice default
+    confidence: high
+  - id: D4
+    type: file_structure
+    question: "Where does it live?"
+    answer: "skills/stakeholder/SKILL.md + manifest + CLAUDE.md + prodmasterai routing table"
+    source: existing pattern
+    confidence: high
+  - id: D5
+    type: integration
+    question: "How does it hook into ship?"
+    answer: "stakeholder block-ship sub-command called by ship before proceeding"
+    source: best-practice default
+    confidence: high
+---
+---
+session_id: 2026-04-06-auto
+goal: "improve plugin parity with playground/gstack plugins"
+status: parked
+branch: not created
+pr_url: ""
+tests_final: n/a
+reviewed: false
+archived: false
+park_reason: "Goal too vague to act autonomously -- 'falling behind vs playground/gstack' does not specify which feature to build. Confidence: low < autonomous_confidence_floor: medium."
+decisions: []
+---
+---
 session_id: 2026-03-27-0002
 goal: Build qa skill — 11-phase systematic QA pipeline
 status: complete
@@ -143,7 +197,7 @@ status: complete
 branch: auto/2026-04-01-1500
 pr_url: "not created — run /prodmasterai update"
 tests_final: 122/122 passing
-reviewed: false
+reviewed: true
 archived: false
 decisions:
   - id: D1

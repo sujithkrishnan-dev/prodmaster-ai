@@ -1,7 +1,7 @@
 ---
 name: parallel-explore
 description: Run multiple implementation approaches in parallel git worktrees, evaluate by test pass rate (quality as tiebreaker), apply the best-performing solution automatically.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - /prodmasterai explore
   - try multiple approaches
@@ -39,6 +39,8 @@ Try multiple implementation approaches simultaneously in isolated git worktrees.
 ## Step 1 — Setup
 
 Parse goal and approach count from the trigger. Default: 2 approaches. Accept `--approaches N` flag (max 4).
+
+**If N > 4:** stop immediately and output: *"Maximum 4 approaches supported -- worktree overhead beyond 4 exceeds benefit. Re-run with `--approaches 4` or fewer."*
 
 Generate `session_id: pe-<YYYY-MM-DD-HHmm>`.
 

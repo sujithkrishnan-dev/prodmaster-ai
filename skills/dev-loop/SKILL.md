@@ -1,7 +1,7 @@
 ---
 name: dev-loop
 description: Use when a task should repeat until tests pass, quality thresholds are met, or a set number of iterations complete. Supports tdd, watch, and polish loop modes with configurable exit conditions. Escalates to research-resolve when stuck.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - User says "loop until passing", "keep iterating", "run until tests pass"
   - User says "dev loop", "improvement loop", "polish loop", "watch mode"
@@ -30,7 +30,7 @@ All parameters are optional and scenario-driven.
 | Parameter | Values | Description |
 |---|---|---|
 | `mode` | `tdd`, `watch`, `polish`, `auto` | Loop mode. `auto` detects from context. Default: `auto` |
-| `max_iterations` | integer | Hard cap on total loop iterations |
+| `max_iterations` | integer | Hard cap on total loop iterations. Minimum 1 — if 0 or negative, treat as 1. |
 | `exit_when` | comma-separated conditions | Threshold conditions, e.g. `coverage>=80, lint=0, score>=8` |
 | `exit_logic` | `or`, `and` | How to combine multiple `exit_when` conditions. Default: `and` - all conditions must pass. With `or`, the loop exits when the first condition is met. |
 | `llm_judge` | `true/false` | LLM quality assessment after each pass |
@@ -158,6 +158,8 @@ dev-loop complete - N iterations
 ```
 
 After printing the summary, call checkpoint.clear.
+
+Next: `/prodmasterai cycle done — N tasks, QA X%, Y reviews, Z hours` to log this cycle | `/prodmasterai` to check what's next
 
 ---
 

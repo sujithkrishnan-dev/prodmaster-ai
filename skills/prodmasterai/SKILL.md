@@ -1,7 +1,7 @@
 ---
 name: prodmasterai
 description: Master entry point -- invoked when user says /prodmasterai (with or without arguments). Reads current memory state and autonomously determines and executes the right action. Routes to orchestrate, measure, report, decide, learn, or evolve-self with no further prompting needed. Evolution is automatic -- runs a convergence loop (until clean) whenever the threshold is hit, no confirmation required.
-version: 2.1.0
+version: 2.1.1
 triggers:
   - User says /prodmasterai
   - User says /prodmasterai followed by any text
@@ -10,7 +10,10 @@ reads:
   - memory/skill-performance.md
   - memory/skill-gaps.md
   - memory/usage-log.md
+  - memory/pending-input.md
 writes:
+  - memory/usage-log.md
+  - memory/pending-input.md
   - delegates to the invoked skill
 generated: false
 generated_from: ""

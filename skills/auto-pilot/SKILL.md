@@ -1,7 +1,7 @@
 ---
 name: auto-pilot
 description: Fully autonomous unattended execution -- runs the complete brainstorm->plan->implement->test->PR pipeline without blocking on questions. Every decision is logged with source and confidence. User returns to a completion card and full decision audit.
-version: 1.2.0
+version: 1.2.1
 argument-hint: "[goal description]"
 disable-model-invocation: true
 effort: high
@@ -18,9 +18,11 @@ reads:
   - memory/patterns.md
   - memory/research-findings.md
   - memory/mistakes.md
+  - memory/task-queue.md
 writes:
   - memory/project-context.md
   - memory/autonomous-log.md
+  - memory/task-queue.md
 generated: false
 generated_from: ""
 ---

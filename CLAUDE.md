@@ -34,12 +34,24 @@ That's it. The plugin reads your current state and decides what to do next — n
 | `/prodmasterai pull latest` | `smooth-dev` — git pull, repo health check, run tests |
 | `/prodmasterai build X` | `orchestrate` — breaks feature into tracked tasks, parallel subtasks, auto-installs needed plugins |
 | `/prodmasterai cycle done — …` | `measure` → `learn` auto-fires (parallel writes) |
-| `/prodmasterai should we A or B?` | `decide` — scored recommendation |
+| `/prodmasterai should we A or B?` | `decide` — scored recommendation with deep reasoning |
 | `/prodmasterai report` | Prints full report directly in terminal (no files written) |
+| `/prodmasterai review` | `review` — two-pass code review, live diff context, auto-fix mechanicals |
+| `/prodmasterai qa` | `qa` — 11-phase QA, health score across 8 categories, atomic fix commits |
+| `/prodmasterai qa-only` | `qa-only` — findings-only QA, no fixes, screenshot evidence, baseline regression |
+| `/prodmasterai ship` | `ship` — completeness-principle pre-merge: tests → coverage → review → changelog → PR |
+| `/prodmasterai deploy` | `deploy` — platform auto-detect, dry-run, canary verification, revert escape hatch |
+| `/prodmasterai cso` | `cso` — 14-phase security audit, exploit-path required for every finding. Writes findings to security gate |
+| `/prodmasterai dependency-audit` | `dependency-audit` — CVE scan across npm/pip/bundler/go. Blocks session exit on CRITICAL CVEs |
+| `/prodmasterai secret-scan` | `secret-scan` — 25+ credential patterns, staged-file scan, git history check, remediation commands |
+| `/prodmasterai benchmark` | `benchmark` — Core Web Vitals, bundle size, regression alerts, 4 modes |
+| `/prodmasterai codex` | `codex` — cross-model adversarial review, PASS/FAIL gate, cost tracking |
+| `/prodmasterai document-release` | `document-release` — post-ship doc sync, CHANGELOG polish, consistency checks |
+| `/prodmasterai learn <topic>` | `skill-forge` — research any topic and generate a production-ready SKILL.md |
 | `/prodmasterai queue add X` | `task-queue` — adds goal to sequential execution queue |
 | `/prodmasterai queue list` | `task-queue` — shows pending/running/done queue |
 | `/prodmasterai queue run` | `task-queue` — runs all queued tasks sequentially, auto-advances |
-| `/prodmasterai explore X` | `parallel-explore` — runs 2+ approaches in separate worktrees, picks best by test pass rate |
+| `/prodmasterai explore X` | `parallel-explore` — runs 2+ approaches in isolated worktrees, picks best by test pass rate |
 | `/prodmasterai auto X` | `auto-pilot` — fully autonomous: brainstorm → plan → implement → test → PR |
 | `/auto-pilot-revoke` | `auto-pilot-revoke` — stops running auto-pilot, commits progress, resets lock |
 | `/prodmasterai resume` | `resume` — shows what auto-pilot did, per-decision review and rollback |
@@ -55,7 +67,9 @@ That's it. The plugin reads your current state and decides what to do next — n
 | Hook | Fires on | What it does |
 |---|---|---|
 | `session-start` | Session open | Injects active features, patterns, gaps, evolutions; detects unprocessed invocations for auto-session; surfaces installed plugins |
-| `pre-tool-bash.py` | Every Bash call | Blocks: `rm -rf`, force push, `git reset --hard`, `git clean -f`, `DROP TABLE/DATABASE`. Allows safe dev commands through immediately. |
+| `pre-tool-bash.py` | Every Bash call | Blocks: `rm -rf`, force push, `git reset --hard`, `git clean -f`, `DROP TABLE/DATABASE`, `chmod 777`, package installs from unverified sources, AWS key exports, PATH hijacking. |
+| `post-tool-write.py` | Every Write/Edit | Passive scanner: detects secrets, SQL injection, unsafe deserialization, subprocess misuse. Advisory warnings; blocks on critical secret material. |
+| `stop-quality-gate.py` | Claude stop | Blocks session exit when: tests failing during ship/deploy, critical secret leaks detected, critical CVEs in dependencies. |
 
 ---
 

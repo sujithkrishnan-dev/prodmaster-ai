@@ -14,7 +14,7 @@ BLOCKED_PATTERNS = [
     (r"rm\s+--recursive", "recursive rm (--recursive flag)"),
     (r"git\s+push\s.*--force", "force push"),
     (r"git\s+push\s.*\s-[a-zA-Z]*f", "force push"),
-    (r"git\s+branch\s.*\s-D", "force branch delete"),
+    (r"git\s+branch\b[^|;&]*-D\b", "force branch delete"),
     (r"git\s+reset\s.*--hard", "git reset --hard"),
     (r"git\s+clean\s.*-[a-zA-Z]*f", "git clean -f"),
     (r"git\s+(checkout|restore)\s+\.\s*($|[;&|])", "discard all changes"),
@@ -24,6 +24,17 @@ BLOCKED_PATTERNS = [
     # eval with base64-decoded content — common obfuscation technique
     (r"eval\s+.*base64", "eval with encoded payload"),
     (r"base64\s+.*\|\s*(bash|sh|zsh|eval)", "base64 decode to shell"),
+    # chmod 777 — world-writable permissions are almost never correct
+    (r"chmod\s+777\b", "world-writable chmod 777"),
+    # Package installs from unverified sources (git+http, direct http URLs)
+    (r"pip\s+install\s+git\+http://", "pip install from unverified git+http source"),
+    (r"npm\s+install\s+https?://", "npm install from direct HTTP URL"),
+    # Secret key exports in shell — exporting AWS/GCP/private keys inline
+    (r"export\s+AWS_SECRET_ACCESS_KEY\s*=\s*\S+", "AWS secret key export in shell"),
+    (r"export\s+AWS_ACCESS_KEY_ID\s*=\s*AKIA\S+", "AWS access key export in shell"),
+    (r"export\s+GOOGLE_APPLICATION_CREDENTIALS\s*=", "GCP credentials export in shell"),
+    # PATH hijacking via /tmp prepend
+    (r"export\s+PATH\s*=\s*/tmp[/:]", "PATH hijack via /tmp prepend"),
 ]
 
 SAFE_COMMANDS = {
@@ -160,12 +171,6 @@ def is_safe_fragment(fragment):
     stripped = fragment.strip()
     if stripped.startswith(".venv/bin/") or "/venv/bin/" in stripped:
         return True
-    if "docs/" in stripped:
-        return True
-    if "/tmp/" in stripped or stripped.startswith("tmp/"):
-        return True
-    if "pytest" in stripped or "unittest" in stripped:
-        return True
     return False
 
 
@@ -197,7 +202,7 @@ def main():
     except SystemExit:
         raise
     except Exception:
-        sys.exit(0)  # never crash, just pass through
+        emit("deny", "hook parse error — command blocked for safety")
 
 
 if __name__ == "__main__":

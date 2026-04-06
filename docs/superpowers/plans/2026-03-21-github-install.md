@@ -1,8 +1,8 @@
 # GitHub Install Support Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+**Status:** Implemented (2026-03-21)
 
-**Goal:** Enable `claude plugin install prodmaster-ai@github:sujithkrishnan-dev/prodmaster-ai` so users can install without cloning.
+**Goal:** Enable users to install from GitHub without a local clone.
 
 **Architecture:** Create a root-level `claude-plugin.json` install manifest the CLI reads when fetching from GitHub. Fix the stale version in `.claude-plugin/marketplace.json`. Update README to surface the one-line install command as the primary path.
 

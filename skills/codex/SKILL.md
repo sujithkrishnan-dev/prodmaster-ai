@@ -20,6 +20,7 @@ reads:
 writes:
   - memory/codex-sessions/
   - memory/codex-log.md
+  - memory/project-context.md
 generated: false
 generated_from: ""
 ---

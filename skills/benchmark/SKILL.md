@@ -17,6 +17,7 @@ reads:
 writes:
   - memory/benchmark-log.md
   - .prodmaster/benchmark-reports/
+  - memory/project-context.md
 generated: false
 generated_from: ""
 ---

@@ -22,6 +22,7 @@ reads:
   - memory/ship-log.md
 writes:
   - memory/document-release-log.md
+  - memory/project-context.md
 generated: false
 generated_from: ""
 ---

@@ -88,6 +88,9 @@ keywords: [security audit, vulnerabilities, threat model, OWASP, pentest, CSO, s
 - reads: memory/connectors/official-plugins-registry.md
 - writes: (none)
 
+### qa-only
+keywords: [qa report, test report only, findings only, what's broken, audit without fixing, qa without fix, what needs fixing, health score report, qa-only, don't fix, just show issues, read-only QA, baseline regression]
+
 ### cso
 keywords: [security audit, cso, audit security, check for vulnerabilities, security review, OWASP, exploit path, threat model, penetration test, find vulnerabilities]
 
@@ -98,19 +101,19 @@ keywords: [dependency audit, CVE, vulnerable packages, check dependencies, audit
 keywords: [secret scan, credential scan, scan for secrets, leaked keys, hardcoded secrets, pre-commit check, api key leak, token leak, credential leak]
 
 ### ship
-keywords: [ship, ready to merge, pre-merge, create PR, prepare for merge, ready to ship, completeness, coverage audit, changelog, pre-merge pipeline]
+keywords: [ship, ready to merge, pre-merge, create PR, prepare for merge, ready to ship, completeness, coverage audit, changelog, pre-merge pipeline, ship it, completeness check]
 
 ### benchmark
-keywords: [benchmark, performance check, perf regression, measure performance, Core Web Vitals, bundle size, how fast is this, LCP, FCP, TTFB]
+keywords: [benchmark, performance check, perf regression, measure performance, Core Web Vitals, bundle size, how fast is this, LCP, FCP, TTFB, regression, speed, latency, CLS]
 
 ### codex
-keywords: [codex, second opinion, cross-model review, adversarial review, challenge this, ask codex, blind spots, dual model, get a second opinion]
+keywords: [codex, second opinion, cross-model review, adversarial review, challenge this, ask codex, blind spots, dual model, get a second opinion, PASS/FAIL gate, independent review]
 
 ### document-release
-keywords: [sync docs, update docs, post-ship docs, document this release, docs sync, update readme, CHANGELOG polish, documentation sync]
-
-### qa-only
-keywords: [qa report, test report only, findings only, what's broken, audit without fixing, qa without fix, what needs fixing, health score report]
+keywords: [sync docs, update docs, post-ship docs, document this release, docs sync, update readme, CHANGELOG polish, documentation sync, release notes, stale docs]
 
 ### skill-forge
-keywords: [learn how to use, add skill for, teach me about, create skill for, generate skill for, add capability for, build skill from, /prodmasterai learn]
+keywords: [learn how to use, add skill for, teach me about, create skill for, generate skill for, add capability for, build skill from, /prodmasterai learn, skill-forge, learn topic, research topic, new skill]
+
+### stakeholder
+keywords: [stakeholder, sign-off, approval gate, who must approve, get approval, need sign-off, request approval, approve feature, blocking ship, multi-stakeholder, PM approval, QA sign-off]

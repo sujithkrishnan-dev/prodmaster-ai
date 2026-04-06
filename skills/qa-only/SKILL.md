@@ -22,6 +22,7 @@ reads:
 writes:
   - memory/qa-only-log.md
   - .prodmaster/qa-baselines/
+  - memory/project-context.md
 generated: false
 generated_from: ""
 ---

@@ -36,6 +36,8 @@ That's it. The plugin reads your current state and decides what to do next — n
 | `/prodmasterai cycle done — …` | `measure` → `learn` auto-fires (parallel writes) |
 | `/prodmasterai should we A or B?` | `decide` — scored recommendation with deep reasoning |
 | `/prodmasterai report` | Prints full report directly in terminal (no files written) |
+| `/prodmasterai stakeholder request X` | `stakeholder` — open approval gate, track sign-offs by role (PM/QA/CTO/EM) |
+| `/prodmasterai approve <id> --role PM` | `stakeholder` — record a stakeholder sign-off |
 | `/prodmasterai review` | `review` — two-pass code review, live diff context, auto-fix mechanicals |
 | `/prodmasterai qa` | `qa` — 11-phase QA, health score across 8 categories, atomic fix commits |
 | `/prodmasterai qa-only` | `qa-only` — findings-only QA, no fixes, screenshot evidence, baseline regression |

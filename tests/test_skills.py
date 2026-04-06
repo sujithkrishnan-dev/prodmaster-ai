@@ -21,7 +21,7 @@ def test_skill_exists(skill):
 def test_skill_frontmatter(skill):
     path = os.path.join(SKILLS_DIR, skill, "SKILL.md")
     if not os.path.exists(path): pytest.skip("missing")
-    content = open(path).read()
+    content = open(path, encoding='utf-8').read()
     assert content.startswith("---"), f"{skill}: must start with frontmatter"
     for f in REQUIRED_FIELDS:
         assert f in content, f"{skill}: missing '{f}'"

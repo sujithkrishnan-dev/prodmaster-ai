@@ -47,3 +47,35 @@ PR: auto-evolved/2026-03-18-structural-review-v2 | Type: skill_improvement | Tri
 - prodmasterai v2.0.1: removed stale reads declarations (evolution-log.md, patterns.md)
 - orchestrate v1.4.1: added superpowers.md to writes frontmatter
 - help v1.0.1: updated evolve-self triggers to include optimize/deep review/audit
+
+## 2026-04-01 — Three-layer security system: cso, dependency-audit, secret-scan + 2 hooks
+PR: https://github.com/sujithkrishnan-dev/prodmaster-ai/pull/14 | Type: new_skill (×3) + hook_improvement (×3) | Trigger: user request
+
+### skills/cso (new) v1.0.0
+14-phase security audit: OWASP Top 10 coverage, exploit-path required for every HIGH/CRITICAL finding, scored report (0–100), writes to security-gate-state.json to block session exit.
+
+### skills/dependency-audit (new) v1.0.0
+CVE scanning across npm/pip/bundler/go/rust/java. Auto-detects package managers. Writes critical CVEs to security-gate-state.json. Blocks session exit on CRITICAL findings.
+
+### skills/secret-scan (new) v1.0.0
+25+ credential pattern detection (AWS, GitHub, OpenAI, Stripe, Slack, etc.). Staged-file scan, git history mode, per-finding remediation with exact commands.
+
+### hooks/post-tool-write.py (new)
+PostToolUse hook scanning every Write/Edit for secrets, SQL injection, unsafe deserialization, subprocess misuse. Advisory for high/medium; blocks on critical secret material.
+
+### hooks/stop-quality-gate.py (new)
+Stop hook blocking session exit when critical leaks or CVEs are active in security-gate-state.json.
+
+### hooks/pre-tool-bash.py v1.1.0
+Expanded with 8 new blocked patterns: chmod 777, pip/npm installs from unverified URLs, AWS credential exports in shell, PATH hijacking via /tmp.
+
+## 2026-04-06 — Structural review pass 2: frontmatter fixes + Next: hints + 10 missing skills in help
+PR: https://github.com/sujithkrishnan-dev/prodmaster-ai/pull/17 | Type: skill_improvement (×7) | Trigger: explicit /evolve structural-review
+
+- auto-pilot v1.2.1: added memory/task-queue.md to reads/writes (Queue Advance section)
+- prodmasterai v2.2.0: added memory/pending-input.md + usage-log.md to reads/writes; added stakeholder routing
+- auto-pilot-revoke v1.0.1: added Next: hints to Step 5 output block
+- dev-loop v1.0.1: added Next: hint + max_iterations minimum-1 guard
+- research-resolve v1.0.1: added Next: hint to Step 5 exhaustion path
+- parallel-explore v1.0.1: added explicit stop+error when --approaches N > 4
+- help v1.0.2: added 10 missing skills across Automate/Build/Improve/Ship sections

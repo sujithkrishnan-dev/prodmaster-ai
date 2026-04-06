@@ -105,3 +105,6 @@ keywords: [sync docs, update docs, post-ship docs, document this release, docs s
 
 ### skill-forge
 keywords: [learn how to use, add skill for, teach me about, create skill for, generate skill for, add capability for, build skill from, /prodmasterai learn, skill-forge, learn topic, research topic, new skill]
+
+### stakeholder
+keywords: [stakeholder, sign-off, approval gate, who must approve, get approval, need sign-off, request approval, approve feature, blocking ship, multi-stakeholder, PM approval, QA sign-off]

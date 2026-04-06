@@ -9,6 +9,7 @@ ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-sel
               "plugin-manager", "qa", "qa-only", "ship", "deploy", "benchmark",
               "codex", "document-release", "review", "skill-forge",
               "cso", "dependency-audit", "secret-scan"]
+
 REQUIRED_FIELDS = ["name:", "description:", "version:", "triggers:", "reads:", "writes:",
                    "generated:", "generated_from:"]
 

@@ -91,6 +91,15 @@ keywords: [security audit, vulnerabilities, threat model, OWASP, pentest, CSO, s
 ### qa-only
 keywords: [qa report, test report only, findings only, what's broken, audit without fixing, qa without fix, what needs fixing, health score report, qa-only, don't fix, just show issues, read-only QA, baseline regression]
 
+### cso
+keywords: [security audit, cso, audit security, check for vulnerabilities, security review, OWASP, exploit path, threat model, penetration test, find vulnerabilities]
+
+### dependency-audit
+keywords: [dependency audit, CVE, vulnerable packages, check dependencies, audit packages, npm audit, pip audit, supply chain, package vulnerabilities]
+
+### secret-scan
+keywords: [secret scan, credential scan, scan for secrets, leaked keys, hardcoded secrets, pre-commit check, api key leak, token leak, credential leak]
+
 ### ship
 keywords: [ship, ready to merge, pre-merge, create PR, prepare for merge, ready to ship, completeness, coverage audit, changelog, pre-merge pipeline, ship it, completeness check]
 

@@ -43,7 +43,9 @@ That's it. The plugin reads your current state and decides what to do next — n
 | `/prodmasterai qa-only` | `qa-only` — findings-only QA, no fixes, screenshot evidence, baseline regression |
 | `/prodmasterai ship` | `ship` — completeness-principle pre-merge: tests → coverage → review → changelog → PR |
 | `/prodmasterai deploy` | `deploy` — platform auto-detect, dry-run, canary verification, revert escape hatch |
-| `/prodmasterai cso` | `cso` — 14-phase security audit, exploit-path required for every finding |
+| `/prodmasterai cso` | `cso` — 14-phase security audit, exploit-path required for every finding. Writes findings to security gate |
+| `/prodmasterai dependency-audit` | `dependency-audit` — CVE scan across npm/pip/bundler/go. Blocks session exit on CRITICAL CVEs |
+| `/prodmasterai secret-scan` | `secret-scan` — 25+ credential patterns, staged-file scan, git history check, remediation commands |
 | `/prodmasterai benchmark` | `benchmark` — Core Web Vitals, bundle size, regression alerts, 4 modes |
 | `/prodmasterai codex` | `codex` — cross-model adversarial review, PASS/FAIL gate, cost tracking |
 | `/prodmasterai document-release` | `document-release` — post-ship doc sync, CHANGELOG polish, consistency checks |
@@ -67,8 +69,9 @@ That's it. The plugin reads your current state and decides what to do next — n
 | Hook | Fires on | What it does |
 |---|---|---|
 | `session-start` | Session open | Injects active features, patterns, gaps, evolutions; detects unprocessed invocations for auto-session; surfaces installed plugins |
-| `pre-tool-bash.py` | Every Bash call | Blocks: `rm -rf`, force push, `git reset --hard`, `git clean -f`, `DROP TABLE/DATABASE`. Allows safe dev commands through immediately. |
-| `stop-quality-gate.py` | Claude stop | Blocks session end if tests are failing during an active ship/deploy. Prevents shipping broken code. |
+| `pre-tool-bash.py` | Every Bash call | Blocks: `rm -rf`, force push, `git reset --hard`, `git clean -f`, `DROP TABLE/DATABASE`, `chmod 777`, package installs from unverified sources, AWS key exports, PATH hijacking. |
+| `post-tool-write.py` | Every Write/Edit | Passive scanner: detects secrets, SQL injection, unsafe deserialization, subprocess misuse. Advisory warnings; blocks on critical secret material. |
+| `stop-quality-gate.py` | Claude stop | Blocks session exit when: tests failing during ship/deploy, critical secret leaks detected, critical CVEs in dependencies. |
 
 ---
 

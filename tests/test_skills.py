@@ -7,10 +7,8 @@ ALL_SKILLS = ["orchestrate", "measure", "report", "decide", "learn", "evolve-sel
               "dev-loop", "research-resolve", "auto-pilot", "resume", "checkpoint",
               "token-efficiency", "auto-pilot-revoke", "task-queue", "parallel-explore",
               "plugin-manager", "qa", "qa-only", "ship", "deploy", "benchmark",
-              "codex", "document-release", "review", "skill-forge"]
-,
-              cso", "dependency-audit", "secret-scan"]
-
+              "codex", "document-release", "review", "skill-forge",
+              "cso", "dependency-audit", "secret-scan"]
 REQUIRED_FIELDS = ["name:", "description:", "version:", "triggers:", "reads:", "writes:",
                    "generated:", "generated_from:"]
 
@@ -22,7 +20,7 @@ def test_skill_exists(skill):
 def test_skill_frontmatter(skill):
     path = os.path.join(SKILLS_DIR, skill, "SKILL.md")
     if not os.path.exists(path): pytest.skip("missing")
-    content = open(path).read()
+    content = open(path, encoding='utf-8').read()
     assert content.startswith("---"), f"{skill}: must start with frontmatter"
     for f in REQUIRED_FIELDS:
         assert f in content, f"{skill}: missing '{f}'"

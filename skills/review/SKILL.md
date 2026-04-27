@@ -1,7 +1,7 @@
 ---
 name: review
 description: Systematic code review — two-pass approach (critical then informational), test coverage diagrams, scope drift detection, adversarial scaling by diff size, and fix-first triage that auto-fixes mechanical issues and batches judgment calls for approval.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[--quick | --deep] [branch]"
 effort: medium
 hooks:
@@ -20,7 +20,6 @@ triggers:
   - review before ship
 reads:
   - memory/project-context.md
-  - memory/mistakes.md
 writes:
   - memory/review-log.md
   - memory/project-context.md

@@ -321,3 +321,155 @@ change_summary: Added Automate section (auto-pilot, auto-pilot-revoke, resume, c
 upstream_status: merged
 pr_url: "https://github.com/sujithkrishnan-dev/prodmaster-ai/pull/17"
 ---
+---
+date: 2026-04-27
+mode: improve
+skill: benchmark
+trigger: structural-review -- memory/project-context.md in writes: but not written to in body
+change_summary: Removed spurious memory/project-context.md from writes: declaration to match actual body behavior.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: checkpoint
+trigger: structural-review -- checkpoint.write missing edge case for absent memory/checkpoint.md
+change_summary: Added file creation guard to checkpoint.write step 3 so the file is created if absent rather than silently failing.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: codex
+trigger: structural-review -- missing Next: completion hints in all three output modes
+change_summary: Added Next: hints to review, challenge, and consult output blocks so users know what to do after each codex session.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: cso
+trigger: structural-review -- memory/mistakes.md in reads: but not referenced in body
+change_summary: Removed spurious memory/mistakes.md from reads: declaration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: dependency-audit
+trigger: structural-review -- missing Next: completion hint
+change_summary: Added Next: hint after fix guidance so users know to run cso or ship after resolving CVEs.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: deploy
+trigger: structural-review -- memory/mistakes.md in reads: but not referenced in body
+change_summary: Removed spurious memory/mistakes.md from reads: declaration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: document-release
+trigger: structural-review -- missing Next: completion hint in output section
+change_summary: Added Next: hint after doc commit so users know to proceed to ship or deploy.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: plugin-manager
+trigger: structural-review -- missing Next: hint in status sub-command output
+change_summary: Added Next: hint to status output block so users know how to return to their task.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: qa
+trigger: structural-review -- memory/mistakes.md in reads: but not referenced in body
+change_summary: Removed spurious memory/mistakes.md from reads: declaration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: qa-only
+trigger: structural-review -- memory/project-context.md in writes: but not written to in body
+change_summary: Removed spurious memory/project-context.md from writes: declaration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: resume
+trigger: structural-review -- missing Next: hint after Step 5 archive step
+change_summary: Added Next: hint after session archive so users know to return to normal operation.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: review
+trigger: structural-review -- memory/mistakes.md in reads: but not referenced in body
+change_summary: Removed spurious memory/mistakes.md from reads: declaration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: secret-scan
+trigger: structural-review -- missing Next: completion hint
+change_summary: Added Next: hint so users know to run cso or ship after secrets are cleared.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: ship
+trigger: structural-review -- memory/mistakes.md in reads: but not referenced in body
+change_summary: Removed spurious memory/mistakes.md from reads: declaration.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: skill-forge
+trigger: structural-review -- skills/*/SKILL.md missing from writes: (Phase 4 creates it)
+change_summary: Added skills/*/SKILL.md to writes: declaration to match Phase 4 body behavior.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: task-queue
+trigger: structural-review -- run sub-command missing explicit missing-file guard
+change_summary: Added explicit "if file does not exist" check in run Step 2 to match list sub-command behavior.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: token-efficiency
+trigger: structural-review -- missing Next: completion hint in audit mode output
+change_summary: Added Next: hint after audit output so users know to run rewrite or return to normal operation.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: codex
+trigger: convergence-pass-1 -- memory/project-context.md in writes: but not written to in body
+change_summary: Removed spurious memory/project-context.md from writes: declaration to match actual body behavior.
+upstream_status: pending_publish
+---
+---
+date: 2026-04-27
+mode: improve
+skill: document-release
+trigger: convergence-pass-1 -- memory/project-context.md in writes: but not written to in body
+change_summary: Removed spurious memory/project-context.md from writes: declaration to match actual body behavior.
+upstream_status: pending_publish
+---

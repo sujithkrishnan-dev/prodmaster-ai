@@ -1,7 +1,7 @@
 ---
 name: skill-forge
 description: Autonomous topic research and SKILL.md generation — /prodmasterai learn <topic> triggers four-stage workflow (research → review → generate → store). Multi-source verification. Generates complete SKILL.md with proper frontmatter, triggers, process steps. Stores in skills/<name>/SKILL.md. Updates skill-pattern-manifest. Quick reference tables in output.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "<topic name>"
 effort: medium
 triggers:
@@ -21,6 +21,7 @@ writes:
   - memory/research-findings.md
   - memory/skill-gaps.md
   - memory/connectors/skill-pattern-manifest.md
+  - skills/*/SKILL.md
 generated: false
 generated_from: ""
 ---

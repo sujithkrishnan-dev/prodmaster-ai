@@ -1,7 +1,7 @@
 ---
 name: benchmark
 description: Performance regression detection — captures Core Web Vitals, bundle size, request counts, and largest resources. Four modes (baseline, measure, diff, trend). Alerts on >50% timing regression or >25% bundle growth. Stores history in .prodmaster/benchmark-reports/.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[--baseline | --diff | --trend] [url]"
 effort: medium
 triggers:
@@ -17,7 +17,6 @@ reads:
 writes:
   - memory/benchmark-log.md
   - .prodmaster/benchmark-reports/
-  - memory/project-context.md
 generated: false
 generated_from: ""
 ---

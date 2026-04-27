@@ -1,7 +1,7 @@
 ---
 name: resume
 description: Show autonomous session audit -- every decision made during an auto-pilot run, with rationale, confidence, and per-decision rollback. Also detects and clears stale auto-pilot locks.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - /prodmasterai resume
   - what happened while I was away
@@ -78,6 +78,8 @@ If `[R]` chosen and `downstream_decision_ids` is non-empty:
 After review completes: set `reviewed: true` on the session block.
 Sessions with `archived: false` and date older than 30 days: set `archived: true`.
 Never delete entries.
+
+Next: `/prodmasterai` to check current state | `/prodmasterai build [feature]` to start new work
 
 ---
 

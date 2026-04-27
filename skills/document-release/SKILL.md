@@ -1,7 +1,7 @@
 ---
 name: document-release
 description: Post-ship documentation sync — analyzes diff, auto-updates README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md, polishes CHANGELOG voice (never regenerates), cleans TODOs, optional VERSION bump. Conservative: auto-execute safe updates, ask for risky changes. Cross-doc consistency checks.
-version: 1.1.0
+version: 1.1.2
 argument-hint: "[--bump patch|minor|major]"
 effort: low
 paths:
@@ -22,7 +22,6 @@ reads:
   - memory/ship-log.md
 writes:
   - memory/document-release-log.md
-  - memory/project-context.md
 generated: false
 generated_from: ""
 ---
@@ -237,6 +236,8 @@ Commit doc changes:
 ```bash
 git commit -m "docs: sync documentation for <branch>"
 ```
+
+Next: `/prodmasterai ship` to create the PR | `/prodmasterai deploy` to proceed to deployment
 
 ---
 

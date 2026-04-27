@@ -1,7 +1,7 @@
 ---
 name: qa
 description: Systematic QA pipeline — runs 11 phases of testing with health scoring across 8 categories, atomic fix commits per bug, and regression test generation. Three depth tiers adapt to available time and severity threshold.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[--quick | --standard | --exhaustive]"
 effort: medium
 paths:
@@ -21,7 +21,6 @@ triggers:
   - health check the codebase
 reads:
   - memory/project-context.md
-  - memory/mistakes.md
 writes:
   - memory/qa-log.md
   - memory/project-context.md

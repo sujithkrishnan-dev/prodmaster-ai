@@ -1,7 +1,7 @@
 ---
 name: qa-only
 description: Report-only QA variant — systematic testing with NO fix-loop. Diff-aware scope detection, screenshot evidence required for every finding, baseline regression tracking in .prodmaster/qa-baselines/, health score across 8 categories, structured issue docs. Use when you want findings only, not fixes.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[--save-baseline]"
 effort: medium
 paths:
@@ -22,7 +22,6 @@ reads:
 writes:
   - memory/qa-only-log.md
   - .prodmaster/qa-baselines/
-  - memory/project-context.md
 generated: false
 generated_from: ""
 ---

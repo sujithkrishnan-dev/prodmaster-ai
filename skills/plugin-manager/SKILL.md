@@ -1,7 +1,7 @@
 ---
 name: plugin-manager
 description: Auto-detect, install, and activate Claude Code official plugins. Called by orchestrate and other skills before invoking plugin-dependent capabilities. Never just suggests — always installs.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - /prodmasterai plugins
   - /prodmasterai install plugin
@@ -58,6 +58,8 @@ Available to install (from claude-plugins-official):
   ...
 
 Install any: claude plugin install <name>@claude-plugins-official
+
+Next: `/prodmasterai` to return to your task | `claude plugin install <name>@claude-plugins-official` to install any listed plugin
 ```
 
 ---

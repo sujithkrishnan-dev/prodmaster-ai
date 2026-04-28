@@ -1,7 +1,7 @@
 ---
 name: codex
 description: Cross-model adversarial review — runs Claude and a second AI model independently on the same code, compares results to catch blind spots. Three modes (review, challenge, consult). Session memory for continuity. Cost tracking per invocation.
-version: 1.1.0
+version: 1.1.2
 argument-hint: "[review | challenge | consult] [question]"
 effort: max
 model: claude-opus-4-6
@@ -20,7 +20,6 @@ reads:
 writes:
   - memory/codex-sessions/
   - memory/codex-log.md
-  - memory/project-context.md
 generated: false
 generated_from: ""
 ---
@@ -107,6 +106,8 @@ Findings (by confidence):
   [CC-004] Contested: <title> — Model A says X, Model B says Y
 
 Cost: ~<N> tokens | ~$<X.XX>
+
+Next: `/prodmasterai review` to apply fixes | `/prodmasterai ship` to proceed to PR
 ```
 
 FAIL verdict if: any critical finding in agreement zone, OR any critical finding in Model B-only zone.
@@ -128,6 +129,8 @@ Challenges raised: <N>
   [CH-003] Better approach: <description>
 
 Verdict: <PLAN HOLDS | PLAN HAS WEAKNESSES | PLAN SHOULD BE REVISED>
+
+Next: `/prodmasterai build [revised approach]` if plan needs revision | proceed with implementation if plan holds
 ```
 
 ### Consult Mode
@@ -144,6 +147,8 @@ Model B response:
 
 Cost: ~<N> tokens | ~$<X.XX>
 Session saved to memory/codex-sessions/<branch>.md
+
+Next: `/prodmasterai codex <follow-up question>` to continue this session | `/prodmasterai` to return to normal operation
 ```
 
 ---

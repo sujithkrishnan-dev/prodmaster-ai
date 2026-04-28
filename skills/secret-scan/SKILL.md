@@ -1,7 +1,7 @@
 ---
 name: secret-scan
 description: Scan staged/committed files for 25+ secret patterns (AWS keys, GitHub tokens, Stripe keys, private keys, JWT secrets, .env leaks). Designed to run pre-commit. Outputs per-file findings with line numbers and remediation. Writes critical leaks to security-gate-state.json.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - User runs /prodmasterai secret-scan
   - User says "scan for secrets", "check for leaked keys", "pre-commit check", "credential scan"
@@ -101,6 +101,8 @@ Write critical findings to `memory/security-gate-state.json`:
 ```
 
 Clear `secret_leaks` once the user confirms secrets are removed and credentials rotated.
+
+Next: `/prodmasterai cso` for full security audit | `/prodmasterai ship` once all secrets are removed and rotated
 
 ### 6. Git History Check (optional)
 

@@ -1,7 +1,7 @@
 ---
 name: ship
 description: Completeness-principle pre-merge pipeline — tests, coverage, review, changelog, scope check, PR. Boils the lake by default: 100% coverage, full error handling, comprehensive review. One command takes a branch from working to PR-ready.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[--skip-coverage] [--skip-review]"
 disable-model-invocation: true
 effort: medium
@@ -16,7 +16,6 @@ triggers:
 reads:
   - memory/project-context.md
   - memory/review-log.md
-  - memory/mistakes.md
 writes:
   - memory/ship-log.md
   - memory/project-context.md

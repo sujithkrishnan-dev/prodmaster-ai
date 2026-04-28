@@ -1,7 +1,7 @@
 ---
 name: token-efficiency
 description: Reduce token consumption across all plugin operations. Three modes: audit (scan + report waste hotspots), enforce (pre-action gate for expensive operations), rewrite (trim verbose skill files).
-version: 1.0.0
+version: 1.0.1
 triggers:
   - /prodmasterai token-efficiency
   - /prodmasterai token-efficiency audit
@@ -79,6 +79,8 @@ low: N
 top_issue: "<highest-severity issue description>"
 ---
 ```
+
+Next: `/prodmasterai token-efficiency rewrite <skill-path>` to trim the top HIGH issue | `/prodmasterai` to return to normal operation
 
 ---
 

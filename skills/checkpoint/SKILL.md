@@ -1,7 +1,7 @@
 ---
 name: checkpoint
 description: Save and restore in-flight task state across plan usage limit resets. Three operations: write (save step before acting), clear (clean exit), resume (relaunch from saved step).
-version: 1.0.0
+version: 1.0.1
 triggers:
   - checkpoint.write called by another skill
   - checkpoint.clear called by another skill
@@ -35,7 +35,8 @@ Parameters: skill, step, step_index, total_steps, context (goal, remaining_tasks
 Steps:
 1. Compute `checkpoint_timestamp` = current UTC datetime in ISO8601 format
 2. Compute `estimated_reset_timestamp` = checkpoint_timestamp + 5 hours
-3. Overwrite `memory/checkpoint.md` frontmatter with:
+3. **File creation guard:** If `memory/checkpoint.md` does not exist, create it with the frontmatter block and an empty log section before proceeding. Never fail silently on a missing file.
+4. Overwrite `memory/checkpoint.md` frontmatter with:
    - status: active
    - skill: <skill>
    - step: <step>
@@ -46,10 +47,10 @@ Steps:
    - estimated_reset_timestamp: <computed>
    - scheduled_resume_id: "" (fill after scheduling)
    - context: <context bag>
-4. Append log line: `<!-- [checkpoint_timestamp] skill=<skill> step=<step> step_index=<step_index> -->`
-5. Call `mcp__scheduled-tasks__create_scheduled_task` to schedule `/prodmasterai resume` at `estimated_reset_timestamp`
-6. If scheduling succeeds: write returned task ID to `scheduled_resume_id` in frontmatter
-7. If scheduling fails (MCP unavailable): leave `scheduled_resume_id: ""`, append log line: `<!-- [checkpoint_timestamp] scheduling failed -- MCP unavailable -->`
+5. Append log line: `<!-- [checkpoint_timestamp] skill=<skill> step=<step> step_index=<step_index> -->`
+6. Call `mcp__scheduled-tasks__create_scheduled_task` to schedule `/prodmasterai resume` at `estimated_reset_timestamp`
+7. If scheduling succeeds: write returned task ID to `scheduled_resume_id` in frontmatter
+8. If scheduling fails (MCP unavailable): leave `scheduled_resume_id: ""`, append log line: `<!-- [checkpoint_timestamp] scheduling failed -- MCP unavailable -->`
 
 ---
 

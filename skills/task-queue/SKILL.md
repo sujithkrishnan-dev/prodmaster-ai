@@ -1,7 +1,7 @@
 ---
 name: task-queue
 description: Sequential task queue — add goals, list queue, run all automatically one after another.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - /prodmasterai queue add
   - /prodmasterai queue list
@@ -84,7 +84,7 @@ If `task-queue.md` does not exist or is empty: *"Queue is empty. Add tasks with 
 Triggered by: `/prodmasterai queue run`, "start queue", "run queue"
 
 1. Read `memory/project-context.md` frontmatter. If `autonomous_session_id` is non-empty: *"Auto-pilot already running (session: [id]). Finish current session first."* Stop.
-2. Read `memory/task-queue.md`. Find the first entry with `status: pending`.
+2. Read `memory/task-queue.md`. If the file does not exist: *"Queue is empty. No pending tasks."* Stop. Otherwise find the first entry with `status: pending`.
 3. If none: *"Queue is empty. No pending tasks."* Stop.
 4. Update that entry in-place: `status: running`, `started_at: <now>`.
 5. Fire `auto-pilot` with that entry's `goal` and record the `session_id`.

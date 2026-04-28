@@ -1,7 +1,7 @@
 ---
 name: dependency-audit
 description: Audit project dependencies for known CVEs. Auto-detects project type (npm, pip, bundler, go modules) and runs the appropriate audit tool. Reports CVEs by severity with fix commands. Writes critical CVEs to security-gate-state.json so the stop-quality-gate blocks session exit until resolved.
-version: 1.0.0
+version: 1.0.1
 triggers:
   - User runs /prodmasterai dependency-audit
   - User says "check dependencies", "audit packages", "check for CVEs", "vulnerable packages"
@@ -104,6 +104,8 @@ go get <module>@<fixed_version>
 ```
 
 If no fix is available (no patched version exists): recommend pinning to the last safe version and note the risk.
+
+Next: `/prodmasterai cso` for full security audit | `/prodmasterai ship` once all CRITICAL CVEs are resolved
 
 ## Rules
 

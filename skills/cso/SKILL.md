@@ -1,7 +1,7 @@
 ---
 name: cso
 description: Security audit — 14-phase infrastructure-first audit covering architecture through STRIDE threat modeling. Two modes (daily/comprehensive). Every finding requires a concrete exploit path, not theoretical risk. Covers supply chain, CI/CD, LLM/AI security, and OWASP Top 10.
-version: 1.1.0
+version: 1.1.1
 argument-hint: "[--daily | --comprehensive]"
 effort: high
 allowed-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
@@ -23,7 +23,6 @@ triggers:
 reads:
   - memory/security-gate-state.json
   - memory/project-context.md
-  - memory/mistakes.md
 writes:
   - memory/security-gate-state.json
   - memory/cso-log.md

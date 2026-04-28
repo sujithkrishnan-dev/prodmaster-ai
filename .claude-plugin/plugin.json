@@ -1,9 +1,31 @@
 {
   "name": "prodmaster-ai",
   "version": "2.1.0",
-  "description": "Full-stack AI development operations for Claude Code. Orchestrate features, run systematic QA, enforce code review, manage deployments, audit security, benchmark performance, cross-model review, generate docs, and self-evolve — all from /prodmasterai.",
+  "description": "The engineering ops layer for Claude Code — one command orchestrates features, QA, code review, deployment, security audits, and performance benchmarks, while the plugin self-improves based on your velocity data.",
   "author": {
-    "name": "sujithkrishnan-dev",
-    "email": ""
-  }
+    "name": "Sujith Krishnan",
+    "email": "sujith.krishnan@techjays.com",
+    "organization": "techjays"
+  },
+  "homepage": "https://github.com/sujithkrishnan-dev/prodmaster-ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "ai-devops",
+    "orchestration",
+    "qa",
+    "code-review",
+    "deployment",
+    "security-audit",
+    "benchmarking",
+    "self-evolving",
+    "productivity"
+  ],
+  "category": "productivity",
+  "skills": "skills/",
+  "hooks": ".claude-plugin/hooks.json"
 }

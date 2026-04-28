@@ -1,8 +1,31 @@
 {
   "name": "prodmaster-ai",
-  "version": "2.0.0",
-  "description": "Meta-orchestration, measurement, and self-evolving intelligence layer for Claude Code.",
-  "author": "sujithkrishnan-dev",
+  "version": "2.1.0",
+  "description": "The engineering ops layer for Claude Code — one command orchestrates features, QA, code review, deployment, security audits, and performance benchmarks, while the plugin self-improves based on your velocity data.",
+  "author": {
+    "name": "Sujith Krishnan",
+    "email": "sujith.krishnan@techjays.com",
+    "organization": "techjays"
+  },
+  "homepage": "https://github.com/sujithkrishnan-dev/prodmaster-ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "ai-devops",
+    "orchestration",
+    "qa",
+    "code-review",
+    "deployment",
+    "security-audit",
+    "benchmarking",
+    "self-evolving",
+    "productivity"
+  ],
+  "category": "productivity",
   "source": {
     "type": "github",
     "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"

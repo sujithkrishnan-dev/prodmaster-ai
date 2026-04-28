@@ -1,6 +1,8 @@
 # ProdMaster AI
 
-> Full-stack AI development operations for Claude Code — one command orchestrates your entire engineering workflow.
+![Version](https://img.shields.io/badge/version-2.1.0-blue) ![License](https://img.shields.io/badge/license-MIT-green) ![Platform](https://img.shields.io/badge/platform-Claude%20Code-orange) ![Skills](https://img.shields.io/badge/skills-31-purple)
+
+> The engineering ops layer for Claude Code — one command orchestrates features, QA, code review, deployment, security audits, and performance benchmarks, while the plugin self-improves based on your velocity data.
 
 **Install:**
 ```bash
@@ -14,21 +16,44 @@ claude plugin install prodmaster-ai@claude-plugins-official
 
 ---
 
-## What It Does
+## Why ProdMaster AI
 
-ProdMaster AI is a meta-orchestration layer for Claude Code. A single command — `/prodmasterai` — reads your current state and routes to the right operation automatically. It covers the full engineering lifecycle: feature planning, implementation, QA, code review, deployment, security auditing, performance benchmarking, and self-evolution.
+Most Claude Code workflows require juggling many commands across many contexts. ProdMaster AI collapses that into one entry point:
 
-The plugin improves itself over time: every N completed tasks it runs a convergence loop, detects skill gaps, and submits upstream PRs with improvements.
+- **`/prodmasterai build auth`** — breaks the feature into tracked parallel tasks, dispatches subtasks, monitors progress
+- **`/prodmasterai qa`** — 11-phase quality check with health scores across 8 categories, atomic fix commits
+- **`/prodmasterai cso`** — 14-phase OWASP + STRIDE security audit, exploit path required for every finding
+- **`/prodmasterai auto <goal>`** — fully autonomous: brainstorm → plan → implement → test → PR, no hand-holding
+
+And then it self-improves: every N tasks the plugin runs a convergence loop, detects skill gaps, and evolves its own skills. Your local improvements can be pushed upstream with `/prodmasterai update`.
+
+---
+
+## Platform Setup
+
+**Windows** — works out of the box (uses `run-hook.cmd` + PowerShell).
+
+**macOS / Linux** — after install, edit `hooks/hooks.json` and `.claude-plugin/hooks.json`, change the SessionStart command to:
+```json
+"command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\" session-start"
+```
+
+Python 3 must be on PATH (default on macOS/Linux) — required for the safety hooks.
 
 ---
 
 ## Quick Start
 
 ```
+/prodmasterai help
+```
+
+Or jump straight in:
+```
 /prodmasterai build user authentication
 ```
 
-That's it. The plugin breaks the feature into tracked tasks, coordinates parallel subtasks, and auto-installs any needed plugins.
+The plugin reads your current state and routes to the right skill — no need to remember command names.
 
 ---
 
@@ -58,7 +83,7 @@ That's it. The plugin breaks the feature into tracked tasks, coordinates paralle
 | `/prodmasterai queue run` | Run all queued tasks sequentially, auto-advance |
 | `/prodmasterai explore <goal>` | Run 2+ approaches in isolated worktrees, pick best by test pass rate |
 | `/prodmasterai auto <goal>` | Fully autonomous: brainstorm → plan → implement → test → PR |
-| `/prodmasterai resume` | Show what auto-pilot did, per-decision review and rollback |
+| `/prodmasterai resume` | Per-decision review and rollback of auto-pilot sessions |
 | `/prodmasterai plugins` | Show installed/available plugins, auto-install when needed |
 | `/prodmasterai cycle done — <summary>` | Record completed cycle, fire measure + learn |
 | `/prodmasterai update` | Push locally evolved improvements upstream via PR |
@@ -106,24 +131,24 @@ That's it. The plugin breaks the feature into tracked tasks, coordinates paralle
 
 ---
 
-## Active Safety Hooks
+## Safety Hooks (4 active)
 
-The plugin installs four hooks that run automatically:
+The plugin installs four hooks that run automatically in every session:
 
 | Hook | Fires on | What it does |
 |---|---|---|
 | `session-start` | Session open | Injects active features, patterns, gaps, open tasks, installed plugins |
 | `pre-tool-bash` | Every Bash call | Blocks: `rm -rf`, force push, `git reset --hard`, `DROP TABLE`, `chmod 777`, pipe-to-shell, base64-to-shell, PATH hijack, AWS key exports |
-| `post-tool-write` | Every Write/Edit | Passive scanner: AWS/GitHub/OpenAI keys, private key material, SQL injection, XSS sinks, unsafe deserialization. Blocks on critical secrets. |
-| `stop-quality-gate` | Claude stop | Blocks session exit when: critical secrets leaked, critical CVEs unfixed, tests failing during ship/deploy |
+| `post-tool-write` | Every Write/Edit | Scans for AWS/GitHub/OpenAI keys, private key material, SQL injection, XSS sinks, unsafe deserialization. Blocks on critical secrets. |
+| `stop-quality-gate` | Session stop | Blocks exit when: critical secrets leaked, critical CVEs unfixed, tests failing during ship/deploy |
 
-All hooks are implemented in pure Python (no external dependencies) and fail open — a hook crash never silently blocks valid work.
+All hooks are pure Python (standard library only, no pip installs). They fail open — a hook crash never silently blocks valid work.
 
 ---
 
 ## Optional Connectors
 
-The plugin supports optional integrations. All are inactive by default and require explicit opt-in:
+All inactive by default. Opt-in by editing the connector file:
 
 | Connector | How to activate |
 |---|---|
@@ -132,17 +157,17 @@ The plugin supports optional integrations. All are inactive by default and requi
 | Linear | Set `active: true` in `memory/connectors/linear.md`, configure MCP server |
 | Superpowers | Set `active: true` in `memory/connectors/superpowers.md` |
 
-Credential files (`slack.md`, `linear.md`) are listed in `.gitignore` and never committed.
+Credential files (`slack.md`, `linear.md`) are in `.gitignore` and never committed.
 
 ---
 
-## External Services
+## External Network Access
 
-The plugin makes no outbound network calls on its own. External network access only occurs when:
+The plugin makes no outbound network calls on its own. External access only occurs when:
 
-- A connector is explicitly activated by the user and a Claude Code MCP server is configured
+- A connector is explicitly activated and a Claude Code MCP server is configured by the user
 - A skill uses Claude Code's built-in `WebSearch` or `WebFetch` tools (user-approved per-call)
-- The `dependency-audit` skill calls package registry APIs to check CVEs (advisory, not automatic)
+- The `dependency-audit` skill queries public package registries to check CVE data
 
 No telemetry. No analytics. No data leaves the machine unless you configure a connector.
 
@@ -150,20 +175,21 @@ No telemetry. No analytics. No data leaves the machine unless you configure a co
 
 ## Memory and State
 
-All state is stored locally in `memory/`. Nothing is sent upstream. Files in `memory/` are excluded from plugin update PRs — your session data, usage logs, and connector configs stay on your machine.
+All state is stored locally in `memory/`. Nothing is sent upstream automatically.
 
-The plugin tracks:
-- `memory/usage-log.md` — per-invocation log (processed locally for auto-session measure)
-- `memory/skill-performance.md` — velocity and quality metrics per cycle
-- `memory/security-gate-state.json` — active security gate state for the stop hook
-- `memory/connectors/` — connector configuration (most files git-ignored)
+| File | Purpose |
+|---|---|
+| `memory/usage-log.md` | Per-invocation log, processed locally for auto-session measure |
+| `memory/skill-performance.md` | Velocity and quality metrics per cycle |
+| `memory/security-gate-state.json` | Active security gate state for the stop hook |
+| `memory/connectors/` | Connector configuration (most files git-ignored) |
 
 ---
 
 ## Requirements
 
 - Claude Code CLI (any recent version)
-- Python 3.8+ (for hooks — standard library only, no pip installs required)
+- Python 3.8+ (standard library only — no pip installs required)
 - Git
 
 ---
@@ -174,14 +200,18 @@ The plugin tracks:
 # From the plugin's own marketplace
 claude plugin install prodmaster-ai@prodmaster-ai-marketplace
 
-# Verify installation
+# Verify
 claude plugin list
-```
 
-After installation, start any session and run:
-```
+# Get started
 /prodmasterai help
 ```
+
+---
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ---
 
@@ -189,5 +219,6 @@ After installation, start any session and run:
 
 MIT — see [LICENSE](LICENSE).
 
-**Author:** sujithkrishnan-dev — sujith.krishnan@techjays.com
+**Author:** Sujith Krishnan — sujith.krishnan@techjays.com
+**Organization:** techjays (https://techjays.com)
 **Repository:** https://github.com/sujithkrishnan-dev/prodmaster-ai

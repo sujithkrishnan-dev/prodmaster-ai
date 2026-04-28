@@ -4,6 +4,27 @@
   "description": "Full-stack AI development operations for Claude Code. Orchestrate features, run systematic QA, enforce code review, manage deployments, audit security, benchmark performance, cross-model review, generate docs, and self-evolve — all from /prodmasterai.",
   "author": {
     "name": "sujithkrishnan-dev",
-    "email": ""
-  }
+    "email": "sujith.krishnan@techjays.com"
+  },
+  "homepage": "https://github.com/sujithkrishnan-dev/prodmaster-ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "ai-devops",
+    "orchestration",
+    "qa",
+    "code-review",
+    "deployment",
+    "security-audit",
+    "benchmarking",
+    "self-evolving",
+    "productivity"
+  ],
+  "category": "productivity",
+  "skills": "skills/",
+  "hooks": ".claude-plugin/hooks.json"
 }

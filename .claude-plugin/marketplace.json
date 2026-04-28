@@ -2,20 +2,34 @@
   "name": "prodmaster-ai-marketplace",
   "owner": {
     "name": "sujithkrishnan-dev",
-    "email": ""
+    "email": "sujith.krishnan@techjays.com"
   },
   "plugins": [
     {
       "name": "prodmaster-ai",
-      "description": "Full-stack AI development operations for Claude Code. One command (/prodmasterai) orchestrates features, systematic QA with health scoring, two-pass code review, deployment pipelines, security audits (14-phase OWASP+STRIDE), performance benchmarking (Core Web Vitals), cross-model adversarial review, post-ship doc sync, and autonomous self-evolution. 20+ skills, all accessible from a single entry point.",
+      "description": "Full-stack AI development operations for Claude Code. One command (/prodmasterai) orchestrates features, systematic QA with health scoring, two-pass code review, deployment pipelines, security audits (14-phase OWASP+STRIDE), performance benchmarking (Core Web Vitals), cross-model adversarial review, post-ship doc sync, and autonomous self-evolution. 31 skills, all accessible from a single entry point.",
       "version": "2.1.0",
       "author": {
         "name": "sujithkrishnan-dev",
-        "email": ""
+        "email": "sujith.krishnan@techjays.com"
       },
       "source": "./",
       "homepage": "https://github.com/sujithkrishnan-dev/prodmaster-ai",
-      "category": "productivity"
+      "repository": "https://github.com/sujithkrishnan-dev/prodmaster-ai.git",
+      "license": "MIT",
+      "category": "productivity",
+      "keywords": [
+        "claude-code",
+        "ai-devops",
+        "orchestration",
+        "qa",
+        "code-review",
+        "deployment",
+        "security-audit",
+        "benchmarking",
+        "self-evolving",
+        "productivity"
+      ]
     }
   ]
 }

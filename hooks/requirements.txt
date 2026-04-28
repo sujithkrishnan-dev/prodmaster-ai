@@ -1,0 +1,6 @@
+# ProdMaster AI hooks use Python standard library only.
+# No external packages required.
+# Minimum Python version: 3.8
+#
+# To run tests:
+#   python -m pytest tests/ -v

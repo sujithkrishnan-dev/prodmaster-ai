@@ -5,35 +5,49 @@ Output format (JSON on stdout, always exit 0):
   - Deny:   {"hookSpecificOutput": {"permissionDecision": "deny", ...}}
   - No opinion: no output (just exit 0)
 """
-import json
 import re
 import sys
 
+from hook_utils import emit, parse_tool_input
+
 BLOCKED_PATTERNS = [
+    # Recursive delete — wipes entire directory trees
     (r"rm\s+-[a-zA-Z]*r", "recursive rm"),
+    # Recursive delete via long flag — same destructive effect as -r
     (r"rm\s+--recursive", "recursive rm (--recursive flag)"),
+    # Force push — rewrites remote history, destroys others' work
     (r"git\s+push\s.*--force", "force push"),
-    (r"git\s+push\s.*\s-[a-zA-Z]*f", "force push"),
+    # Force push short flag — same as --force but harder to spot; matches -f anywhere after push
+    (r"git\s+push\s+[^|;&]*-[a-zA-Z]*f\b", "force push"),
+    # Force branch delete — removes branch regardless of merge status
     (r"git\s+branch\b[^|;&]*-D\b", "force branch delete"),
+    # Hard reset — discards all local commits and staged changes permanently
     (r"git\s+reset\s.*--hard", "git reset --hard"),
+    # Clean with force — deletes all untracked files without confirmation
     (r"git\s+clean\s.*-[a-zA-Z]*f", "git clean -f"),
+    # Checkout/restore dot — silently discards all working-tree changes
     (r"git\s+(checkout|restore)\s+\.\s*($|[;&|])", "discard all changes"),
+    # DROP TABLE/DATABASE/SCHEMA — irreversible data destruction in SQL
     (r"(?i)drop\s+(table|database|schema)", "DROP operation"),
     # Pipe-to-shell: fetching and executing remote code is never safe
     (r"(curl|wget)\s+.*\|\s*(bash|sh|zsh|fish|python3?|ruby|perl|node)", "pipe remote content to shell"),
     # eval with base64-decoded content — common obfuscation technique
     (r"eval\s+.*base64", "eval with encoded payload"),
+    # Base64 decode piped to shell — another obfuscation vector
     (r"base64\s+.*\|\s*(bash|sh|zsh|eval)", "base64 decode to shell"),
     # chmod 777 — world-writable permissions are almost never correct
     (r"chmod\s+777\b", "world-writable chmod 777"),
-    # Package installs from unverified sources (git+http, direct http URLs)
+    # pip install over plain HTTP git URL — bypasses TLS, allows MITM injection
     (r"pip\s+install\s+git\+http://", "pip install from unverified git+http source"),
+    # npm install from raw HTTP URL — bypasses registry integrity checks
     (r"npm\s+install\s+https?://", "npm install from direct HTTP URL"),
-    # Secret key exports in shell — exporting AWS/GCP/private keys inline
+    # AWS secret key export in shell — leaks credentials into process environment
     (r"export\s+AWS_SECRET_ACCESS_KEY\s*=\s*\S+", "AWS secret key export in shell"),
+    # AWS access key export in shell — AKIA prefix confirms real key material
     (r"export\s+AWS_ACCESS_KEY_ID\s*=\s*AKIA\S+", "AWS access key export in shell"),
+    # GCP credentials export in shell — exposes service account key path
     (r"export\s+GOOGLE_APPLICATION_CREDENTIALS\s*=", "GCP credentials export in shell"),
-    # PATH hijacking via /tmp prepend
+    # PATH hijacking via /tmp prepend — allows malicious binaries to shadow system commands
     (r"export\s+PATH\s*=\s*/tmp[/:]", "PATH hijack via /tmp prepend"),
 ]
 
@@ -54,28 +68,10 @@ SAFE_COMMANDS = {
 }
 
 
-def emit(decision, reason=""):
-    """Print hook decision JSON to stdout."""
-    output = {
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": decision,
-            "permissionDecisionReason": reason,
-        }
-    }
-    print(json.dumps(output))
-    sys.exit(0)
-
-
 def parse_command(raw_input):
     """Extract the command string from hook JSON input."""
-    try:
-        data = json.loads(raw_input)
-        # Try both possible input key names
-        tool_input = data.get("tool_input") or data.get("input") or {}
-        return tool_input.get("command", "")
-    except Exception:
-        return ""
+    tool_input = parse_tool_input(raw_input)
+    return tool_input.get("command", "")
 
 
 def split_compound(cmd):
@@ -184,25 +180,30 @@ def main():
         # Check blocked patterns first
         for pattern, label in BLOCKED_PATTERNS:
             if re.search(pattern, command):
-                emit("deny", "%s is not allowed" % label)
+                emit("PreToolUse", "deny", "%s is not allowed" % label)
+                sys.exit(0)
 
         # Allow any python command early (before split_compound mangles -c strings)
         first_word = command.strip().split()[0] if command.strip() else ""
         base = first_word.rsplit("/", 1)[-1]
         if base in ("python", "python3", "pytest"):
-            emit("allow", "python command")
+            emit("PreToolUse", "allow", "python command")
+            sys.exit(0)
 
         # Check all fragments are safe
         fragments = split_compound(command)
         if all(is_safe_fragment(f) for f in fragments):
-            emit("allow", "safe development command")
+            emit("PreToolUse", "allow", "safe development command")
+            sys.exit(0)
 
         # Allow everything else that isn't explicitly blocked above
-        emit("allow", "not a destructive command")
+        emit("PreToolUse", "allow", "not a destructive command")
+        sys.exit(0)
     except SystemExit:
         raise
     except Exception:
-        emit("deny", "hook parse error — command blocked for safety")
+        emit("PreToolUse", "deny", "hook parse error — command blocked for safety")
+        sys.exit(0)
 
 
 if __name__ == "__main__":

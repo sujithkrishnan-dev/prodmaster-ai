@@ -192,6 +192,14 @@ All state is stored locally in `memory/`. Nothing is sent upstream automatically
 - Python 3.8+ (standard library only — no pip installs required)
 - Git
 
+**Skills that require additional tools (optional):**
+| Skill | Tool required |
+|---|---|
+| `ship`, `review`, `deploy` | `gh` (GitHub CLI) |
+| `dependency-audit` | `npm` (for Node projects), `pip` (for Python projects) |
+| `benchmark` | Browser / Lighthouse (auto-detected) |
+| `qa`, `qa-only` | `pytest` or project test runner |
+
 ---
 
 ## Installation

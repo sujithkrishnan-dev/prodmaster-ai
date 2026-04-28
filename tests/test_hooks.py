@@ -1,10 +1,14 @@
 import os, json, subprocess, sys, importlib.util, pytest
+from pathlib import Path
 
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOKS_DIR = os.path.join(PLUGIN_ROOT, "hooks")
 
 def _load_hook():
     """Load pre-tool-bash.py as a module (hyphen in filename requires importlib)."""
+    # Add hooks/ to sys.path so hook_utils is importable during exec_module
+    if HOOKS_DIR not in sys.path:
+        sys.path.insert(0, HOOKS_DIR)
     spec = importlib.util.spec_from_file_location(
         "pre_tool_bash", os.path.join(HOOKS_DIR, "pre-tool-bash.py")
     )
@@ -13,10 +17,11 @@ def _load_hook():
     return mod
 
 def test_hooks_json_exists():
-    assert os.path.exists(os.path.join(HOOKS_DIR, "hooks.json"))
+    # Canonical hooks config lives in .claude-plugin/hooks.json (hooks/hooks.json was removed as duplicate)
+    assert os.path.exists(os.path.join(PLUGIN_ROOT, ".claude-plugin", "hooks.json"))
 
 def test_hooks_json_valid():
-    with open(os.path.join(HOOKS_DIR, "hooks.json")) as f:
+    with open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "hooks.json")) as f:
         data = json.load(f)
     assert "hooks" in data
     assert "SessionStart" in data["hooks"]
@@ -276,12 +281,13 @@ class TestStopQualityGate:
         assert os.path.exists(os.path.join(HOOKS_DIR, "stop-quality-gate.py"))
 
     def test_gate_registered_in_hooks_json(self):
-        with open(os.path.join(HOOKS_DIR, "hooks.json")) as f:
+        # Canonical hooks config is .claude-plugin/hooks.json (hooks/hooks.json removed as duplicate)
+        with open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "hooks.json")) as f:
             data = json.load(f)
         assert "Stop" in data["hooks"], "Stop hook must be registered in hooks.json"
 
     def test_write_hook_registered_in_hooks_json(self):
-        with open(os.path.join(HOOKS_DIR, "hooks.json")) as f:
+        with open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "hooks.json")) as f:
             data = json.load(f)
         assert "PostToolUse" in data["hooks"], "PostToolUse hook must be registered"
         matchers = [h.get("matcher", "") for h in data["hooks"]["PostToolUse"]]
@@ -338,3 +344,11 @@ def test_run_hook_sh_produces_output():
         assert len(result.stdout.strip()) > 20
     except FileNotFoundError:
         pytest.skip("bash not available")
+
+
+def test_windows_hook_files_exist():
+    """Windows hook runner files exist alongside the shell version."""
+    hooks_dir = Path(HOOKS_DIR)
+    assert (hooks_dir / "run-hook.cmd").exists(), "run-hook.cmd missing"
+    assert (hooks_dir / "run-hook.ps1").exists(), "run-hook.ps1 missing"
+    assert (hooks_dir / "run-hook.sh").exists(), "run-hook.sh missing"

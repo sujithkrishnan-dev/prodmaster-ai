@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run tests
+        run: python -m pytest tests/ -v
+
+      - name: Validate JSON files
+        run: |
+          python -m json.tool .claude-plugin/plugin.json > /dev/null
+          python -m json.tool .claude-plugin/marketplace.json > /dev/null
+          python -m json.tool .claude-plugin/hooks.json > /dev/null
+          python -m json.tool claude-plugin.json > /dev/null
+          echo "All JSON files are valid"
+
+      - name: Syntax-check Python hook files
+        run: |
+          python -m py_compile hooks/pre-tool-bash.py
+          python -m py_compile hooks/post-tool-write.py
+          python -m py_compile hooks/stop-quality-gate.py
+          echo "All hook files pass syntax check"
+
+      - name: Check SKILL.md frontmatter
+        run: |
+          python - <<'EOF'
+          import os
+          import sys
+
+          required_fields = {"name", "description"}
+          errors = []
+
+          for root, dirs, files in os.walk("skills"):
+              for fname in files:
+                  if fname == "SKILL.md":
+                      path = os.path.join(root, fname)
+                      with open(path, encoding="utf-8") as f:
+                          content = f.read()
+
+                      if not content.startswith("---"):
+                          errors.append(f"{path}: missing frontmatter (no leading '---')")
+                          continue
+
+                      # Extract frontmatter block
+                      parts = content.split("---", 2)
+                      if len(parts) < 3:
+                          errors.append(f"{path}: malformed frontmatter")
+                          continue
+
+                      frontmatter = parts[1]
+                      found_fields = set()
+                      for line in frontmatter.splitlines():
+                          if ":" in line:
+                              key = line.split(":", 1)[0].strip()
+                              if key:
+                                  found_fields.add(key)
+
+                      missing = required_fields - found_fields
+                      if missing:
+                          errors.append(
+                              f"{path}: missing required frontmatter fields: {missing}"
+                          )
+
+          if errors:
+              for e in errors:
+                  print(f"ERROR: {e}", file=sys.stderr)
+              sys.exit(1)
+
+          print(f"All SKILL.md files have required frontmatter fields.")
+          EOF

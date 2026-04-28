@@ -8,9 +8,10 @@ Output (JSON on stdout, always exit 0):
   - Block:    {"hookSpecificOutput": {"permissionDecision": "block", ...}}
   - Clean:    no output (silent)
 """
-import json
 import re
 import sys
+
+from hook_utils import emit as _emit_hook, parse_tool_input
 
 # Patterns that would be blocked by the installed security-guidance hook if written
 # as plain string literals are assembled here at runtime so this file is not
@@ -148,14 +149,7 @@ def scan_content(content, file_path):
 
 
 def emit(decision, reason):
-    output = {
-        "hookSpecificOutput": {
-            "hookEventName": "PostToolUse",
-            "permissionDecision": decision,
-            "permissionDecisionReason": reason,
-        }
-    }
-    print(json.dumps(output))
+    _emit_hook("PostToolUse", decision, reason)
 
 
 def format_warning(findings, file_path):
@@ -167,25 +161,12 @@ def format_warning(findings, file_path):
     return "\n".join(parts)
 
 
-def parse_input(raw_input):
-    try:
-        data = json.loads(raw_input)
-        tool_input = data.get("tool_input") or data.get("input") or {}
-        file_path = tool_input.get("file_path") or tool_input.get("path") or ""
-        content = (
-            tool_input.get("content")
-            or tool_input.get("new_string")
-            or ""
-        )
-        return file_path, content
-    except Exception:
-        return "", ""
-
-
 def main():
     try:
         raw_input = sys.stdin.read()
-        file_path, content = parse_input(raw_input)
+        tool_input = parse_tool_input(raw_input)
+        file_path = tool_input.get("file_path") or tool_input.get("path") or ""
+        content = tool_input.get("content") or tool_input.get("new_string") or ""
 
         if not content:
             sys.exit(0)

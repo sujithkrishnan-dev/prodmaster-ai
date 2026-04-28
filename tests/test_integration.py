@@ -6,7 +6,7 @@ PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def test_all_required_files_exist():
     required = [
         ".claude-plugin/plugin.json",
-        "hooks/hooks.json", "hooks/run-hook.cmd", "hooks/run-hook.sh",
+        ".claude-plugin/hooks.json", "hooks/run-hook.cmd", "hooks/run-hook.sh",
         "hooks/run-hook.ps1", "hooks/session-start.md",
         "skills/orchestrate/SKILL.md", "skills/measure/SKILL.md",
         "skills/report/SKILL.md", "skills/decide/SKILL.md",
@@ -38,7 +38,7 @@ def test_all_required_files_exist():
     assert not missing, "Missing files:\n" + "\n".join(missing)
 
 def test_all_json_valid():
-    for f in [".claude-plugin/plugin.json", "hooks/hooks.json"]:
+    for f in [".claude-plugin/plugin.json", ".claude-plugin/hooks.json", ".claude-plugin/marketplace.json", "claude-plugin.json"]:
         path = os.path.join(PLUGIN_ROOT, f)
         try:
             json.load(open(path))
@@ -53,7 +53,7 @@ def test_all_skill_frontmatter():
         p = os.path.join(skills_dir, name, "SKILL.md")
         if not os.path.exists(p):
             failures.append(f"skills/{name}/SKILL.md missing"); continue
-        c = open(p).read()
+        c = open(p, encoding="utf-8").read()
         if not c.startswith("---"):
             failures.append(f"skills/{name}/SKILL.md: no frontmatter"); continue
         for f in required:

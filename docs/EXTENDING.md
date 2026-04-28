@@ -184,6 +184,24 @@ Generated skills have `generated: true` and `generated_from: <gap-id>` in their 
 
 ---
 
+## Design documents
+
+Implementation plans and feature specs live in:
+- [docs/superpowers/plans/](superpowers/plans/) — feature implementation plans
+- [docs/superpowers/specs/](superpowers/specs/) — design specs
+
+---
+
+## Plugin manifests
+
+Two manifest files exist:
+- `.claude-plugin/plugin.json` — read by Claude Code's plugin loader (canonical for hooks, skills path)
+- `claude-plugin.json` (root) — read by some marketplace tools (includes source/GitHub info)
+
+Both must have the same `version`. If you bump the version, update both files.
+
+---
+
 ## File layout reference
 
 ```

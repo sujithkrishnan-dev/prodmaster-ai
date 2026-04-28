@@ -16,6 +16,8 @@ import json
 import os
 import sys
 
+from hook_utils import emit
+
 DEFAULT_STATE_FILE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "memory",
@@ -77,22 +79,11 @@ def check_gate(state_file=None):
     return {"allow": True, "reason": ""}
 
 
-def emit_block(reason):
-    output = {
-        "hookSpecificOutput": {
-            "hookEventName": "Stop",
-            "permissionDecision": "block",
-            "permissionDecisionReason": reason,
-        }
-    }
-    print(json.dumps(output))
-
-
 def main():
     try:
         result = check_gate()
         if not result["allow"]:
-            emit_block(result["reason"])
+            emit("Stop", "block", result["reason"])
         # allow = silent (no output)
     except SystemExit:
         raise
